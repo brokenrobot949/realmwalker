@@ -247,6 +247,134 @@
   .modal-items{ font-size:0.85rem; color:var(--parchment-dim); margin-top:0.5rem; max-height:120px; overflow-y:auto; }
   .modal-actions{ text-align:center; margin-top:1.2rem; }
   .modal-warning{ color:#e08080; font-size:0.85rem; margin:0.8rem 0; }
+  .wb-rest-note{ text-align:center; color:var(--green); font-size:0.9rem; margin-top:0.6rem; font-style:italic; }
+  .wb-content-note{ text-align:center; color:var(--gold-bright); font-size:0.9rem; margin-top:0.6rem; }
+  #cr-outcome{ text-align:center; font-family:Georgia,'Times New Roman',serif; font-size:1.2rem; margin-bottom:0.4rem; }
+
+  /* ================= TABS ================= */
+  .tab-row{ display:flex; gap:0.5rem; }
+  .tab-btn{
+    background:var(--panel); border:1px solid var(--panel-border); border-bottom:none;
+    color:var(--parchment-dim); padding:0.55rem 1.3rem; border-radius:8px 8px 0 0;
+    cursor:pointer; font-family:Georgia,'Times New Roman',serif; font-size:0.95rem;
+  }
+  .tab-btn.active{ background:var(--bg-2); color:var(--gold-bright); border-color:var(--gold-dim); }
+  .tab-btn:hover:not(.active){ color:var(--gold); }
+  .tab-panel{ }
+
+  /* ================= INJURY / REST / BUFFS ================= */
+  .injury-row{ display:flex; align-items:center; gap:1rem; margin-top:0.7rem; flex-wrap:wrap; }
+  .injury-status{ font-size:0.9rem; font-weight:bold; }
+  .injury-status.injury-ok{ color:var(--green); }
+  .injury-status.injury-warn{ color:var(--gold); }
+  .injury-status.injury-bad{ color:var(--red); }
+  .rest-actions{ display:flex; gap:0.5rem; flex-wrap:wrap; }
+  .rest-countdown{ font-size:0.85rem; color:var(--parchment-dim); }
+
+  .buff-row{ display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.5rem; }
+  .buff-chip{
+    font-size:0.75rem; background:var(--bg-1); border:1px solid var(--panel-border);
+    border-radius:10px; padding:0.2rem 0.6rem; color:var(--gold);
+  }
+
+  /* ================= EQUIPMENT / GEAR ================= */
+  .equipment-list{ display:flex; flex-direction:column; gap:0.4rem; }
+  .equip-slot-row{
+    display:flex; justify-content:space-between; align-items:center; gap:0.6rem; flex-wrap:wrap;
+    background:var(--bg-1); border:1px solid var(--panel-border); border-radius:6px;
+    padding:0.4rem 0.65rem; font-size:0.85rem;
+  }
+  .equip-slot-label{ color:var(--text-muted); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em; min-width:60px; }
+  .equip-slot-empty{ color:var(--text-muted); font-style:italic; flex:1; }
+  .equip-slot-item{ flex:1; }
+  .equip-slot-power{ font-size:0.78rem; color:var(--parchment-dim); }
+
+  .inv-meta{ color:var(--text-muted); font-size:0.75rem; margin-left:0.5rem; }
+  .inv-row-main{ display:flex; flex-direction:column; }
+  .inv-actions{ display:flex; gap:0.4rem; align-items:center; }
+
+  /* ================= TOWN HUB ================= */
+  .town-grid{ display:grid; grid-template-columns:1fr 1fr; gap:1rem; align-items:start; }
+  @media (max-width:900px){ .town-grid{ grid-template-columns:1fr; } }
+  .shop-list, .blacksmith-list, .tavern-list{
+    display:flex; flex-direction:column; gap:0.5rem; max-height:340px; overflow-y:auto; padding-right:0.3rem;
+  }
+  .shop-item, .blacksmith-item{
+    display:flex; justify-content:space-between; align-items:center; gap:0.6rem; flex-wrap:wrap;
+    background:var(--bg-1); border:1px solid var(--panel-border); border-radius:6px; padding:0.5rem 0.7rem; font-size:0.85rem;
+  }
+  .shop-restock{ font-size:0.78rem; color:var(--text-muted); margin-bottom:0.6rem; }
+  .medic-row{
+    display:flex; justify-content:space-between; align-items:center; gap:0.8rem;
+    background:var(--bg-1); border:1px solid var(--panel-border); border-radius:6px;
+    padding:0.6rem 0.8rem; margin-bottom:0.5rem; font-size:0.9rem; flex-wrap:wrap;
+  }
+  .tavern-item{
+    display:flex; flex-direction:column; gap:0.25rem;
+    background:var(--bg-1); border:1px solid var(--panel-border); border-radius:6px; padding:0.6rem 0.8rem; font-size:0.85rem;
+  }
+  .tavern-name{ color:var(--gold-bright); font-family:Georgia,'Times New Roman',serif; }
+
+  /* ================= ADVENTURE SUB-TABS ================= */
+  .adv-subtab-row{ display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.9rem; border-bottom:1px solid var(--panel-border); padding-bottom:0.6rem; }
+  .subtab-btn{
+    background:var(--bg-1); border:1px solid var(--panel-border); color:var(--parchment-dim);
+    padding:0.35rem 0.9rem; border-radius:14px; cursor:pointer;
+    font-family:Georgia,'Times New Roman',serif; font-size:0.85rem;
+  }
+  .subtab-btn.active{ background:linear-gradient(180deg, #2a2314, var(--bg-1)); color:var(--gold-bright); border-color:var(--gold-dim); }
+  .subtab-btn:hover:not(.active){ color:var(--gold); border-color:var(--gold-dim); }
+
+  /* ================= TIMED CONTENT / QUESTS / ARENA ================= */
+  .content-flavor{ font-style:italic; color:var(--parchment-dim); font-size:0.8rem; margin-top:0.15rem; }
+  .content-band{ font-size:0.78rem; }
+  .content-countdown{ color:var(--gold); font-size:0.85rem; }
+  .quest-chapter-done{
+    display:flex; align-items:center; gap:0.5rem; background:var(--bg-1);
+    border:1px solid var(--panel-border); border-radius:8px; padding:0.45rem 1rem;
+    color:var(--text-muted); font-size:0.85rem;
+  }
+  .quest-chapter-done .check{ color:var(--green); }
+  .quest-chapter-locked{
+    background:var(--bg-1); border:1px dashed var(--panel-border); border-radius:8px;
+    padding:0.45rem 1rem; color:var(--text-muted); font-size:0.85rem; opacity:0.6;
+  }
+  .quest-current{
+    background:var(--bg-1); border:1px solid var(--gold-dim); border-radius:8px; padding:0.8rem 1rem;
+  }
+  .quest-current h4{ margin:0 0 0.35rem 0; }
+  .quest-intro{ font-style:italic; color:var(--parchment-dim); font-size:0.85rem; margin-bottom:0.6rem; line-height:1.45; }
+  .quest-story{ font-style:italic; color:var(--parchment-dim); font-size:0.9rem; line-height:1.5; margin:0.8rem 0; max-height:180px; overflow-y:auto; }
+
+  .arena-status-grid{ display:grid; grid-template-columns:1fr 1fr; gap:0.4rem 1rem; margin:0.7rem 0; font-size:0.9rem; }
+  .arena-status-grid .k{ color:var(--parchment-dim); }
+  .arena-status-grid .v{ color:var(--gold-bright); text-align:right; }
+  .arena-monster{
+    text-align:center; font-family:Georgia,'Times New Roman',serif; font-size:1.1rem; color:var(--gold-bright);
+    background:var(--bg-1); border:1px solid var(--panel-border); border-radius:8px; padding:0.7rem; margin:0.7rem 0;
+  }
+  .arena-monster .sub{ font-size:0.8rem; color:var(--parchment-dim); font-family:'Segoe UI',sans-serif; margin-top:0.25rem; }
+  .arena-actions{ display:flex; gap:0.6rem; justify-content:center; margin:0.8rem 0; }
+  .arena-combat-log{ display:flex; flex-direction:column; gap:0.3rem; margin-top:0.6rem; }
+  .arena-combat-log .line{ font-size:0.8rem; color:var(--parchment-dim); border-left:2px solid var(--panel-border); padding-left:0.5rem; }
+  .arena-note{ font-size:0.82rem; color:var(--green); margin:0.4rem 0; }
+
+  /* ================= RENOWN ================= */
+  .renown-title-line{ font-family:Georgia,'Times New Roman',serif; color:var(--gold-bright); font-size:1.05rem; margin-bottom:0.35rem; }
+  .renown-progress-label{ display:flex; justify-content:space-between; font-size:0.78rem; color:var(--parchment-dim); margin:0.4rem 0 0.25rem; }
+  .renown-bonus-list{ font-size:0.78rem; color:var(--parchment-dim); margin-top:0.5rem; }
+  .renown-bonus-list .b{ color:var(--green); }
+
+  /* ================= EVOLUTION ================= */
+  .evolution-banner{
+    display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap;
+    background:linear-gradient(180deg, #2e2410, #1d1708);
+    border:1px solid var(--gold); border-radius:10px; padding:0.8rem 1.2rem;
+    box-shadow:0 0 18px rgba(212,175,55,0.25);
+    font-family:Georgia,'Times New Roman',serif; color:var(--gold-bright); font-size:1.05rem;
+  }
+  .evo-card .skills{ font-size:0.78rem; color:var(--blue); margin-top:0.4rem; }
+  .evo-card .perks{ font-size:0.8rem; color:var(--green); margin-top:0.4rem; }
 
   footer.version-tag{ text-align:center; color:var(--text-muted); font-size:0.72rem; margin-top:1rem; }
 </style>
@@ -280,7 +408,7 @@
         <div id="creation-error"></div>
       </div>
     </div>
-    <footer class="version-tag">Realmwalker v1</footer>
+    <footer class="version-tag">Realmwalker v2</footer>
   </div>
 
   <!-- ============================================================
@@ -306,6 +434,15 @@
           </div>
           <div class="xp-bar-bg"><div class="xp-bar-fill" id="xp-bar-fill" style="width:0%"></div></div>
         </div>
+        <div class="injury-row">
+          <span class="injury-status" id="injury-status"></span>
+          <div class="rest-actions" id="rest-actions">
+            <button class="btn small secondary" id="rest-short-btn">Short Rest (4h)</button>
+            <button class="btn small secondary" id="rest-long-btn">Long Rest (8h)</button>
+          </div>
+          <div class="rest-countdown hidden" id="rest-countdown"></div>
+        </div>
+        <div class="buff-row" id="buff-row"></div>
       </div>
 
       <div class="settings-corner">
@@ -316,29 +453,101 @@
       </div>
     </div>
 
-    <div class="main-grid">
-      <div class="panel">
-        <h3>Training Zones</h3>
-        <div class="activity-banner">
-          <div>
-            <div class="label">Currently</div>
-            <div class="value" id="activity-value">Idle</div>
+    <div class="tab-row">
+      <button class="tab-btn active" id="tab-btn-adventure" data-tab="adventure">Adventure</button>
+      <button class="tab-btn" id="tab-btn-town" data-tab="town">Town</button>
+    </div>
+
+    <div id="evolution-banner" class="evolution-banner hidden">
+      <span id="evolution-banner-text">Evolution awaits.</span>
+      <button class="btn" id="evolution-open-btn">Choose your path</button>
+    </div>
+
+    <div id="adventure-tab" class="tab-panel">
+      <div class="main-grid">
+        <div class="panel">
+          <div class="activity-banner">
+            <div>
+              <div class="label">Currently</div>
+              <div class="value" id="activity-value">Idle</div>
+            </div>
+            <button class="btn secondary small" id="stop-training-btn">Stop training</button>
           </div>
-          <button class="btn secondary small" id="stop-training-btn">Stop training</button>
+          <div class="adv-subtab-row">
+            <button class="subtab-btn active" data-subtab="training">Training</button>
+            <button class="subtab-btn" data-subtab="dungeons">Dungeons</button>
+            <button class="subtab-btn" data-subtab="raids">Raids</button>
+            <button class="subtab-btn" data-subtab="quests">Quests</button>
+            <button class="subtab-btn" data-subtab="arena">Arena</button>
+          </div>
+          <div id="adv-training" class="adv-subpanel">
+            <h3>Training Zones</h3>
+            <div id="zone-list" class="zone-list"></div>
+          </div>
+          <div id="adv-dungeons" class="adv-subpanel hidden">
+            <h3>Dungeons</h3>
+            <div id="dungeon-list" class="zone-list"></div>
+          </div>
+          <div id="adv-raids" class="adv-subpanel hidden">
+            <h3>Raids</h3>
+            <div id="raid-list" class="zone-list"></div>
+          </div>
+          <div id="adv-quests" class="adv-subpanel hidden">
+            <h3>Quests</h3>
+            <div id="quest-list" class="zone-list"></div>
+          </div>
+          <div id="adv-arena" class="adv-subpanel hidden">
+            <h3>The Arena</h3>
+            <div id="arena-body"></div>
+          </div>
         </div>
-        <div id="zone-list" class="zone-list"></div>
+
+        <div class="side-col">
+          <div class="panel">
+            <h3>Renown</h3>
+            <div id="renown-body"></div>
+          </div>
+
+          <div class="panel">
+            <h3>Equipped Gear</h3>
+            <div id="equipment-list" class="equipment-list"></div>
+          </div>
+
+          <div class="panel">
+            <h3>Inventory</h3>
+            <div id="inventory-list" class="inventory-list"></div>
+            <div class="inv-note">Equip gear to raise your power, or sell it to the shop for gold.</div>
+          </div>
+
+          <div class="panel">
+            <h3>Chronicle</h3>
+            <div id="log-list" class="log-list"></div>
+          </div>
+        </div>
       </div>
+    </div>
 
-      <div class="side-col">
-        <div class="panel">
-          <h3>Inventory</h3>
-          <div id="inventory-list" class="inventory-list"></div>
-          <div class="inv-note">Trophies for now &mdash; equipping gear arrives in a future update.</div>
+    <div id="town-tab" class="tab-panel hidden">
+      <div class="town-grid">
+        <div class="panel" id="shop-panel">
+          <h3>Shop</h3>
+          <div class="shop-restock" id="shop-restock-label"></div>
+          <div id="shop-list" class="shop-list"></div>
         </div>
 
-        <div class="panel">
-          <h3>Chronicle</h3>
-          <div id="log-list" class="log-list"></div>
+        <div class="panel" id="blacksmith-panel">
+          <h3>Blacksmith</h3>
+          <div id="blacksmith-list" class="blacksmith-list"></div>
+        </div>
+
+        <div class="panel" id="medic-panel">
+          <h3>Medic</h3>
+          <div id="medic-body"></div>
+        </div>
+
+        <div class="panel" id="tavern-panel">
+          <h3>Tavern</h3>
+          <div id="tavern-list" class="tavern-list"></div>
         </div>
       </div>
     </div>
@@ -358,7 +567,45 @@
         <div class="k">Items found</div><div class="v" id="wb-item-count"></div>
       </div>
       <div id="wb-items" class="modal-items"></div>
+      <div id="wb-content-note" class="wb-content-note hidden"></div>
+      <div id="wb-rest-note" class="wb-rest-note hidden"></div>
       <div class="modal-actions"><button class="btn" id="wb-close-btn">Continue your journey</button></div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       CONTENT RESULT MODAL (dungeon / raid / quest resolution)
+  ============================================================ -->
+  <div id="content-result-modal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3 id="cr-title"></h3>
+      <div id="cr-outcome"></div>
+      <div id="cr-story" class="quest-story hidden"></div>
+      <div class="modal-stat-grid">
+        <div class="k">Experience gained</div><div class="v" id="cr-xp"></div>
+        <div class="k">Gold gained</div><div class="v" id="cr-gold"></div>
+        <div class="k">Renown earned</div><div class="v" id="cr-renown"></div>
+        <div class="k">Items recovered</div><div class="v" id="cr-item-count"></div>
+      </div>
+      <div id="cr-items" class="modal-items"></div>
+      <div id="cr-injury" class="modal-warning hidden" style="text-align:center;"></div>
+      <div class="modal-actions"><button class="btn" id="cr-close-btn">Continue</button></div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       EVOLUTION CHOICE MODAL
+  ============================================================ -->
+  <div id="evolution-modal" class="modal-overlay hidden">
+    <div class="modal-box" style="max-width:760px;">
+      <h3 id="evo-modal-title">Evolution awaits</h3>
+      <p id="evo-modal-sub" style="text-align:center; color:var(--parchment-dim); margin-top:0;"></p>
+      <div id="evo-options" class="card-grid" style="grid-template-columns:1fr 1fr;"></div>
+      <div class="modal-warning" style="text-align:center;">This choice is permanent and cannot be undone.</div>
+      <div class="modal-actions" style="display:flex; gap:0.6rem; justify-content:center;">
+        <button class="btn secondary" id="evo-cancel-btn">Not yet</button>
+        <button class="btn" id="evo-confirm-btn" disabled>Confirm path</button>
+      </div>
     </div>
   </div>
 
@@ -393,7 +640,7 @@
 
 <script>
 /* ================================================================
-   REALMWALKER v1
+   REALMWALKER v2
    Section map: DATA, STATE, MODIFIERS, SAVE/LOAD, GAME LOOP,
                 OFFLINE, UI, EVENT WIRING, BOOT
 ================================================================ */
@@ -404,7 +651,7 @@
 
 const SAVE_KEY = "realmwalker_save";
 const SAVE_KEY_CORRUPT = "realmwalker_save_corrupt";
-const SAVE_VERSION = 1;
+const SAVE_VERSION = 3;
 
 const RACES = {
   human: {
@@ -420,7 +667,7 @@ const RACES = {
     name: "Dwarf",
     flavor: "Stone-tough and stubborn. A dwarf's grudge outlives most kingdoms.",
     bonusText: "-20% injury chance",
-    bonusInert: "injuries arrive in a future update",
+    bonusInert: null,
     injuryReduction: 0.20
   },
   elf: {
@@ -428,7 +675,7 @@ const RACES = {
     name: "Elf",
     flavor: "Ancient and attuned to the deep currents of magic.",
     bonusText: "+10% power for magical classes",
-    bonusInert: "rest time reduction arrives in a future update",
+    bonusInert: null,
     magicPowerMult: 1.10,
     restReduction: 0.10
   },
@@ -436,8 +683,8 @@ const RACES = {
     id: "orc",
     name: "Orc",
     flavor: "Bred for battle, restless without a fight to pick.",
-    bonusText: "+10% power for martial classes",
-    bonusInert: "the extra Arena fight arrives in a future update",
+    bonusText: "+10% power for martial classes, +1 safe Arena fight",
+    bonusInert: null,
     martialPowerMult: 1.10,
     extraArenaFights: 1
   },
@@ -454,7 +701,7 @@ const RACES = {
     name: "Tiefling",
     flavor: "Silver-tongued, with a bargain for every occasion.",
     bonusText: "+10% gold from all sources",
-    bonusInert: "the 10% cheaper shop prices arrive in a future update",
+    bonusInert: null,
     goldMult: 1.10,
     shopDiscount: 0.10
   }
@@ -513,6 +760,328 @@ const ITEM_NAMES = [
   "Idol", "Coin", "Band", "Fang", "Bauble", "Emblem", "Rune Stone", "Feather"
 ];
 
+/* ---- v2: gear, equipment, town hub data ---- */
+
+const SLOTS = ["weapon", "helm", "armor", "gloves", "boots", "relic"];
+
+// Item power range by tier, before zone-tier scaling.
+const POWER_RANGES = {
+  common:    [2, 4],
+  uncommon:  [5, 9],
+  rare:      [12, 18],
+  epic:      [25, 35],
+  legendary: [50, 70]
+};
+
+// Relic bonus keys feed the matching central modifier function.
+const RELIC_BOOST_KEYS = ["xpMult", "goldMult", "dropMult"];       // values >1 are good
+const RELIC_REDUCE_KEYS = ["injuryChanceMult", "restTimeMult"];    // values <1 are good
+const RELIC_BONUS_KEYS = RELIC_BOOST_KEYS.concat(RELIC_REDUCE_KEYS);
+const RELIC_BOOST_BY_TIER  = { common:1.02, uncommon:1.04, rare:1.06, epic:1.09, legendary:1.12 };
+const RELIC_REDUCE_BY_TIER = { common:0.98, uncommon:0.96, rare:0.93, epic:0.90, legendary:0.88 };
+const RELIC_LABELS = {
+  xpMult: "XP", goldMult: "Gold", dropMult: "Drop Chance",
+  injuryChanceMult: "Injury Chance", restTimeMult: "Rest Time"
+};
+
+const SELL_VALUE_BY_TIER = { common:10, uncommon:30, rare:100, epic:300, legendary:1000 };
+const SHOP_PRICE_MULT = 5;
+
+const ITEM_NAMES_V2 = {
+  weapon_sword: ["Longsword", "Broadsword", "Falchion", "Cutlass", "Bastard Sword", "Executioner's Blade", "Duelist's Rapier", "Zweihander", "Hookfang Saber", "Widow-Edge"],
+  weapon_bow: ["Hunting Bow", "Recurve Bow", "Longbow", "Warbow", "Bone Bow", "Ashwood Bow", "Hornbow", "Deadfall Bow", "Ravenwing Bow", "Widowmaker Bow"],
+  weapon_staff: ["Oak Staff", "Bonestaff", "Warden's Staff", "Ashen Staff", "Runed Staff", "Grave Staff", "Starlight Staff", "Hollow Staff", "Thornstaff", "Deathwhisper Staff"],
+  helm: ["Leather Cap", "Iron Helm", "Barbute", "Great Helm", "Skull Cage", "Warden's Helm", "Horned Helm", "Death Mask", "Hollow Crown", "Sable Visor"],
+  armor: ["Padded Jerkin", "Chainmail", "Scale Hauberk", "Plate Cuirass", "Ashen Mail", "Bonecage Armor", "Warden's Plate", "Blackened Cuirass", "Grave Shroud", "Kingsguard Plate"],
+  gloves: ["Leather Gloves", "Iron Gauntlets", "Padded Grips", "Warden's Gauntlets", "Bonewoven Gloves", "Cinder Gauntlets", "Grave Wraps", "Talon Gauntlets", "Hollow Handguards", "Kingsblood Gauntlets"],
+  boots: ["Worn Boots", "Iron Greaves", "Traveler's Boots", "Warden's Greaves", "Ashwalker Boots", "Bonecage Greaves", "Silent Treads", "Gravehopper Boots", "Hollow Striders", "Kingsroad Boots"],
+  relic: ["Ember of the First Fire", "Shard of a Broken Vow", "The Widow's Coin", "Locket of the Unremembered", "Splinter of the Shattered Peaks", "The Last Watchman's Bell", "Coil of the Hollow Choir", "Tooth of the Sleeping King", "Ash from an Unlit Pyre", "The Beggar-Saint's Ring"]
+};
+
+// Weapon-name drops stay driven by the BASE class's weapon category,
+// even after evolutions change the displayed class/weapon text.
+const CLASS_WEAPON_CATEGORY = { squire: "weapon_sword", scout: "weapon_bow", apprentice: "weapon_staff" };
+
+// Injuries
+const MAX_INJURIES = 2;
+
+// Rest
+const REST_SHORT_MS = 4 * 60 * 60 * 1000;
+const REST_LONG_MS = 8 * 60 * 60 * 1000;
+
+// Shop
+const SHOP_STOCK_SIZE = 4;
+const SHOP_RESTOCK_INTERVAL_MS = 6 * 60 * 60 * 1000;
+
+// Blacksmith
+const BLACKSMITH_MAX_UPGRADE = 5;
+const BLACKSMITH_BASE_COST = 100;
+const BLACKSMITH_COST_GROWTH = 3;
+const BLACKSMITH_TIER_COST_MULT = { common:1, uncommon:2, rare:4, epic:8, legendary:16 };
+const BLACKSMITH_UPGRADE_POWER_STEP = 0.2; // +20% of base power per upgrade level
+
+// Medic
+const MEDIC_HEAL_COST_PER_LEVEL = 50;
+const MEDIC_CUT_COST_PER_LEVEL = 25;
+
+// Tavern — temporary buffs. One active per effect key; rebuying refreshes duration.
+const TAVERN_BUFFS = [
+  { id: "emberroot_ale", name: "Emberroot Ale", flavor: "A slow-burning brew that keeps a hero sharp long after the fire's gone out.", durationMin: 60, effect: { key: "xpMult", value: 1.10 }, cost: 500 },
+  { id: "gilded_mead", name: "Gilded Mead", flavor: "Sweet, expensive, and known to loosen the purse-strings of anyone selling to you.", durationMin: 90, effect: { key: "goldMult", value: 1.15 }, cost: 900 },
+  { id: "foxglove_tonic", name: "Foxglove Tonic", flavor: "Bitter and faintly poisonous; drinkers swear it sharpens their eye for anything worth stealing.", durationMin: 90, effect: { key: "dropMult", value: 1.20 }, cost: 1400 },
+  { id: "widows_brew", name: "Widow's Brew", flavor: "Named for the tavern-keeper who claims it's kept her burying fewer regulars than she should.", durationMin: 120, effect: { key: "injuryChanceMult", value: 0.80 }, cost: 2000 }
+];
+
+/* ---- v2 phase 2: evolutions, timed content, renown, arena ---- */
+
+const EVOLUTIONS = {
+  /* ---------------- TIER 2 (levelReq 25) ---------------- */
+  knight: {
+    id: "knight", name: "Knight", parentId: "squire", tier: 2, levelReq: 25,
+    type: "martial", weapon: "Longsword & Kite Shield",
+    flavor: "Discipline hardens into doctrine; the squire's oath becomes a wall nothing walks through twice.",
+    skillNames: ["Shield Wall", "Oath Strike", "Bulwark Stance"],
+    perks: { powerMult: 1.09 }
+  },
+  berserker: {
+    id: "berserker", name: "Berserker", parentId: "squire", tier: 2, levelReq: 25,
+    type: "martial", weapon: "Twin Battleaxes",
+    flavor: "The squire's restraint burns away, leaving only the swing and the roar beneath it.",
+    skillNames: ["Reckless Fury", "Bloodletting Swing", "Warpath Roar"],
+    perks: { powerMult: 1.10 }
+  },
+  ranger: {
+    id: "ranger", name: "Ranger", parentId: "scout", tier: 2, levelReq: 25,
+    type: "martial", weapon: "Recurve Bow & Hunting Knife",
+    flavor: "The scout's quiet patience sharpens into a hunter's certainty — every shot already decided.",
+    skillNames: ["Hunter's Mark", "Piercing Volley", "Trailsense"],
+    perks: { xpMult: 1.08 }
+  },
+  thief: {
+    id: "thief", name: "Thief", parentId: "scout", tier: 2, levelReq: 25,
+    type: "martial", weapon: "Twin Daggers",
+    flavor: "Where the scout reads a room, the thief reads a mark, and neither ever sees them leave.",
+    skillNames: ["Shadow Step", "Cutpurse Strike", "Vanishing Trick"],
+    perks: { goldMult: 1.10 }
+  },
+  mage: {
+    id: "mage", name: "Mage", parentId: "apprentice", tier: 2, levelReq: 25,
+    type: "magical", weapon: "Runed Staff",
+    flavor: "The apprentice's fumbling sparks become a controlled, hungry fire.",
+    skillNames: ["Arcane Bolt", "Mind Ward", "Kindling Surge"],
+    perks: { powerMult: 1.08 }
+  },
+  acolyte: {
+    id: "acolyte", name: "Acolyte", parentId: "apprentice", tier: 2, levelReq: 25,
+    type: "magical", weapon: "Warstaff & Prayer Beads",
+    flavor: "The apprentice trades raw power for something steadier — a whispered rite, a borrowed grace.",
+    skillNames: ["Mending Light", "Ward of Faith", "Bound Spirit"],
+    perks: { restTimeMult: 0.92 }
+  },
+
+  /* ---------------- TIER 3 (levelReq 60) ---------------- */
+  paladin: {
+    id: "paladin", name: "Paladin", parentId: "knight", tier: 3, levelReq: 60,
+    type: "martial", weapon: "Longsword & Sacred Aegis",
+    flavor: "The knight's oath calcifies into something holy and unbending — a wall that heals as it holds. Where lesser blades tire, the paladin's faith does not.",
+    skillNames: ["Aegis of Dawn", "Judgment's Edge", "Sacred Bulwark"],
+    perks: { powerMult: 1.18, injuryChanceMult: 0.85, restTimeMult: 0.95 }
+  },
+  dragoon: {
+    id: "dragoon", name: "Dragoon", parentId: "knight", tier: 3, levelReq: 60,
+    type: "martial", weapon: "Lance & Wyvernplate",
+    flavor: "The knight abandons the shield wall for the open sky, closing distances other classes are still marching across. No fortress outruns a dragoon.",
+    skillNames: ["Skyfall Lance", "Wyvern's Stride", "Piercing Descent"],
+    perks: { timerMult: 0.80, powerMult: 1.08 }
+  },
+  warlord: {
+    id: "warlord", name: "Warlord", parentId: "berserker", tier: 3, levelReq: 60,
+    type: "martial", weapon: "Greataxe & Battle Standard",
+    flavor: "The berserker's fury is tempered into command — a voice that turns a mob of the frightened into a line that holds.",
+    skillNames: ["Rally the Line", "Banner of Iron", "Executioner's Decree"],
+    perks: { powerMult: 1.15, rewardMult: 1.10 }
+  },
+  raider: {
+    id: "raider", name: "Raider", parentId: "berserker", tier: 3, levelReq: 60,
+    type: "martial", weapon: "Twin Cleavers",
+    flavor: "The berserker sheds even the pretense of caution, trading safety for plunder with both hands. Raiders come home richer, and more often bloodied.",
+    skillNames: ["Bloodfrenzy", "Reckless Cleave", "No Quarter"],
+    perks: { injuryChanceMult: 1.30, rewardMult: 1.25, powerMult: 1.10 }
+  },
+  beastmaster: {
+    id: "beastmaster", name: "Beastmaster", parentId: "ranger", tier: 3, levelReq: 60,
+    type: "martial", weapon: "Recurve Bow & Bonded Companion",
+    flavor: "The ranger's solitary hunt becomes a pack hunt — a bonded creature at their side that finds what the eye alone would miss.",
+    skillNames: ["Call of the Pack", "Savage Bond", "Feral Pursuit"],
+    perks: { powerMult: 1.10, dropMult: 1.10 }
+  },
+  sharpshooter: {
+    id: "sharpshooter", name: "Sharpshooter", parentId: "ranger", tier: 3, levelReq: 60,
+    type: "martial", weapon: "Warbow",
+    flavor: "The ranger narrows their whole world to a single point down-range. A sharpshooter's arrow arrives before the target finishes deciding it's afraid.",
+    skillNames: ["Deadeye Volley", "Longshot", "Piercing Silence"],
+    perks: { powerMult: 1.25, injuryChanceMult: 0.95 }
+  },
+  assassin: {
+    id: "assassin", name: "Assassin", parentId: "thief", tier: 3, levelReq: 60,
+    type: "martial", weapon: "Twin Blackened Daggers",
+    flavor: "The thief's opportunism sharpens into doctrine: the first strike is the only one that should matter. Assassins are paid in silence and in coin.",
+    skillNames: ["First Blood", "Garrote", "Death's Whisper"],
+    perks: { powerMult: 1.15, rewardMult: 1.15, goldMult: 1.05 }
+  },
+  shadowdancer: {
+    id: "shadowdancer", name: "Shadowdancer", parentId: "thief", tier: 3, levelReq: 60,
+    type: "martial", weapon: "Shadow-woven Daggers",
+    flavor: "The thief steps halfway into the dark between worlds, borrowing enough shadow-magic to stop existing exactly when a blade arrives.",
+    skillNames: ["Umbral Step", "Veil of Night", "Twin Shadows"],
+    perks: { injuryChanceMult: 0.85, powerMult: 1.10, dropMult: 1.08 }
+  },
+  archmage: {
+    id: "archmage", name: "Archmage", parentId: "mage", tier: 3, levelReq: 60,
+    type: "magical", weapon: "Arcane Staff",
+    flavor: "The mage stops channeling power and starts commanding it outright — ley lines bend to their intent rather than their effort.",
+    skillNames: ["Arcane Cataclysm", "Ley Line Surge", "Runeshatter"],
+    perks: { powerMult: 1.25, xpMult: 1.05 }
+  },
+  warlock: {
+    id: "warlock", name: "Warlock", parentId: "mage", tier: 3, levelReq: 60,
+    type: "magical", weapon: "Pact-bound Grimoire",
+    flavor: "The mage's hunger for power finds a patron willing to sell it, at a price paid in favors, in years, in things warlocks have stopped naming aloud.",
+    skillNames: ["Soulbind Pact", "Hex of Ruin", "Black Tithe"],
+    perks: { goldMult: 1.20, powerMult: 1.08, injuryChanceMult: 1.10 }
+  },
+  cleric: {
+    id: "cleric", name: "Cleric", parentId: "acolyte", tier: 3, levelReq: 60,
+    type: "magical", weapon: "Warstaff & Holy Symbol",
+    flavor: "The acolyte's borrowed grace becomes a font of their own — wounds close faster, and the line between healer and healed blurs.",
+    skillNames: ["Radiant Mercy", "Sanctified Ground", "Wounds Undone"],
+    perks: { restTimeMult: 0.75, injuryChanceMult: 0.80, powerMult: 1.05 }
+  },
+  necromancer: {
+    id: "necromancer", name: "Necromancer", parentId: "acolyte", tier: 3, levelReq: 60,
+    type: "magical", weapon: "Bone Scepter",
+    flavor: "The acolyte's quiet rites turn toward older, colder gods, and the necromancer stops fighting alone — the dead are patient company, and they do not tire.",
+    skillNames: ["Grave Call", "Bone Legion", "Wither Touch"],
+    perks: { powerMult: 1.15, dropMult: 1.05, xpMult: 1.05 }
+  }
+};
+
+const DUNGEONS = [
+  { id: "ashen_crypt", name: "The Ashen Crypt", flavor: "A collapsed mausoleum on the Millbrook road, its dead restless since the roof came down.", durationMin: 15, difficulty: 40, levelReq: 1, xp: 260, gold: 130, renown: 3, dropRolls: 2, dropTierBonus: 0 },
+  { id: "wolfsbane_hollow", name: "Wolfsbane Hollow", flavor: "A poisoned dell where the wolves stopped dying and started waiting.", durationMin: 20, difficulty: 65, levelReq: 6, xp: 850, gold: 420, renown: 4, dropRolls: 2, dropTierBonus: 0 },
+  { id: "drowned_chapel", name: "The Drowned Chapel", flavor: "A chapel the marsh swallowed whole, its bell still ringing when the water goes still.", durationMin: 25, difficulty: 100, levelReq: 12, xp: 2100, gold: 1050, renown: 5, dropRolls: 3, dropTierBonus: 1 },
+  { id: "gallows_hill", name: "Gallows Hill", flavor: "Executions stopped here a century ago; the gallows never got the message.", durationMin: 30, difficulty: 150, levelReq: 20, xp: 4800, gold: 2400, renown: 6, dropRolls: 3, dropTierBonus: 1 },
+  { id: "emberfall_catacombs", name: "Emberfall Catacombs", flavor: "Beneath the ruins, tunnels the old empire dug for reasons no one wrote down.", durationMin: 40, difficulty: 210, levelReq: 30, xp: 12000, gold: 6000, renown: 8, dropRolls: 3, dropTierBonus: 1 },
+  { id: "cinder_maw", name: "The Cinder Maw", flavor: "A fissure of permanent fire at Emberfall's heart, said to breathe like something alive.", durationMin: 45, difficulty: 290, levelReq: 38, xp: 19800, gold: 9900, renown: 10, dropRolls: 4, dropTierBonus: 2 },
+  { id: "frostbound_vault", name: "Frostbound Vault", flavor: "A treasury sealed in ice long before anyone alive was born, still guarding what it was told to guard.", durationMin: 55, difficulty: 370, levelReq: 50, xp: 42000, gold: 21000, renown: 13, dropRolls: 4, dropTierBonus: 2 },
+  { id: "shattered_throne", name: "The Shattered Throne", flavor: "The Peaks' broken summit hides a throne room that was never meant to be found again.", durationMin: 60, difficulty: 450, levelReq: 60, xp: 50000, gold: 25000, renown: 16, dropRolls: 4, dropTierBonus: 2 }
+];
+
+const RAIDS = [
+  { id: "siege_of_thornwood_keep", name: "Siege of Thornwood Keep", flavor: "A ruined keep retaken by something organized enough to post sentries.", durationMin: 120, difficulty: 120, levelReq: 15, xp: 15700, gold: 7850, renown: 21, dropRolls: 4, dropTierBonus: 1 },
+  { id: "the_sunken_court", name: "The Sunken Court", flavor: "A drowned noble house beneath the Marsh, holding court for guests who never leave.", durationMin: 150, difficulty: 250, levelReq: 30, xp: 67000, gold: 33500, renown: 35, dropRolls: 5, dropTierBonus: 2 },
+  { id: "the_ember_conclave", name: "The Ember Conclave", flavor: "A gathering of the Hollow Choir's faithful, deep in Emberfall's burning heart.", durationMin: 200, difficulty: 400, levelReq: 45, xp: 167000, gold: 83500, renown: 46, dropRolls: 5, dropTierBonus: 3 },
+  { id: "the_shattered_vigil", name: "The Shattered Vigil", flavor: "What's left of an army that marched into the Peaks and forgot to march back out.", durationMin: 240, difficulty: 550, levelReq: 60, xp: 204000, gold: 102000, renown: 58, dropRolls: 6, dropTierBonus: 3 }
+];
+
+const QUEST_CHAPTERS = [
+  {
+    id: "ch1_empty_road", chapter: 1, title: "The Empty Road",
+    intro: "Warden Mira Ashcombe flags you down at the Millbrook crossroads, dust still settling behind her horse. Three merchant caravans have missed their dates on the road to Thornwood, and her riders have found nothing — not a wheel track past a certain bend, not a body, not a clue.",
+    outro: "You find the fourth caravan exactly where the others vanished: horses tethered and calm, cargo untouched, and not a single person left to claim it. Mira crouches by the wheel and goes quiet for a long moment. \"Something took them without taking anything else,\" she says. \"That's worse than bandits.\"",
+    mission: { name: "Walk the Vanishing Road", durationMin: 20, difficulty: 35, xp: 460, gold: 230, renown: 5 }
+  },
+  {
+    id: "ch2_marks_in_mud", chapter: 2, title: "Marks in the Mud",
+    intro: "Mira asks you to walk the vanishing-point again, this time on hands and knees. Somewhere in that stretch of road, whatever happened left a sign — she's certain of it, and she hates being certain of things she can't explain.",
+    outro: "Pressed into the drying mud past the tree line: a symbol, deliberate and old, scratched by more than one set of hands. Mira doesn't recognize it, but she knows someone who might — a hermit scholar who left Thornwood decades ago and never came back.",
+    mission: { name: "Tracks Before Dawn", durationMin: 25, difficulty: 55, xp: 1440, gold: 720, renown: 6 }
+  },
+  {
+    id: "ch3_hermits_warning", chapter: 3, title: "The Hermit's Warning",
+    intro: "Aldric Vane lives alone at the edge of Thornwood, surrounded by books he swears are the only honest company he's found in forty years. He looks at your rubbing of the symbol for a long time before he speaks.",
+    outro: "\"The Hollow Choir,\" Aldric says finally, like the words cost him something. \"A cult I thought the Church burned out a lifetime ago. They don't kill their converts, Warden — they collect them.\" He agrees to help, on the condition that no one calls it retirement.",
+    mission: { name: "The Hermit's Archive", durationMin: 30, difficulty: 80, xp: 3030, gold: 1515, renown: 8 }
+  },
+  {
+    id: "ch4_tithe_road", chapter: 4, title: "The Tithe Road",
+    intro: "Aldric's research points to a cult waystation past Cragside, where the missing are gathered before being moved onward. Mira wants it burned to the ground. Aldric wants it questioned first.",
+    outro: "The waystation gives up both answers: crude ledgers tracking a \"tithe,\" and a terrified robed acolyte who claims the tithes are all walked toward one destination. He won't say the name of it without shaking. He doesn't have to — you already know which direction he's pointing.",
+    mission: { name: "Raid the Waystation", durationMin: 35, difficulty: 110, xp: 5550, gold: 2775, renown: 10 }
+  },
+  {
+    id: "ch5_marsh_keeps", chapter: 5, title: "What the Marsh Keeps",
+    intro: "The tithe road cuts through the Sunken Marsh, where a caravan of the missing is said to be moving under guard tonight. Mira insists on riding with you this time; Aldric, for once, doesn't argue.",
+    outro: "You free one survivor from the marsh column — an old woman who won't stop describing \"a door that breathes\" somewhere beneath the Peaks. Mira wraps a blanket around her shoulders and won't meet your eyes. She's starting to believe this is bigger than a cult.",
+    mission: { name: "The Marsh Column", durationMin: 45, difficulty: 150, xp: 10800, gold: 5400, renown: 13 }
+  },
+  {
+    id: "ch6_unmade_king", chapter: 6, title: "The Unmade King",
+    intro: "Aldric finally tells the story he's clearly been avoiding: before the Peaks were shattered, they crowned a king named Kaeloth, who bargained with something older than the mountains to escape his own death. The mountains broke soon after. Kaeloth did not.",
+    outro: "\"The Choir doesn't worship a memory,\" Aldric says, closing the last of his books. \"They worship a king who is still, technically, alive. And they mean to wake him properly.\" For the first time since you've known him, he looks afraid of his own research.",
+    mission: { name: "Beneath the Old Crown", durationMin: 50, difficulty: 195, xp: 19500, gold: 9750, renown: 16 }
+  },
+  {
+    id: "ch7_cinders_secrets", chapter: 7, title: "Cinders and Secrets",
+    intro: "The Hollow Choir keeps a stronghold burning quietly inside Emberfall Ruins. Mira wants a look at their ritual calendar before deciding whether to bring the full Wardenry down on the place.",
+    outro: "The calendar you recover marks a completion date in the language of moons and tides, and it isn't far off. Worse, it names a location the Choir calls the Threshold — a name Aldric recognizes from older, uglier texts as the seam where Kaeloth was sealed.",
+    mission: { name: "The Choir's Calendar", durationMin: 60, difficulty: 250, xp: 33000, gold: 16500, renown: 20 }
+  },
+  {
+    id: "ch8_wardens_price", chapter: 8, title: "The Warden's Price",
+    intro: "Mira rides ahead to scout the pass into the Peaks alone, against every piece of advice you and Aldric can offer her. She doesn't return by nightfall.",
+    outro: "You find her alive but broken-boned, disarmed by something she describes only as \"faster than it should have been able to move.\" She grips your arm before you leave without her. \"Finish it,\" she says. \"Don't wait for me to heal first.\"",
+    mission: { name: "Recover the Warden", durationMin: 70, difficulty: 320, xp: 50700, gold: 25350, renown: 25 }
+  },
+  {
+    id: "ch9_into_the_peaks", chapter: 9, title: "Into the Shattered Peaks",
+    intro: "Alone now but for Aldric's letters of guidance, you climb into the Peaks toward the Threshold, where the Hollow Choir's high priest is already mid-ritual, chanting Kaeloth's unmade name into the dark.",
+    outro: "The ritual breaks apart around you — chants cut short, the high priest silenced, the gathered Choir scattered or worse. But the seam beneath the mountain has already cracked open, and something vast and patient exhales through it before the stone grinds shut again.",
+    mission: { name: "The Threshold Ritual", durationMin: 80, difficulty: 400, xp: 81300, gold: 40650, renown: 32 }
+  },
+  {
+    id: "ch10_sleeper_stirs", chapter: 10, title: "The Sleeper Stirs",
+    intro: "With the Threshold sealed but not repaired, Aldric insists on one final descent to confirm Kaeloth is still bound. Mira, healed enough to travel, refuses to let you go down there without her.",
+    outro: "The seal holds — for now. But the chamber beneath the Peaks is emptier than it should be, and the impression left in ancient stone is shaped like a throne with no one sitting in it. Mira asks if you noticed the footprints leading away from it, and out, toward the lowlands. Neither of you has an answer yet.",
+    mission: { name: "What the Throne Remembers", durationMin: 90, difficulty: 500, xp: 136000, gold: 68000, renown: 40 }
+  }
+];
+
+const RENOWN_MILESTONES = [
+  { threshold: 0, title: "the Unproven", bonus: { key: "xpMult", value: 1.00 }, bonusText: "No bonus yet — reputation is earned, not given." },
+  { threshold: 10, title: "the Known", bonus: { key: "dropMult", value: 1.03 }, bonusText: "+3% item drop chance" },
+  { threshold: 30, title: "the Blooded", bonus: { key: "injuryChanceMult", value: 0.97 }, bonusText: "-3% injury chance" },
+  { threshold: 75, title: "the Notorious", bonus: { key: "goldMult", value: 1.05 }, bonusText: "+5% gold from all sources" },
+  { threshold: 150, title: "the Celebrated", bonus: { key: "xpMult", value: 1.05 }, bonusText: "+5% XP from all sources" },
+  { threshold: 300, title: "the Renowned", bonus: { key: "restTimeMult", value: 0.95 }, bonusText: "-5% rest time" },
+  { threshold: 600, title: "the Feared", bonus: { key: "injuryChanceMult", value: 0.93 }, bonusText: "-7% injury chance" },
+  { threshold: 1200, title: "the Legendary", bonus: { key: "dropMult", value: 1.08 }, bonusText: "+8% item drop chance" },
+  { threshold: 2500, title: "the Undying", bonus: { key: "goldMult", value: 1.10 }, bonusText: "+10% gold from all sources" }
+];
+
+const ARENA_MONSTERS = {
+  prefixes: ["Rabid", "Feral", "Blighted", "Hollow", "Gaunt", "Wretched", "Ashen", "Ravenous", "Corpse-fed", "Moon-touched", "Iron-jawed", "Plague-marked"],
+  names: ["Marsh Ghoul", "Bog Wraith", "Crag Wolf", "Barrow Hound", "Root Widow", "Thistle Imp", "Mire Stalker", "Grave Moth", "Tallow Beast", "Cairn Crawler", "Fen Serpent", "Husk Revenant", "Bramble Fiend", "Cinder Jackal", "Salt Ghast", "Widow's Kin", "Rot Antler", "Chalk Wisp", "Gallows Crow", "Stone Grub"],
+  epithets: ["Eater of Lanterns", "Breaker of Oaths", "Bringer of Frost", "the Unburied", "Who Walks Backward", "Keeper of the Empty Cup", "the Second Shadow", "Who Counts the Dead", "the Bell That Doesn't Ring", "Wearer of Borrowed Faces"]
+};
+
+// Timed content (dungeons / raids / quests) tuning.
+const CONTENT_INJURY_CHANCE_SUCCESS = 0.10;   // × getInjuryChanceMultiplier
+const CONTENT_INJURY_CHANCE_FAILURE = 0.60;   // × getInjuryChanceMultiplier
+const CONTENT_FAILURE_REWARD_FRACTION = 0.30; // failure pays 30% xp/gold, no renown, no drops
+const QUEST_DROP_ROLLS = 2;                   // quest missions carry no dropRolls in data
+const QUEST_DROP_TIER_BONUS = 1;
+
+// Arena tuning.
+const ARENA_MONSTER_POWER_BASE = 0.6;    // monster power = hero power × (base + step × fightNumber)
+const ARENA_MONSTER_POWER_STEP = 0.12;
+const ARENA_XP_ZONE_FRACTION = 0.15;     // xp per win ≈ zone xp/hour × this × fightNumber
+const ARENA_INJURY_CHANCE_BASE = 0.04;   // injury roll after a win: (base + step × fightNumber) × injury mult
+const ARENA_INJURY_CHANCE_STEP = 0.03;
+const ARENA_RENOWN_FIGHT_INTERVAL = 3;   // +1 banked renown per this many fights won
+const ARENA_EPITHET_INTERVAL = 5;        // every Nth fight's monster carries an epithet
+const ARENA_COMBAT_LOG_LINES = 6;
+
 /* ================================================================
    STATE
 ================================================================ */
@@ -521,6 +1090,10 @@ let state = null; // set on boot: { hero, activity, inventory, log, lastTick }
 let tickHandle = null;
 let autosaveHandle = null;
 
+function createEmptyEquipment(){
+  return { weapon:null, helm:null, armor:null, gloves:null, boots:null, relic:null };
+}
+
 function createNewHero(name, raceId, classId){
   return {
     name: name,
@@ -528,7 +1101,12 @@ function createNewHero(name, raceId, classId){
     classId: classId,
     level: 1,
     xp: 0,
-    gold: 0
+    gold: 0,
+    injuries: 0,
+    equipment: createEmptyEquipment(),
+    buffs: [],
+    renown: 0,       // lifetime prestige — never decreases, never spent
+    evolutions: []   // chosen evolution ids in order, e.g. ["knight","dragoon"]
   };
 }
 
@@ -538,6 +1116,8 @@ function createDefaultState(name, raceId, classId){
     activity: { type: "idle", zoneId: null, startedAt: Date.now(), dropAccumulatorMs: 0 },
     inventory: [],
     log: [],
+    shop: { stock: [], nextRestockAt: 0 },
+    questProgress: 0, // number of completed story chapters (0-10)
     lastTick: Date.now()
   };
 }
@@ -553,11 +1133,102 @@ function xpNeeded(level){
 function getRace(hero){ return RACES[hero.raceId]; }
 function getClass(hero){ return CLASSES[hero.classId]; }
 
+/* ---- evolutions ---- */
+
+function getEvolutionDefs(hero){
+  return (hero.evolutions || []).map(id => EVOLUTIONS[id]).filter(Boolean);
+}
+
+// The hero's current class identity: the last chosen evolution, or the
+// base class if none. Both shapes carry name/type/weapon; evolutions
+// additionally carry perks/skillNames/flavor.
+function getCurrentClassInfo(hero){
+  const evos = getEvolutionDefs(hero);
+  return evos.length > 0 ? evos[evos.length - 1] : getClass(hero);
+}
+
+// Only the CURRENT evolution's perks apply — tier-3 perk values are
+// authored as stage totals that supersede the tier-2 stage (Paladin's
+// powerMult 1.18 replaces Knight's 1.09; they do not stack).
+function getEvolutionPerkMult(hero, key){
+  const cur = getCurrentClassInfo(hero);
+  return (cur.perks && cur.perks[key]) ? cur.perks[key] : 1;
+}
+
+// Which evolution tier (2 or 3) the hero is currently eligible to
+// choose, or null if none is pending.
+function pendingEvolutionTier(hero){
+  const evos = hero.evolutions || [];
+  if (evos.length === 0 && hero.level >= 25) return 2;
+  if (evos.length === 1 && hero.level >= 60) return 3;
+  return null;
+}
+
+// The two evolution options for the pending tier: tier 2 branches off
+// the base class, tier 3 off the chosen tier-2 evolution.
+function evolutionOptions(hero){
+  const tier = pendingEvolutionTier(hero);
+  if (!tier) return [];
+  const parentId = tier === 2 ? hero.classId : hero.evolutions[0];
+  return Object.values(EVOLUTIONS).filter(e => e.tier === tier && e.parentId === parentId);
+}
+
+/* ---- renown ---- */
+
+function getRenownMilestonesReached(hero){
+  const renown = hero.renown || 0;
+  return RENOWN_MILESTONES.filter(m => renown >= m.threshold);
+}
+
+function getRenownTitle(hero){
+  const reached = getRenownMilestonesReached(hero);
+  return reached.length > 0 ? reached[reached.length - 1].title : RENOWN_MILESTONES[0].title;
+}
+
+function getNextRenownMilestone(hero){
+  const renown = hero.renown || 0;
+  return RENOWN_MILESTONES.find(m => renown < m.threshold) || null;
+}
+
+// Cumulative: every reached milestone's bonus applies, each feeding the
+// central multiplier function matching its key.
+function getRenownBonusMult(hero, key){
+  let mult = 1;
+  getRenownMilestonesReached(hero).forEach(m => {
+    if (m.bonus && m.bonus.key === key) mult *= m.bonus.value;
+  });
+  return mult;
+}
+
+function heroDisplayName(hero){
+  return hero.name + " " + getRenownTitle(hero);
+}
+
+// A relic's bonus only applies while it's equipped, and only feeds the
+// modifier function matching its key. Neutral (1) if no relic, or the
+// equipped relic's bonus key doesn't match.
+function getRelicBonusMult(hero, key){
+  const relic = hero.equipment && hero.equipment.relic;
+  if (relic && relic.bonus && relic.bonus.key === key) return relic.bonus.value;
+  return 1;
+}
+
+// Product of all active temporary buffs matching key. Buffs are pruned
+// elsewhere (pruneExpiredBuffs); this just multiplies whatever remains.
+function getBuffMultiplier(hero, key){
+  let mult = 1;
+  (hero.buffs || []).forEach(b => { if (b.key === key) mult *= b.value; });
+  return mult;
+}
+
 function getXpMultiplier(hero){
   let mult = 1;
   const race = getRace(hero);
   if (race.xpMult) mult *= race.xpMult;
-  // future systems (renown, buffs, gear) extend here
+  mult *= getRelicBonusMult(hero, "xpMult");
+  mult *= getBuffMultiplier(hero, "xpMult");
+  mult *= getEvolutionPerkMult(hero, "xpMult");
+  mult *= getRenownBonusMult(hero, "xpMult");
   return mult;
 }
 
@@ -565,6 +1236,10 @@ function getGoldMultiplier(hero){
   let mult = 1;
   const race = getRace(hero);
   if (race.goldMult) mult *= race.goldMult;
+  mult *= getRelicBonusMult(hero, "goldMult");
+  mult *= getBuffMultiplier(hero, "goldMult");
+  mult *= getEvolutionPerkMult(hero, "goldMult");
+  mult *= getRenownBonusMult(hero, "goldMult");
   return mult;
 }
 
@@ -572,22 +1247,147 @@ function getDropChanceMultiplier(hero){
   let mult = 1;
   const race = getRace(hero);
   if (race.dropChanceMult) mult *= race.dropChanceMult;
+  mult *= getRelicBonusMult(hero, "dropMult");
+  mult *= getBuffMultiplier(hero, "dropMult");
+  mult *= getEvolutionPerkMult(hero, "dropMult");
+  mult *= getRenownBonusMult(hero, "dropMult");
+  return mult;
+}
+
+// Lower is better — multiplies the base chance of gaining an injury.
+// Dungeons/raids/quests/arena roll against this before calling addInjury().
+function getInjuryChanceMultiplier(hero){
+  let mult = 1;
+  const race = getRace(hero);
+  if (race.injuryReduction) mult *= (1 - race.injuryReduction);
+  mult *= getRelicBonusMult(hero, "injuryChanceMult");
+  mult *= getBuffMultiplier(hero, "injuryChanceMult");
+  mult *= getEvolutionPerkMult(hero, "injuryChanceMult"); // Raider 1.30, Cleric 0.80, ...
+  mult *= getRenownBonusMult(hero, "injuryChanceMult");
+  return mult;
+}
+
+// Lower is better — multiplies rest duration.
+function getRestTimeMultiplier(hero){
+  let mult = 1;
+  const race = getRace(hero);
+  if (race.restReduction) mult *= (1 - race.restReduction);
+  mult *= getRelicBonusMult(hero, "restTimeMult");
+  mult *= getEvolutionPerkMult(hero, "restTimeMult"); // Cleric 0.75, Acolyte 0.92, ...
+  mult *= getRenownBonusMult(hero, "restTimeMult");
+  return mult;
+}
+
+// Lower is better — multiplies dungeon/raid/quest durations.
+function getTimerMultiplier(hero){
+  let mult = 1;
+  mult *= getEvolutionPerkMult(hero, "timerMult"); // Dragoon 0.80
+  return mult;
+}
+
+// Multiplies xp/gold payouts from dungeons, raids, quests, and the Arena
+// (applied on top of the regular xp/gold multipliers).
+function getRewardMultiplier(hero){
+  let mult = 1;
+  mult *= getEvolutionPerkMult(hero, "rewardMult"); // Raider 1.25, Assassin 1.15, Warlord 1.10
+  return mult;
+}
+
+// Number of early Arena fights with no post-win injury roll.
+function getArenaExtraFights(hero){
+  const race = getRace(hero);
+  let n = race.extraArenaFights || 0; // Orc 1
+  const cur = getCurrentClassInfo(hero);
+  if (cur.perks && cur.perks.arenaExtraFights) n += cur.perks.arenaExtraFights;
+  return n;
+}
+
+// Lower is better — multiplies shop/blacksmith prices.
+function getShopPriceMultiplier(hero){
+  let mult = 1;
+  const race = getRace(hero);
+  if (race.shopDiscount) mult *= (1 - race.shopDiscount);
+  // future systems (renown) extend here
   return mult;
 }
 
 function getPowerMultiplier(hero){
   let mult = 1;
   const race = getRace(hero);
-  const cls = getClass(hero);
+  // Racial power bonuses key off the CURRENT class's type (a shadowdancer
+  // is still martial, a necromancer still magical — see EVOLUTIONS types).
+  const cls = getCurrentClassInfo(hero);
   if (cls.type === "magical" && race.magicPowerMult) mult *= race.magicPowerMult;
   if (cls.type === "martial" && race.martialPowerMult) mult *= race.martialPowerMult;
-  // future systems (gear, injuries, renown) extend here
+  mult *= getEvolutionPerkMult(hero, "powerMult");
   return mult;
+}
+
+// Displayed/effective power of a gear item after blacksmith upgrades.
+function displayItemPower(item){
+  return Math.round(item.power * (1 + BLACKSMITH_UPGRADE_POWER_STEP * (item.upgradeLevel || 0)));
 }
 
 function computePower(hero){
   const base = 10 + hero.level * 5;
-  return Math.round(base * getPowerMultiplier(hero));
+  let gearPower = 0;
+  SLOTS.forEach(slot => {
+    const item = hero.equipment && hero.equipment[slot];
+    if (item) gearPower += displayItemPower(item);
+  });
+  return Math.round((base + gearPower) * getPowerMultiplier(hero));
+}
+
+/* ================================================================
+   SUCCESS FORMULA  (dungeons, raids, quests, arena fights)
+================================================================ */
+
+// Success chance from the power ratio (hero power / content difficulty,
+// or hero power / monster power in the Arena):
+//
+//   chance = clamp(0.05, 0.95, 0.70 * ratio^1.675)
+//
+// Smooth and monotonically increasing in ratio, with the two anchor
+// points: exactly 70% at ratio 1.0, and exactly 95% at ratio 1.2 (the
+// exponent is ln(0.95/0.70)/ln(1.2) ≈ 1.675, so the curve hits the cap
+// precisely there and clamps to 95% for every ratio above). The floor
+// clamp keeps hopeless attempts at 5% instead of 0.
+function successChance(ratio){
+  if (!(ratio > 0)) return 0.05;
+  return Math.min(0.95, Math.max(0.05, 0.70 * Math.pow(ratio, 1.675)));
+}
+
+/* ================================================================
+   XP / RENOWN AWARDS  (shared by training, timed content, arena)
+================================================================ */
+
+// Adds xp and runs the level-up loop (handles multiple levels at once).
+// Returns the number of levels gained.
+function grantXp(hero, xp){
+  hero.xp += xp;
+  let levels = 0;
+  while (hero.xp >= xpNeeded(hero.level)){
+    hero.xp -= xpNeeded(hero.level);
+    hero.level += 1;
+    levels += 1;
+    addLog("Reached level " + hero.level + "!", "levelup");
+  }
+  return levels;
+}
+
+// Renown is earned ONLY from dungeons, raids, quests, and the Arena —
+// never from training. It never decreases and is never spent. Crossing
+// a milestone logs a celebratory entry; the bonus applies immediately
+// because the getRenownBonusMult reads hero.renown live.
+function awardRenown(hero, amount){
+  if (!amount || amount <= 0) return;
+  const before = hero.renown || 0;
+  hero.renown = before + amount;
+  RENOWN_MILESTONES.forEach(m => {
+    if (m.threshold > 0 && before < m.threshold && hero.renown >= m.threshold){
+      addLog("Word of your deeds spreads — " + hero.name + " is now known as \"" + m.title + "\"! (" + m.bonusText + ")", "levelup");
+    }
+  });
 }
 
 /* ================================================================
@@ -597,6 +1397,33 @@ function computePower(hero){
 function addLog(message, type){
   state.log.unshift({ t: Date.now(), msg: message, type: type || "system" });
   if (state.log.length > MAX_LOG_ENTRIES) state.log.length = MAX_LOG_ENTRIES;
+}
+
+/* ================================================================
+   INJURIES
+   Nothing in phase 1 inflicts injuries during normal play — this is
+   the hook phase 2 content (dungeons/raids/quests/arena) will call.
+================================================================ */
+
+// Increments hero.injuries (capped at MAX_INJURIES), logs it, and — if
+// this pushes the hero to the cap — interrupts whatever they're doing
+// back to idle (rest is the only thing left available to them).
+function addInjury(hero, sourceLabel){
+  const before = hero.injuries || 0;
+  hero.injuries = Math.min(MAX_INJURIES, before + 1);
+  addLog(hero.name + " suffers an injury" + (sourceLabel ? " (" + sourceLabel + ")" : "") + ".", "system");
+
+  if (hero.injuries >= MAX_INJURIES && before < MAX_INJURIES){
+    if (state.activity.type === "training"){
+      const zone = ZONES.find(z => z.id === state.activity.zoneId);
+      addLog("Badly hurt, " + hero.name + " stumbles back from " + (zone ? zone.name : "the field") + "!", "system");
+    } else if (state.activity.type !== "rest" && state.activity.type !== "idle"){
+      addLog("Badly hurt, " + hero.name + " is forced to stop.", "system");
+    }
+    if (state.activity.type !== "rest"){
+      state.activity = { type:"idle", zoneId:null, startedAt: Date.now(), dropAccumulatorMs: 0 };
+    }
+  }
 }
 
 /* ================================================================
@@ -619,16 +1446,101 @@ function rollItemTier(zoneTier){
   return ITEM_TIERS[0];
 }
 
-function rollItem(zone){
-  const tier = rollItemTier(zone.tier);
-  const name = ITEM_NAMES[Math.floor(Math.random() * ITEM_NAMES.length)];
-  return {
+// Highest zone tier the hero currently qualifies for — used to bias
+// shop stock and legacy-item migration toward the hero's power level.
+function zoneTierForHero(hero){
+  let tier = 1;
+  ZONES.forEach(z => { if (hero.level >= z.levelReq) tier = z.tier; });
+  return tier;
+}
+
+function rollGearName(slot, hero){
+  const list = slot === "weapon"
+    ? ITEM_NAMES_V2[CLASS_WEAPON_CATEGORY[hero.classId]]
+    : ITEM_NAMES_V2[slot];
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+// Relic names are full item names ("The Widow's Coin"), not prefixes, so
+// relics display without the tier prepended; other gear shows "Tier Name".
+function itemDisplayName(item){
+  return item.slot === "relic" ? item.name : item.tierName + " " + item.name;
+}
+
+function computeItemPower(tierId, zoneTier){
+  const range = POWER_RANGES[tierId] || POWER_RANGES.common;
+  const base = range[0] + Math.random() * (range[1] - range[0]);
+  const scaled = base * (1 + 0.15 * (zoneTier - 1));
+  return Math.max(1, Math.round(scaled));
+}
+
+function rollRelicBonus(tierId){
+  const key = RELIC_BONUS_KEYS[Math.floor(Math.random() * RELIC_BONUS_KEYS.length)];
+  const value = RELIC_BOOST_KEYS.indexOf(key) !== -1 ? RELIC_BOOST_BY_TIER[tierId] : RELIC_REDUCE_BY_TIER[tierId];
+  return { key: key, value: value };
+}
+
+// Builds a fresh gear item of the given tier/zoneTier for hero (weapon
+// names match the hero's class). Used by drops, shop stock, and save migration.
+function rollGearItem(tier, zoneTier, hero){
+  const slot = SLOTS[Math.floor(Math.random() * SLOTS.length)];
+  const item = {
     id: "item_" + Date.now() + "_" + Math.floor(Math.random()*100000),
-    name: name,
+    name: rollGearName(slot, hero),
+    slot: slot,
     tierId: tier.id,
     tierName: tier.name,
+    power: computeItemPower(tier.id, zoneTier),
+    upgradeLevel: 0,
+    bonus: slot === "relic" ? rollRelicBonus(tier.id) : null,
     foundAt: Date.now()
   };
+  return item;
+}
+
+function rollItem(zone, hero){
+  const tier = rollItemTier(zone.tier);
+  return rollGearItem(tier, zone.tier, hero);
+}
+
+function itemSellValue(item){
+  return SELL_VALUE_BY_TIER[item.tierId] || SELL_VALUE_BY_TIER.common;
+}
+
+function itemShopPrice(item, hero){
+  return Math.round(itemSellValue(item) * SHOP_PRICE_MULT * getShopPriceMultiplier(hero));
+}
+
+function rollShopItem(hero){
+  const zoneTier = zoneTierForHero(hero);
+  const tier = rollItemTier(zoneTier);
+  return rollGearItem(tier, zoneTier, hero);
+}
+
+function generateShopStock(hero){
+  const stock = [];
+  for (let i = 0; i < SHOP_STOCK_SIZE; i++) stock.push(rollShopItem(hero));
+  return stock;
+}
+
+// Checked on every tick and on load — restocks (once) if the restock
+// timestamp has passed, including while offline. Does not simulate
+// multiple missed restocks, just the one.
+function maybeRestockShop(){
+  if (!state.shop) return;
+  const now = Date.now();
+  if (now >= state.shop.nextRestockAt){
+    state.shop.stock = generateShopStock(state.hero);
+    state.shop.nextRestockAt = now + SHOP_RESTOCK_INTERVAL_MS;
+  }
+}
+
+// Removes buffs whose expiresAt has passed. asOf defaults to "now";
+// offline catch-up passes segment timestamps so each buff only covers
+// the portion of the span it was actually active for.
+function pruneExpiredBuffs(hero, asOf){
+  const cutoff = (typeof asOf === "number") ? asOf : Date.now();
+  hero.buffs = (hero.buffs || []).filter(b => b.expiresAt > cutoff);
 }
 
 /* ================================================================
@@ -644,21 +1556,155 @@ function applyProgress(elapsedMs, opts){
   opts = opts || {};
   const maxDrops = (typeof opts.maxDrops === "number") ? opts.maxDrops : Infinity;
 
-  const summary = { xpGained: 0, goldGained: 0, levelsGained: 0, itemsFound: [] };
+  const summary = { xpGained: 0, goldGained: 0, levelsGained: 0, itemsFound: [], restCompleted: null, contentResolved: null };
   if (elapsedMs <= 0) return summary;
 
   const activity = state.activity;
 
   if (activity.type === "training"){
     applyTrainingProgress(elapsedMs, maxDrops, summary);
+  } else if (activity.type === "rest"){
+    applyRestProgress(summary);
+  } else if (activity.type === "dungeon" || activity.type === "raid" || activity.type === "quest"){
+    applyTimedContentProgress(summary);
+  } else if (activity.type === "arena"){
+    // Arena runs are interactive and accrue nothing with time — online
+    // or offline. A run left open by closing the page is resolved as a
+    // yield at boot (see boot()), not here.
   } else if (activity.type === "idle"){
     // nothing accrues while idle
   }
-  // future: else if (activity.type === "dungeon") { ... }
-  // future: else if (activity.type === "quest") { ... }
-  // future: else if (activity.type === "rest") { ... }
 
   return summary;
+}
+
+// Rest doesn't scale with elapsedMs like training does — it just checks
+// whether "now" (state.lastTick, already advanced by the caller) has
+// crossed the activity's endsAt. Works identically for the 1s online
+// tick and a single large offline catch-up span.
+function applyRestProgress(summary){
+  const hero = state.hero;
+  const activity = state.activity;
+  if (state.lastTick < activity.endsAt) return; // still resting
+
+  const kind = activity.restKind;
+  if (kind === "short"){
+    if (hero.injuries > 0) hero.injuries -= 1;
+  } else if (kind === "long"){
+    hero.injuries = 0;
+  }
+  state.activity = { type:"idle", zoneId:null, startedAt: state.lastTick, dropAccumulatorMs: 0 };
+  addLog("Finished a " + (kind === "short" ? "short" : "long") + " rest and " +
+    (hero.injuries === 0 ? "feel fully healed" : "feel a little better") + ".", "system");
+  summary.restCompleted = kind;
+}
+
+/* ---- timed content: dungeons / raids / quests ---- */
+
+// Normalized definition for a piece of timed content. Quest chapters
+// keep their mission stats nested, so this flattens them into the same
+// shape dungeons and raids already have.
+function getTimedContentDef(type, contentId){
+  if (type === "dungeon") return DUNGEONS.find(d => d.id === contentId) || null;
+  if (type === "raid") return RAIDS.find(r => r.id === contentId) || null;
+  if (type === "quest"){
+    const ch = QUEST_CHAPTERS.find(q => q.id === contentId);
+    if (!ch) return null;
+    return {
+      id: ch.id, name: ch.mission.name, chapter: ch.chapter, title: ch.title,
+      durationMin: ch.mission.durationMin, difficulty: ch.mission.difficulty,
+      levelReq: 1, xp: ch.mission.xp, gold: ch.mission.gold, renown: ch.mission.renown,
+      dropRolls: QUEST_DROP_ROLLS, dropTierBonus: QUEST_DROP_TIER_BONUS
+    };
+  }
+  return null;
+}
+
+function isBusyWithContent(){
+  const t = state.activity.type;
+  return t === "dungeon" || t === "raid" || t === "quest" || t === "arena";
+}
+
+// Like rest, timed content doesn't scale with elapsedMs — it resolves
+// exactly once when "now" (state.lastTick, already advanced by the
+// caller) crosses the activity's endsAt, identically for the 1s online
+// tick and the single large offline catch-up span. After resolution the
+// hero is idle for the remainder of the span (no training auto-resume).
+function applyTimedContentProgress(summary){
+  const activity = state.activity;
+  if (state.lastTick < activity.endsAt) return; // still out there
+
+  const hero = state.hero;
+  const type = activity.type;
+  const def = getTimedContentDef(type, activity.contentId);
+  state.activity = { type:"idle", zoneId:null, startedAt: state.lastTick, dropAccumulatorMs: 0 };
+  if (!def) return;
+
+  const ratio = computePower(hero) / def.difficulty;
+  const success = Math.random() < successChance(ratio);
+
+  // Payout: content xp/gold × reward multiplier (Raider/Warlord/Assassin)
+  // × the regular xp/gold multipliers. Failure pays a fraction of that,
+  // with no renown and no drops.
+  const rewardMult = getRewardMultiplier(hero);
+  let xpGain = def.xp * rewardMult * getXpMultiplier(hero);
+  let goldGain = def.gold * rewardMult * getGoldMultiplier(hero);
+  let renownGain = def.renown;
+  const items = [];
+  let injured = false;
+
+  if (success){
+    // dropRolls guaranteed drops, tier weights shifted up by dropTierBonus.
+    const effTier = zoneTierForHero(hero) + (def.dropTierBonus || 0);
+    for (let i = 0; i < (def.dropRolls || 0); i++){
+      const tier = rollItemTier(effTier);
+      const item = rollGearItem(tier, effTier, hero);
+      state.inventory.push(item);
+      items.push(item);
+      addLog("Recovered " + itemDisplayName(item) + " from " + def.name + ".", "drop");
+    }
+    injured = Math.random() < CONTENT_INJURY_CHANCE_SUCCESS * getInjuryChanceMultiplier(hero);
+  } else {
+    xpGain *= CONTENT_FAILURE_REWARD_FRACTION;
+    goldGain *= CONTENT_FAILURE_REWARD_FRACTION;
+    renownGain = 0;
+    injured = Math.random() < CONTENT_INJURY_CHANCE_FAILURE * getInjuryChanceMultiplier(hero);
+  }
+
+  summary.xpGained += xpGain;
+  summary.goldGained += goldGain;
+  summary.levelsGained += grantXp(hero, xpGain);
+  hero.gold += goldGain;
+  awardRenown(hero, renownGain);
+  summary.itemsFound = summary.itemsFound.concat(items);
+
+  const typeLabel = type === "dungeon" ? "Dungeon" : type === "raid" ? "Raid" : "Quest";
+  addLog(typeLabel + " — " + def.name + ": " + (success ? "Success!" : "Failure.") +
+    " +" + fmtNumber(xpGain) + " xp, +" + fmtNumber(goldGain) + " gold" +
+    (renownGain > 0 ? ", +" + renownGain + " renown" : "") + ".",
+    success ? "zone" : "system");
+
+  let outro = null;
+  if (type === "quest"){
+    const ch = QUEST_CHAPTERS.find(q => q.id === def.id);
+    if (success && ch){
+      // Advance the story spine only if this chapter is still the frontier.
+      if ((state.questProgress || 0) === ch.chapter - 1) state.questProgress = ch.chapter;
+      outro = ch.outro;
+      addLog("Chapter " + ch.chapter + " complete: \"" + ch.title + "\".", "levelup");
+    } else if (ch){
+      addLog("The story does not advance — \"" + ch.title + "\" can be attempted again.", "system");
+    }
+  }
+
+  if (injured) addInjury(hero, def.name);
+
+  summary.contentResolved = {
+    type: type, name: def.name, success: success,
+    xp: xpGain, gold: goldGain, renown: renownGain,
+    items: items, injured: injured, outro: outro,
+    questTitle: type === "quest" ? def.title : null
+  };
 }
 
 function applyTrainingProgress(elapsedMs, maxDrops, summary){
@@ -671,18 +1717,11 @@ function applyTrainingProgress(elapsedMs, maxDrops, summary){
   const xpGain = zone.xpPerHour * hours * getXpMultiplier(hero);
   const goldGain = zone.goldPerHour * hours * getGoldMultiplier(hero);
 
-  hero.xp += xpGain;
   hero.gold += goldGain;
   summary.xpGained += xpGain;
   summary.goldGained += goldGain;
-
-  // level-up loop (handles multiple levels in a single tick/offline span)
-  while (hero.xp >= xpNeeded(hero.level)){
-    hero.xp -= xpNeeded(hero.level);
-    hero.level += 1;
-    summary.levelsGained += 1;
-    addLog("Reached level " + hero.level + "!", "levelup");
-  }
+  // grantXp runs the level-up loop (handles multiple levels in one span)
+  summary.levelsGained += grantXp(hero, xpGain);
 
   // drop rolling — accumulate elapsed time, roll once per interval
   activity.dropAccumulatorMs += elapsedMs;
@@ -697,10 +1736,10 @@ function applyTrainingProgress(elapsedMs, maxDrops, summary){
   for (let i = 0; i < intervals; i++){
     if (summary.itemsFound.length >= maxDrops) break;
     if (Math.random() < dropChance){
-      const item = rollItem(zone);
+      const item = rollItem(zone, hero);
       state.inventory.push(item);
       summary.itemsFound.push(item);
-      addLog("Found a " + item.tierName + " " + item.name + " at " + zone.name + ".", "drop");
+      addLog("Found " + itemDisplayName(item) + " at " + zone.name + ".", "drop");
     }
   }
 }
@@ -717,6 +1756,8 @@ function saveGame(){
     activity: state.activity,
     inventory: state.inventory,
     log: state.log,
+    shop: state.shop,
+    questProgress: state.questProgress || 0,
     lastTick: Date.now()
   };
   try {
@@ -751,6 +1792,63 @@ function deleteSave(){
 }
 
 /* ================================================================
+   SAVE MIGRATION
+   Structured as a chain so a future v2 -> v3 step can slot in
+   alongside this one without touching the v1 -> v2 logic.
+================================================================ */
+
+function migrateSave(data){
+  let d = data;
+  if (!d.version) d.version = 1;
+  if (d.version === 1) d = migrateV1toV2(d);
+  if (d.version === 2) d = migrateV2toV3(d);
+  return d;
+}
+
+// v1 had no injuries, equipment, buffs, shop, or gear slot/power on
+// items — items were flavor-only trophies. This adds all of that,
+// rolling a plausible slot + power for every existing item so they
+// become usable gear instead of disappearing or breaking.
+function migrateV1toV2(data){
+  const hero = data.hero;
+  hero.injuries = 0;
+  hero.equipment = createEmptyEquipment();
+  hero.buffs = [];
+  data.inventory = (data.inventory || []).map(item => migrateItemToGear(item, hero));
+  data.shop = { stock: [], nextRestockAt: 0 };
+  data.version = 2;
+  return data;
+}
+
+// v2 had no renown, evolutions, or quest progress. Null-safe defaults so
+// v1 saves chain cleanly v1 -> v2 -> v3.
+function migrateV2toV3(data){
+  const hero = data.hero;
+  if (typeof hero.renown !== "number") hero.renown = 0;
+  if (!Array.isArray(hero.evolutions)) hero.evolutions = [];
+  if (typeof data.questProgress !== "number") data.questProgress = 0;
+  data.version = 3;
+  return data;
+}
+
+function migrateItemToGear(item, hero){
+  if (item.slot) return item; // already gear-shaped, leave as-is
+  const slot = SLOTS[Math.floor(Math.random() * SLOTS.length)];
+  const migrated = {
+    id: item.id,
+    name: rollGearName(slot, hero),
+    slot: slot,
+    tierId: item.tierId,
+    tierName: item.tierName,
+    power: computeItemPower(item.tierId, 1),
+    upgradeLevel: 0,
+    bonus: slot === "relic" ? rollRelicBonus(item.tierId) : null,
+    foundAt: item.foundAt
+  };
+  return migrated;
+}
+
+/* ================================================================
    GAME LOOP
 ================================================================ */
 
@@ -758,10 +1856,19 @@ function tick(){
   const now = Date.now();
   const elapsed = now - state.lastTick;
   state.lastTick = now;
+  let summary = null;
   if (elapsed > 0){
-    applyProgress(elapsed, {});
+    summary = applyProgress(elapsed, {});
   }
+  pruneExpiredBuffs(state.hero);
+  maybeRestockShop();
   render();
+  // A dungeon/raid/quest that just resolved while the player watched
+  // gets a result modal (offline resolutions report via welcome-back).
+  if (summary && summary.contentResolved){
+    saveGame();
+    showContentResultModal(summary.contentResolved);
+  }
 }
 
 function startLoops(){
@@ -791,13 +1898,48 @@ function humanizeDuration(ms){
 
 function applyOfflineProgress(){
   const now = Date.now();
-  const elapsed = now - state.lastTick;
-  state.lastTick = now;
-  if (elapsed <= 0) return null;
+  const start = state.lastTick;
+  const elapsed = now - start;
+  if (elapsed <= 0){ state.lastTick = now; return null; }
 
-  const summary = applyProgress(elapsed, { maxDrops: MAX_OFFLINE_DROPS });
-  summary.elapsedMs = elapsed;
-  return summary;
+  // Buff expiries strictly inside the gap split it into segments, so a
+  // buff only multiplies the portion of the span it was active for —
+  // otherwise a 60-min buff would boost an entire multi-day offline gap.
+  // A running rest/dungeon/raid/quest's endsAt is also a boundary, so it
+  // resolves exactly at endsAt (with whatever buffs were live then) and
+  // the hero sits idle for the remainder of the gap.
+  const rawBoundaries = (state.hero.buffs || []).map(b => b.expiresAt);
+  const a = state.activity;
+  if ((a.type === "rest" || a.type === "dungeon" || a.type === "raid" || a.type === "quest") && a.endsAt){
+    rawBoundaries.push(a.endsAt);
+  }
+  const boundaries = rawBoundaries
+    .filter(t => t > start && t < now)
+    .sort((x, y) => x - y)
+    .filter((t, i, arr) => i === 0 || t !== arr[i - 1]); // unique
+  boundaries.push(now);
+
+  const total = { xpGained: 0, goldGained: 0, levelsGained: 0, itemsFound: [], restCompleted: null, contentResolved: null };
+  let dropsBudget = MAX_OFFLINE_DROPS;
+  let prev = start;
+  boundaries.forEach(t => {
+    state.lastTick = t; // applyRestProgress/applyTimedContentProgress read lastTick as "now"
+    const seg = applyProgress(t - prev, { maxDrops: dropsBudget });
+    total.xpGained += seg.xpGained;
+    total.goldGained += seg.goldGained;
+    total.levelsGained += seg.levelsGained;
+    total.itemsFound = total.itemsFound.concat(seg.itemsFound);
+    if (seg.restCompleted) total.restCompleted = seg.restCompleted;
+    if (seg.contentResolved) total.contentResolved = seg.contentResolved;
+    dropsBudget -= seg.itemsFound.length;
+    pruneExpiredBuffs(state.hero, t);
+    prev = t;
+  });
+
+  pruneExpiredBuffs(state.hero);
+  maybeRestockShop();
+  total.elapsedMs = elapsed;
+  return total;
 }
 
 /* ================================================================
@@ -815,6 +1957,25 @@ function escapeHtml(s){
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+function capitalize(s){
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+// h:mm:ss countdown display for rests, buffs, and shop restock.
+function fmtCountdown(ms){
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
+  return h + ":" + String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+}
+
+function relicBonusLabel(bonus){
+  const pct = Math.round(Math.abs(bonus.value - 1) * 100);
+  const sign = bonus.value >= 1 ? "+" : "-";
+  return sign + pct + "% " + (RELIC_LABELS[bonus.key] || bonus.key);
 }
 
 // render signatures — skip DOM rebuilds when displayed data is unchanged
@@ -853,7 +2014,7 @@ function renderRaceClassGrids(){
       "<h4>" + cls.name + "</h4>" +
       "<div class=\"flavor\">" + cls.flavor + "</div>" +
       "<div class=\"weapon\">" + cls.weapon + "</div>" +
-      "<div class=\"future\">" + cls.futureLine + " (locked)</div>";
+      "<div class=\"future\">" + cls.futureLine + "</div>";
     card.addEventListener("click", () => {
       creationChoice.classId = cls.id;
       document.querySelectorAll("#class-grid .pick-card").forEach(c => c.classList.remove("selected"));
@@ -875,10 +2036,10 @@ function validateCreationForm(){
 function renderHeroPanel(){
   const hero = state.hero;
   const race = getRace(hero);
-  const cls = getClass(hero);
+  const cls = getCurrentClassInfo(hero); // displayed class = last evolution (or base)
 
-  document.getElementById("hero-name-display").textContent = hero.name;
-  document.getElementById("hero-sub-display").textContent = race.name + " " + cls.name;
+  document.getElementById("hero-name-display").textContent = heroDisplayName(hero);
+  document.getElementById("hero-sub-display").textContent = race.name + " " + cls.name + " · " + cls.weapon;
   document.getElementById("hero-level").textContent = hero.level;
   document.getElementById("hero-gold").textContent = fmtNumber(hero.gold);
   document.getElementById("hero-power").textContent = computePower(hero);
@@ -890,18 +2051,206 @@ function renderHeroPanel(){
     fmtNumber(hero.xp) + " / " + fmtNumber(needed) + " (" + pct.toFixed(1) + "%)";
 
   const activityEl = document.getElementById("activity-value");
-  if (state.activity.type === "training"){
-    const zone = ZONES.find(z => z.id === state.activity.zoneId);
+  const act = state.activity;
+  if (act.type === "training"){
+    const zone = ZONES.find(z => z.id === act.zoneId);
     activityEl.textContent = "Training at " + (zone ? zone.name : "Unknown");
+  } else if (act.type === "rest"){
+    activityEl.textContent = (act.restKind === "short" ? "Resting (short)" : "Resting (long)");
+  } else if (act.type === "dungeon" || act.type === "raid" || act.type === "quest"){
+    const def = getTimedContentDef(act.type, act.contentId);
+    const label = act.type === "dungeon" ? "Dungeon" : act.type === "raid" ? "Raid" : "Quest";
+    activityEl.textContent = label + ": " + (def ? def.name : "Unknown") + " — " + fmtCountdown(Math.max(0, act.endsAt - Date.now())) + " left";
+  } else if (act.type === "arena"){
+    activityEl.textContent = "In the Arena — fight " + act.fightNumber;
   } else {
     activityEl.textContent = "Idle";
   }
-  document.getElementById("stop-training-btn").disabled = state.activity.type !== "training";
+  document.getElementById("stop-training-btn").disabled = act.type !== "training";
+
+  renderInjuryStatus();
+  renderBuffRow();
+}
+
+function renderInjuryStatus(){
+  const hero = state.hero;
+  const statusEl = document.getElementById("injury-status");
+  let label, cls;
+  if (hero.injuries <= 0){ label = "Unhurt"; cls = "injury-ok"; }
+  else if (hero.injuries === 1){ label = "Injured"; cls = "injury-warn"; }
+  else { label = "Badly hurt — must rest"; cls = "injury-bad"; }
+  statusEl.textContent = label;
+  statusEl.className = "injury-status " + cls;
+
+  const resting = state.activity.type === "rest";
+  const busy = isBusyWithContent();
+  const shortBtn = document.getElementById("rest-short-btn");
+  const longBtn = document.getElementById("rest-long-btn");
+  shortBtn.disabled = hero.injuries <= 0 || resting || busy;
+  longBtn.disabled = hero.injuries <= 0 || resting || busy;
+  shortBtn.title = busy ? "Finish or yield the current venture first" : "";
+  longBtn.title = busy ? "Finish or yield the current venture first" : "";
+
+  const actionsEl = document.getElementById("rest-actions");
+  const countdownEl = document.getElementById("rest-countdown");
+  if (resting){
+    actionsEl.classList.add("hidden");
+    countdownEl.classList.remove("hidden");
+    const remaining = Math.max(0, state.activity.endsAt - Date.now());
+    countdownEl.textContent = (state.activity.restKind === "short" ? "Short" : "Long") + " rest — " + fmtCountdown(remaining) + " remaining";
+  } else {
+    actionsEl.classList.remove("hidden");
+    countdownEl.classList.add("hidden");
+  }
+}
+
+function renderBuffRow(){
+  const el = document.getElementById("buff-row");
+  const buffs = state.hero.buffs || [];
+  if (buffs.length === 0){ el.innerHTML = ""; return; }
+  el.innerHTML = buffs.map(b => {
+    const remaining = Math.max(0, b.expiresAt - Date.now());
+    return "<span class=\"buff-chip\">" + escapeHtml(b.name) + " — " + fmtCountdown(remaining) + "</span>";
+  }).join("");
+}
+
+function renderEquipment(){
+  const list = document.getElementById("equipment-list");
+  list.innerHTML = "";
+  SLOTS.forEach(slot => {
+    const item = state.hero.equipment[slot];
+    const row = document.createElement("div");
+    row.className = "equip-slot-row";
+    if (item){
+      const tier = ITEM_TIERS.find(t => t.id === item.tierId) || ITEM_TIERS[0];
+      const bonusText = item.bonus ? (" · " + relicBonusLabel(item.bonus)) : "";
+      row.innerHTML =
+        "<span class=\"equip-slot-label\">" + capitalize(slot) + "</span>" +
+        "<span class=\"equip-slot-item\" style=\"color:" + tier.color + "\">" + escapeHtml(item.name) + (item.upgradeLevel ? " +" + item.upgradeLevel : "") + "</span>" +
+        "<span class=\"equip-slot-power\">Pwr " + displayItemPower(item) + bonusText + "</span>" +
+        "<button class=\"btn small secondary\" data-unequip=\"" + slot + "\">Unequip</button>";
+    } else {
+      row.innerHTML =
+        "<span class=\"equip-slot-label\">" + capitalize(slot) + "</span>" +
+        "<span class=\"equip-slot-empty\">Empty</span>";
+    }
+    list.appendChild(row);
+  });
+  list.querySelectorAll("[data-unequip]").forEach(btn => {
+    btn.addEventListener("click", () => unequipItem(btn.dataset.unequip));
+  });
+}
+
+function renderShopPanel(){
+  const remaining = Math.max(0, state.shop.nextRestockAt - Date.now());
+  document.getElementById("shop-restock-label").textContent = "Restocks in " + fmtCountdown(remaining);
+
+  const list = document.getElementById("shop-list");
+  list.innerHTML = "";
+  if (!state.shop.stock || state.shop.stock.length === 0){
+    list.innerHTML = "<div class=\"inv-empty\">Sold out. Check back after restock.</div>";
+    return;
+  }
+  state.shop.stock.forEach(item => {
+    const tier = ITEM_TIERS.find(t => t.id === item.tierId) || ITEM_TIERS[0];
+    const price = itemShopPrice(item, state.hero);
+    const afford = state.hero.gold >= price;
+    const bonusText = item.bonus ? (" · " + relicBonusLabel(item.bonus)) : "";
+    const row = document.createElement("div");
+    row.className = "shop-item";
+    row.innerHTML =
+      "<span><span style=\"color:" + tier.color + "\">" + escapeHtml(itemDisplayName(item)) + "</span>" +
+      "<span class=\"inv-meta\">" + capitalize(item.slot) + " · Pwr " + item.power + bonusText + "</span></span>" +
+      "<button class=\"btn small\" " + (afford ? "" : "disabled") + " data-buy=\"" + item.id + "\">Buy (" + fmtNumber(price) + "g)</button>";
+    list.appendChild(row);
+  });
+  list.querySelectorAll("[data-buy]").forEach(btn => {
+    btn.addEventListener("click", () => buyShopItem(btn.dataset.buy));
+  });
+}
+
+function renderBlacksmithPanel(){
+  const list = document.getElementById("blacksmith-list");
+  list.innerHTML = "";
+  const entries = [];
+  SLOTS.forEach(slot => { if (state.hero.equipment[slot]) entries.push({ item: state.hero.equipment[slot], equipped: true }); });
+  state.inventory.forEach(item => entries.push({ item: item, equipped: false }));
+
+  if (entries.length === 0){
+    list.innerHTML = "<div class=\"inv-empty\">No gear to upgrade yet.</div>";
+    return;
+  }
+  entries.forEach(({ item, equipped }) => {
+    const tier = ITEM_TIERS.find(t => t.id === item.tierId) || ITEM_TIERS[0];
+    const atCap = (item.upgradeLevel || 0) >= BLACKSMITH_MAX_UPGRADE;
+    const cost = atCap ? null : blacksmithUpgradeCost(item);
+    const afford = cost !== null && state.hero.gold >= cost;
+    const row = document.createElement("div");
+    row.className = "blacksmith-item";
+    row.innerHTML =
+      "<span><span style=\"color:" + tier.color + "\">" + escapeHtml(item.name) + (item.upgradeLevel ? " +" + item.upgradeLevel : "") + "</span>" +
+      "<span class=\"inv-meta\">" + (equipped ? "Equipped · " : "") + "Pwr " + displayItemPower(item) + "</span></span>" +
+      (atCap ?
+        "<span class=\"inv-meta\">Max upgrade</span>" :
+        "<button class=\"btn small\" " + (afford ? "" : "disabled") + " data-upgrade=\"" + item.id + "\">Upgrade (" + fmtNumber(cost) + "g)</button>");
+    list.appendChild(row);
+  });
+  list.querySelectorAll("[data-upgrade]").forEach(btn => {
+    btn.addEventListener("click", () => upgradeItem(btn.dataset.upgrade));
+  });
+}
+
+function renderMedicPanel(){
+  const hero = state.hero;
+  const body = document.getElementById("medic-body");
+  let html = "";
+  if (hero.injuries <= 0){
+    html += "<div class=\"inv-empty\">No injuries to treat.</div>";
+  } else {
+    const healCost = medicHealCost(hero);
+    const afford = hero.gold >= healCost;
+    html += "<div class=\"medic-row\"><span>Heal one injury</span><button class=\"btn small\" id=\"medic-heal-btn\" " + (afford ? "" : "disabled") + ">Pay (" + fmtNumber(healCost) + "g)</button></div>";
+  }
+  if (state.activity.type === "rest"){
+    const cutCost = medicCutCost(hero);
+    const afford2 = hero.gold >= cutCost;
+    html += "<div class=\"medic-row\"><span>Cut remaining rest time in half</span><button class=\"btn small\" id=\"medic-cut-btn\" " + (afford2 ? "" : "disabled") + ">Pay (" + fmtNumber(cutCost) + "g)</button></div>";
+  }
+  if (html === "") html = "<div class=\"inv-empty\">Nothing to treat right now.</div>";
+  body.innerHTML = html;
+
+  const healBtn = document.getElementById("medic-heal-btn");
+  if (healBtn) healBtn.addEventListener("click", medicHealInjury);
+  const cutBtn = document.getElementById("medic-cut-btn");
+  if (cutBtn) cutBtn.addEventListener("click", medicCutRestTime);
+}
+
+function renderTavernPanel(){
+  const list = document.getElementById("tavern-list");
+  list.innerHTML = "";
+  TAVERN_BUFFS.forEach(def => {
+    const cost = tavernBuffCost(def, state.hero);
+    const afford = state.hero.gold >= cost;
+    const active = (state.hero.buffs || []).find(b => b.key === def.effect.key);
+    const row = document.createElement("div");
+    row.className = "tavern-item";
+    row.innerHTML =
+      "<div class=\"tavern-name\">" + escapeHtml(def.name) + "</div>" +
+      "<div class=\"inv-meta\" style=\"font-style:italic;\">" + escapeHtml(def.flavor) + "</div>" +
+      "<div class=\"inv-meta\">" + escapeHtml(tavernEffectDesc(def)) + "</div>" +
+      (active ? "<div class=\"inv-meta\">Active — " + fmtCountdown(Math.max(0, active.expiresAt - Date.now())) + " left</div>" : "") +
+      "<button class=\"btn small\" " + (afford ? "" : "disabled") + " data-buff=\"" + def.id + "\">" + (active ? "Refresh" : "Buy") + " (" + fmtNumber(cost) + "g)</button>";
+    list.appendChild(row);
+  });
+  list.querySelectorAll("[data-buff]").forEach(btn => {
+    btn.addEventListener("click", () => buyTavernBuff(btn.dataset.buff));
+  });
 }
 
 function renderZones(){
   const hero = state.hero;
-  const sig = hero.level + "|" + state.activity.type + "|" + state.activity.zoneId + "|" + getDropChanceMultiplier(hero);
+  const hurtLocked = hero.injuries >= MAX_INJURIES;
+  const sig = hero.level + "|" + state.activity.type + "|" + state.activity.zoneId + "|" + getDropChanceMultiplier(hero) + "|" + hurtLocked;
   if (sig === zonesRenderSig) return;
   zonesRenderSig = sig;
 
@@ -913,7 +2262,7 @@ function renderZones(){
     const active = state.activity.type === "training" && state.activity.zoneId === zone.id;
 
     const card = document.createElement("div");
-    card.className = "zone-card" + (locked ? " locked" : "") + (active ? " active" : "");
+    card.className = "zone-card" + ((locked || hurtLocked) ? " locked" : "") + (active ? " active" : "");
 
     const dropPct = (zone.dropChance * getDropChanceMultiplier(hero) * 100).toFixed(1);
 
@@ -929,7 +2278,9 @@ function renderZones(){
       "</div>" +
       "<div class=\"zone-action\">" +
         (locked ? "<span style=\"color:var(--text-muted); font-size:0.8rem;\">Locked</span>" :
+          hurtLocked ? "<span style=\"color:var(--red); font-size:0.8rem;\">Must rest</span>" :
           active ? "<span style=\"color:var(--gold); font-size:0.85rem;\">Training here</span>" :
+          isBusyWithContent() ? "<span style=\"color:var(--text-muted); font-size:0.8rem;\" title=\"Finish or yield the current venture first\">Busy</span>" :
           "<button class=\"btn small\" data-zone-select=\"" + zone.id + "\">Train here</button>") +
       "</div>";
 
@@ -941,9 +2292,374 @@ function renderZones(){
   });
 }
 
+/* ---- v2 phase 2: dungeons / raids / quests / arena / renown ---- */
+
+const contentRenderSigs = {}; // per-list render signatures
+
+// Difficulty band for a power ratio — a coarse hint alongside the exact chance.
+function contentBandInfo(ratio){
+  if (ratio >= 1.2) return { label: "Favorable", color: "var(--green)" };
+  if (ratio >= 1.0) return { label: "Even match", color: "var(--gold)" };
+  if (ratio >= 0.8) return { label: "Challenging", color: "#d9944a" };
+  if (ratio >= 0.55) return { label: "Dangerous", color: "var(--red)" };
+  return { label: "Overwhelming", color: "var(--red)" };
+}
+
+// Shared card list for dungeons and raids.
+function renderTimedContentList(type, defs, listElId){
+  const hero = state.hero;
+  const power = computePower(hero);
+  const act = state.activity;
+  const activeId = (act.type === type) ? act.contentId : null;
+  const remaining = activeId ? Math.max(0, act.endsAt - Date.now()) : 0;
+  const sig = hero.level + "|" + power + "|" + act.type + "|" + activeId + "|" +
+    Math.floor(remaining / 1000) + "|" + (hero.injuries >= MAX_INJURIES) + "|" + getTimerMultiplier(hero);
+  if (contentRenderSigs[listElId] === sig) return;
+  contentRenderSigs[listElId] = sig;
+
+  const list = document.getElementById(listElId);
+  list.innerHTML = "";
+  defs.forEach(def => {
+    const active = def.id === activeId;
+    const reason = timedContentBlockReason(type, def);
+    const locked = !!reason && !active;
+    const ratio = power / def.difficulty;
+    const band = contentBandInfo(ratio);
+    const chancePct = Math.round(successChance(ratio) * 100);
+    const dur = Math.round(def.durationMin * 60000 * getTimerMultiplier(hero));
+
+    const card = document.createElement("div");
+    card.className = "zone-card" + (locked ? " locked" : "") + (active ? " active" : "");
+    card.innerHTML =
+      "<div class=\"zone-info\">" +
+        "<div class=\"zone-name-row\"><h4>" + escapeHtml(def.name) + "</h4>" +
+          "<span class=\"tier-badge\">" + humanizeDuration(dur) + "</span></div>" +
+        "<div class=\"content-flavor\">" + escapeHtml(def.flavor || "") + "</div>" +
+        "<div class=\"zone-req\">" + (hero.level < def.levelReq ? "Requires level " + def.levelReq : "Level " + def.levelReq + "+") + "</div>" +
+        "<div class=\"zone-stats\">" +
+          "<span><b>" + fmtNumber(def.xp) + "</b> xp</span>" +
+          "<span><b>" + fmtNumber(def.gold) + "</b> gold</span>" +
+          "<span><b>" + def.renown + "</b> renown</span>" +
+          "<span><b>" + def.dropRolls + "</b> drops</span>" +
+          "<span class=\"content-band\" style=\"color:" + band.color + "\">" + band.label + " (" + chancePct + "%)</span>" +
+        "</div>" +
+      "</div>" +
+      "<div class=\"zone-action\">" +
+        (active ? "<span class=\"content-countdown\">" + fmtCountdown(remaining) + "</span>" :
+          reason ? "<span style=\"color:var(--text-muted); font-size:0.78rem;\" title=\"" + escapeHtml(reason) + "\">" + escapeHtml(reason) + "</span>" :
+          "<button class=\"btn small\" data-content-start=\"" + def.id + "\">Set out</button>") +
+      "</div>";
+    list.appendChild(card);
+  });
+
+  list.querySelectorAll("[data-content-start]").forEach(btn => {
+    btn.addEventListener("click", () => startTimedContent(type, btn.dataset.contentStart));
+  });
+}
+
+function renderQuests(){
+  const hero = state.hero;
+  const power = computePower(hero);
+  const progress = state.questProgress || 0;
+  const act = state.activity;
+  const activeId = (act.type === "quest") ? act.contentId : null;
+  const remaining = activeId ? Math.max(0, act.endsAt - Date.now()) : 0;
+  const sig = progress + "|" + power + "|" + act.type + "|" + activeId + "|" +
+    Math.floor(remaining / 1000) + "|" + (hero.injuries >= MAX_INJURIES) + "|" + getTimerMultiplier(hero);
+  if (contentRenderSigs["quest-list"] === sig) return;
+  contentRenderSigs["quest-list"] = sig;
+
+  const list = document.getElementById("quest-list");
+  list.innerHTML = "";
+
+  QUEST_CHAPTERS.forEach((ch, i) => {
+    if (i < progress){
+      // completed — title only
+      const row = document.createElement("div");
+      row.className = "quest-chapter-done";
+      row.innerHTML = "<span class=\"check\">&#10003;</span> Chapter " + ch.chapter + " — " + escapeHtml(ch.title);
+      list.appendChild(row);
+    } else if (i === progress){
+      // current — full intro + mission card
+      const def = getTimedContentDef("quest", ch.id);
+      const active = ch.id === activeId;
+      const reason = timedContentBlockReason("quest", def);
+      const ratio = power / def.difficulty;
+      const band = contentBandInfo(ratio);
+      const chancePct = Math.round(successChance(ratio) * 100);
+      const dur = Math.round(def.durationMin * 60000 * getTimerMultiplier(hero));
+      const card = document.createElement("div");
+      card.className = "quest-current";
+      card.innerHTML =
+        "<h4>Chapter " + ch.chapter + " — " + escapeHtml(ch.title) + "</h4>" +
+        "<div class=\"quest-intro\">" + escapeHtml(ch.intro) + "</div>" +
+        "<div class=\"zone-stats\">" +
+          "<span>Mission: <b>" + escapeHtml(def.name) + "</b></span>" +
+          "<span><b>" + humanizeDuration(dur) + "</b></span>" +
+          "<span><b>" + fmtNumber(def.xp) + "</b> xp</span>" +
+          "<span><b>" + fmtNumber(def.gold) + "</b> gold</span>" +
+          "<span><b>" + def.renown + "</b> renown</span>" +
+          "<span class=\"content-band\" style=\"color:" + band.color + "\">" + band.label + " (" + chancePct + "%)</span>" +
+        "</div>" +
+        "<div style=\"margin-top:0.6rem;\">" +
+          (active ? "<span class=\"content-countdown\">Underway — " + fmtCountdown(remaining) + " remaining</span>" :
+            reason ? "<span style=\"color:var(--text-muted); font-size:0.8rem;\">" + escapeHtml(reason) + "</span>" :
+            "<button class=\"btn small\" data-quest-start=\"" + ch.id + "\">Begin chapter</button>") +
+        "</div>";
+      list.appendChild(card);
+    } else {
+      // locked future chapter
+      const row = document.createElement("div");
+      row.className = "quest-chapter-locked";
+      row.textContent = "Chapter " + ch.chapter + " — ???";
+      list.appendChild(row);
+    }
+  });
+
+  if (progress >= QUEST_CHAPTERS.length){
+    const row = document.createElement("div");
+    row.className = "quest-current";
+    row.innerHTML = "<h4>The story rests… for now.</h4><div class=\"quest-intro\">The seal beneath the Peaks holds, and the realm breathes easier. But the footprints led somewhere.</div>";
+    list.appendChild(row);
+  }
+
+  list.querySelectorAll("[data-quest-start]").forEach(btn => {
+    btn.addEventListener("click", () => startTimedContent("quest", btn.dataset.questStart));
+  });
+}
+
+function renderArena(){
+  const hero = state.hero;
+  const act = state.activity;
+  const inRun = act.type === "arena";
+  const power = computePower(hero);
+  const sig = inRun + "|" + (inRun ? act.fightNumber + "|" + Math.round(act.bankedXp) + "|" + (act.combatLog[0] || "") + "|" + act.monsterName : "") +
+    "|" + power + "|" + hero.injuries + "|" + act.type + "|" + getArenaExtraFights(hero);
+  if (contentRenderSigs["arena-body"] === sig) return;
+  contentRenderSigs["arena-body"] = sig;
+
+  const body = document.getElementById("arena-body");
+  const safeFights = getArenaExtraFights(hero);
+
+  if (!inRun){
+    const reason = arenaBlockReason();
+    const gambling = hero.injuries === 1;
+    body.innerHTML =
+      "<div class=\"content-flavor\">Fight randomly drawn monsters of escalating menace. Every win banks XP, gold, and renown — but an injury forces a yield, and only what you banked comes home with you.</div>" +
+      (safeFights > 0 ? "<div class=\"arena-note\">" + (getRace(hero).id === "orc" ?
+        "Your orcish blood shrugs off the first blow — the first " + (safeFights === 1 ? "fight carries" : safeFights + " fights carry") + " no injury risk." :
+        "Your training grants " + safeFights + " early fight" + (safeFights === 1 ? "" : "s") + " with no injury risk.") + "</div>" : "") +
+      (gambling && !reason ? "<div class=\"modal-warning\">You carry an injury — one more locks you out of everything until you rest. A calculated gamble.</div>" : "") +
+      "<div class=\"arena-actions\">" +
+        (reason ? "<span style=\"color:var(--text-muted); font-size:0.85rem;\">" + escapeHtml(reason) + "</span>" :
+          "<button class=\"btn\" id=\"arena-enter-btn\">Enter the Arena</button>") +
+      "</div>";
+    const enterBtn = document.getElementById("arena-enter-btn");
+    if (enterBtn) enterBtn.addEventListener("click", startArenaRun);
+    return;
+  }
+
+  const monsterPower = arenaMonsterPower(hero, act.fightNumber);
+  const winPct = Math.round(successChance(power / monsterPower) * 100);
+  const protectedFight = act.fightNumber <= safeFights;
+  body.innerHTML =
+    "<div class=\"arena-monster\">Fight " + act.fightNumber + ": " + escapeHtml(act.monsterName) +
+      "<div class=\"sub\">Monster power <b>" + fmtNumber(monsterPower) + "</b> vs yours <b>" + fmtNumber(power) + "</b> — " + winPct + "% to win</div>" +
+      (protectedFight ? "<div class=\"sub\" style=\"color:var(--green)\">" + (getRace(hero).id === "orc" ? "Your orcish blood shrugs off the first blow — no injury risk this fight." : "No injury risk this fight.") + "</div>" : "") +
+    "</div>" +
+    "<div class=\"arena-status-grid\">" +
+      "<div class=\"k\">Banked XP</div><div class=\"v\">" + fmtNumber(act.bankedXp) + "</div>" +
+      "<div class=\"k\">Banked gold</div><div class=\"v\">" + fmtNumber(act.bankedGold) + "</div>" +
+      "<div class=\"k\">Banked renown</div><div class=\"v\">" + act.bankedRenown + "</div>" +
+    "</div>" +
+    "<div class=\"arena-actions\">" +
+      "<button class=\"btn\" id=\"arena-fight-btn\">Fight</button>" +
+      "<button class=\"btn secondary\" id=\"arena-yield-btn\">Yield (bank rewards)</button>" +
+    "</div>" +
+    "<div class=\"arena-combat-log\">" +
+      act.combatLog.map(l => "<div class=\"line\">" + escapeHtml(l) + "</div>").join("") +
+    "</div>";
+  document.getElementById("arena-fight-btn").addEventListener("click", arenaFight);
+  document.getElementById("arena-yield-btn").addEventListener("click", arenaYield);
+}
+
+function renderRenownPanel(){
+  const hero = state.hero;
+  const sig = (hero.renown || 0) + "";
+  if (contentRenderSigs["renown-body"] === sig) return;
+  contentRenderSigs["renown-body"] = sig;
+
+  const body = document.getElementById("renown-body");
+  const next = getNextRenownMilestone(hero);
+  const reached = getRenownMilestonesReached(hero).filter(m => m.threshold > 0);
+  let html = "<div class=\"renown-title-line\">" + escapeHtml(heroDisplayName(hero)) + "</div>" +
+    "<div style=\"font-size:0.9rem;\">Renown: <b style=\"color:var(--gold)\">" + fmtNumber(hero.renown || 0) + "</b></div>";
+  if (next){
+    const prevThreshold = RENOWN_MILESTONES.filter(m => m.threshold <= (hero.renown || 0)).reduce((a, m) => Math.max(a, m.threshold), 0);
+    const span = next.threshold - prevThreshold;
+    const into = (hero.renown || 0) - prevThreshold;
+    const pct = Math.max(0, Math.min(100, (into / span) * 100));
+    html +=
+      "<div class=\"renown-progress-label\"><span>Next: \"" + escapeHtml(next.title) + "\" (" + escapeHtml(next.bonusText) + ")</span><span>" + fmtNumber(hero.renown || 0) + " / " + fmtNumber(next.threshold) + "</span></div>" +
+      "<div class=\"xp-bar-bg\" style=\"height:10px;\"><div class=\"xp-bar-fill\" style=\"width:" + pct.toFixed(1) + "%\"></div></div>";
+  } else {
+    html += "<div class=\"renown-progress-label\"><span>Every title in the realm is yours.</span></div>";
+  }
+  if (reached.length > 0){
+    html += "<div class=\"renown-bonus-list\">" + reached.map(m => "<div><span class=\"b\">" + escapeHtml(m.bonusText) + "</span> — " + escapeHtml(m.title) + "</div>").join("") + "</div>";
+  } else {
+    html += "<div class=\"renown-bonus-list\">Renown is earned from dungeons, raids, quests, and the Arena — never from training.</div>";
+  }
+  body.innerHTML = html;
+}
+
+function renderEvolutionBanner(){
+  const hero = state.hero;
+  const tier = pendingEvolutionTier(hero);
+  const banner = document.getElementById("evolution-banner");
+  if (!tier){
+    banner.classList.add("hidden");
+    return;
+  }
+  banner.classList.remove("hidden");
+  document.getElementById("evolution-banner-text").textContent =
+    "Evolution awaits — " + getCurrentClassInfo(hero).name + " " + hero.name + " has outgrown this path. Two roads open ahead.";
+}
+
+/* ---- evolution choice modal ---- */
+
+let evoModalChoice = null;
+
+function perkLine(perks){
+  const parts = [];
+  Object.keys(perks || {}).forEach(k => {
+    const v = perks[k];
+    if (k === "arenaExtraFights"){ parts.push("+" + v + " safe Arena fight" + (v === 1 ? "" : "s")); return; }
+    const labels = {
+      powerMult: "Power", xpMult: "XP", goldMult: "Gold", dropMult: "Drop Chance",
+      injuryChanceMult: "Injury Chance", restTimeMult: "Rest Time",
+      timerMult: "Dungeon/Raid/Quest Time", rewardMult: "Expedition Rewards"
+    };
+    const pct = Math.round(Math.abs(v - 1) * 100);
+    parts.push((v >= 1 ? "+" : "-") + pct + "% " + (labels[k] || k));
+  });
+  return parts.join(" · ");
+}
+
+function openEvolutionModal(){
+  const hero = state.hero;
+  const tier = pendingEvolutionTier(hero);
+  const options = evolutionOptions(hero);
+  if (!tier || options.length === 0) return;
+  evoModalChoice = null;
+
+  document.getElementById("evo-modal-title").textContent = "Tier " + tier + " Evolution";
+  document.getElementById("evo-modal-sub").textContent =
+    "The " + getCurrentClassInfo(hero).name + "'s road forks here. Choose the path " + hero.name + " will walk.";
+
+  const grid = document.getElementById("evo-options");
+  grid.innerHTML = "";
+  options.forEach(evo => {
+    const card = document.createElement("div");
+    card.className = "pick-card evo-card";
+    card.dataset.evoId = evo.id;
+    card.innerHTML =
+      "<h4>" + escapeHtml(evo.name) + "</h4>" +
+      "<div class=\"flavor\">" + escapeHtml(evo.flavor) + "</div>" +
+      "<div class=\"weapon\">" + escapeHtml(evo.weapon) + "</div>" +
+      "<div class=\"skills\">Skills: " + escapeHtml(evo.skillNames.join(", ")) + "</div>" +
+      "<div class=\"perks\">" + escapeHtml(perkLine(evo.perks)) + "</div>";
+    card.addEventListener("click", () => {
+      evoModalChoice = evo.id;
+      grid.querySelectorAll(".pick-card").forEach(c => c.classList.remove("selected"));
+      card.classList.add("selected");
+      document.getElementById("evo-confirm-btn").disabled = false;
+    });
+    grid.appendChild(card);
+  });
+  document.getElementById("evo-confirm-btn").disabled = true;
+  document.getElementById("evolution-modal").classList.remove("hidden");
+}
+
+function wireEvolutionModal(){
+  document.getElementById("evolution-open-btn").addEventListener("click", openEvolutionModal);
+  document.getElementById("evo-cancel-btn").addEventListener("click", () => {
+    document.getElementById("evolution-modal").classList.add("hidden");
+  });
+  document.getElementById("evo-confirm-btn").addEventListener("click", () => {
+    if (!evoModalChoice) return;
+    chooseEvolution(evoModalChoice);
+    document.getElementById("evolution-modal").classList.add("hidden");
+  });
+}
+
+/* ---- content result modal (dungeon / raid / quest resolution) ---- */
+
+function showContentResultModal(result){
+  const typeLabel = result.type === "dungeon" ? "Dungeon" : result.type === "raid" ? "Raid" : "Quest";
+  document.getElementById("cr-title").textContent = typeLabel + ": " + result.name;
+  const outcomeEl = document.getElementById("cr-outcome");
+  outcomeEl.textContent = result.success ? "Success!" : "Failure";
+  outcomeEl.style.color = result.success ? "var(--green)" : "var(--red)";
+
+  const storyEl = document.getElementById("cr-story");
+  if (result.outro){
+    storyEl.textContent = result.outro;
+    storyEl.classList.remove("hidden");
+  } else if (result.type === "quest" && !result.success){
+    storyEl.textContent = "The trail goes cold this time — but the story is not over. The chapter can be attempted again.";
+    storyEl.classList.remove("hidden");
+  } else {
+    storyEl.classList.add("hidden");
+  }
+
+  document.getElementById("cr-xp").textContent = fmtNumber(result.xp);
+  document.getElementById("cr-gold").textContent = fmtNumber(result.gold);
+  document.getElementById("cr-renown").textContent = result.renown > 0 ? "+" + result.renown : "0";
+  document.getElementById("cr-item-count").textContent = result.items.length;
+
+  const itemsEl = document.getElementById("cr-items");
+  itemsEl.innerHTML = result.items.map(item => {
+    const tier = ITEM_TIERS.find(t => t.id === item.tierId) || ITEM_TIERS[0];
+    return "<div style=\"color:" + tier.color + "\">" + escapeHtml(itemDisplayName(item)) + "</div>";
+  }).join("");
+
+  const injuryEl = document.getElementById("cr-injury");
+  if (result.injured){
+    injuryEl.textContent = state.hero.injuries >= MAX_INJURIES
+      ? "You return badly hurt — you must rest before doing anything else."
+      : "You return injured. One more wound will force you to rest.";
+    injuryEl.classList.remove("hidden");
+  } else {
+    injuryEl.classList.add("hidden");
+  }
+
+  document.getElementById("content-result-modal").classList.remove("hidden");
+}
+
+function wireContentResultModal(){
+  document.getElementById("cr-close-btn").addEventListener("click", () => {
+    document.getElementById("content-result-modal").classList.add("hidden");
+  });
+}
+
+function wireAdventureSubtabs(){
+  document.querySelectorAll(".subtab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".subtab-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const sub = btn.dataset.subtab;
+      ["training", "dungeons", "raids", "quests", "arena"].forEach(s => {
+        document.getElementById("adv-" + s).classList.toggle("hidden", s !== sub);
+      });
+    });
+  });
+}
+
 function renderInventory(){
   const newest = state.inventory.length > 0 ? state.inventory[state.inventory.length - 1].id : "";
-  const sig = state.inventory.length + "|" + newest;
+  const upgradeSum = state.inventory.reduce((a, i) => a + (i.upgradeLevel || 0), 0);
+  const sig = state.inventory.length + "|" + newest + "|" + upgradeSum;
   if (sig === inventoryRenderSig) return;
   inventoryRenderSig = sig;
 
@@ -957,14 +2673,28 @@ function renderInventory(){
   const items = state.inventory.slice().reverse().slice(0, 200);
   items.forEach(item => {
     const tier = ITEM_TIERS.find(t => t.id === item.tierId) || ITEM_TIERS[0];
+    const bonusText = item.bonus ? (" · " + relicBonusLabel(item.bonus)) : "";
     const row = document.createElement("div");
     row.className = "inv-item";
     row.innerHTML =
-      "<span style=\"color:" + tier.color + "\">" + escapeHtml(tier.name + " " + item.name) + "</span>" +
-      "<span style=\"color:var(--text-muted); font-size:0.75rem;\">" + new Date(item.foundAt).toLocaleTimeString() + "</span>";
+      "<span class=\"inv-row-main\">" +
+        "<span style=\"color:" + tier.color + "\">" + escapeHtml(itemDisplayName(item)) + (item.upgradeLevel ? " +" + item.upgradeLevel : "") + "</span>" +
+        "<span class=\"inv-meta\">" + capitalize(item.slot) + " · Pwr " + displayItemPower(item) + bonusText + "</span>" +
+      "</span>" +
+      "<span class=\"inv-actions\">" +
+        "<button class=\"btn small\" data-equip=\"" + item.id + "\">Equip</button>" +
+        "<button class=\"btn small secondary\" data-sell=\"" + item.id + "\">Sell (" + itemSellValue(item) + "g)</button>" +
+      "</span>";
     list.appendChild(row);
   });
   list.scrollTop = prevScroll;
+
+  list.querySelectorAll("[data-equip]").forEach(btn => {
+    btn.addEventListener("click", () => equipItem(btn.dataset.equip));
+  });
+  list.querySelectorAll("[data-sell]").forEach(btn => {
+    btn.addEventListener("click", () => sellItem(btn.dataset.sell));
+  });
 }
 
 function renderLog(){
@@ -994,8 +2724,19 @@ function render(){
   if (!state) return;
   renderHeroPanel();
   renderZones();
+  renderTimedContentList("dungeon", DUNGEONS, "dungeon-list");
+  renderTimedContentList("raid", RAIDS, "raid-list");
+  renderQuests();
+  renderArena();
+  renderRenownPanel();
+  renderEvolutionBanner();
   renderInventory();
+  renderEquipment();
   renderLog();
+  renderShopPanel();
+  renderBlacksmithPanel();
+  renderMedicPanel();
+  renderTavernPanel();
 }
 
 /* ================================================================
@@ -1006,6 +2747,8 @@ function startTraining(zoneId){
   const zone = ZONES.find(z => z.id === zoneId);
   if (!zone) return;
   if (state.hero.level < zone.levelReq) return;
+  if (state.hero.injuries >= MAX_INJURIES) return; // badly hurt — locked out until rested
+  if (isBusyWithContent()) return; // expeditions and Arena runs aren't abandoned by training
 
   state.activity = { type:"training", zoneId: zoneId, startedAt: Date.now(), dropAccumulatorMs: 0 };
   addLog("Began training at " + zone.name + ".", "zone");
@@ -1018,6 +2761,363 @@ function stopTraining(){
   const zone = ZONES.find(z => z.id === state.activity.zoneId);
   state.activity = { type:"idle", zoneId:null, startedAt: Date.now(), dropAccumulatorMs: 0 };
   addLog("Stopped training" + (zone ? " at " + zone.name : "") + ".", "zone");
+  saveGame();
+  render();
+}
+
+/* ---- v2: rest ---- */
+
+function startRest(kind){
+  const hero = state.hero;
+  if (hero.injuries <= 0) return;
+  if (state.activity.type === "rest") return;
+  if (isBusyWithContent()) return; // finish (or yield) the current venture first
+
+  if (state.activity.type === "training"){
+    const zone = ZONES.find(z => z.id === state.activity.zoneId);
+    addLog("Stopped training" + (zone ? " at " + zone.name : "") + " to rest.", "zone");
+  }
+
+  const baseMs = kind === "short" ? REST_SHORT_MS : REST_LONG_MS;
+  const dur = Math.round(baseMs * getRestTimeMultiplier(hero));
+  const now = Date.now();
+  state.activity = { type:"rest", restKind: kind, startedAt: now, endsAt: now + dur };
+  addLog("Began a " + (kind === "short" ? "short (4h)" : "long (8h)") + " rest.", "zone");
+  saveGame();
+  render();
+}
+
+/* ---- v2 phase 2: timed content (dungeons / raids / quests) ---- */
+
+// Why this piece of content can't be started right now, or null if it
+// can. Used both as the click guard and as the disabled-reason text.
+function timedContentBlockReason(type, def){
+  const hero = state.hero;
+  if (hero.injuries >= MAX_INJURIES) return "Badly hurt — must rest";
+  if (state.activity.type === "rest") return "Resting";
+  if (isBusyWithContent()) return "Already engaged";
+  if (def.levelReq && hero.level < def.levelReq) return "Requires level " + def.levelReq;
+  if (type === "quest"){
+    const idx = QUEST_CHAPTERS.findIndex(q => q.id === def.id);
+    if (idx !== (state.questProgress || 0)) return "The story hasn't reached this chapter";
+  }
+  return null;
+}
+
+function startTimedContent(type, contentId){
+  const def = getTimedContentDef(type, contentId);
+  if (!def) return;
+  if (timedContentBlockReason(type, def)) return;
+
+  if (state.activity.type === "training"){
+    const zone = ZONES.find(z => z.id === state.activity.zoneId);
+    addLog("Stopped training" + (zone ? " at " + zone.name : "") + " to set out.", "zone");
+  }
+
+  const now = Date.now();
+  // Duration through the central timer multiplier (Dragoon 0.8).
+  const dur = Math.round(def.durationMin * 60000 * getTimerMultiplier(state.hero));
+  state.activity = { type: type, contentId: contentId, startedAt: now, endsAt: now + dur };
+
+  const typeLabel = type === "dungeon" ? "the dungeon" : type === "raid" ? "the raid" : "the quest";
+  addLog("Set out for " + typeLabel + " \"" + def.name + "\" (" + humanizeDuration(dur) + ").", "zone");
+  saveGame();
+  render();
+}
+
+/* ---- v2 phase 2: the Arena ---- */
+
+function arenaMonsterName(fightNumber){
+  const prefix = ARENA_MONSTERS.prefixes[Math.floor(Math.random() * ARENA_MONSTERS.prefixes.length)];
+  const name = ARENA_MONSTERS.names[Math.floor(Math.random() * ARENA_MONSTERS.names.length)];
+  let full = prefix + " " + name;
+  if (fightNumber % ARENA_EPITHET_INTERVAL === 0){
+    full += ", " + ARENA_MONSTERS.epithets[Math.floor(Math.random() * ARENA_MONSTERS.epithets.length)];
+  }
+  return full;
+}
+
+function arenaMonsterPower(hero, fightNumber){
+  return Math.max(1, Math.round(computePower(hero) * (ARENA_MONSTER_POWER_BASE + ARENA_MONSTER_POWER_STEP * fightNumber)));
+}
+
+// Rewards scale off the best zone the hero has unlocked ("zone-hour-scale").
+function arenaRewardZone(hero){
+  let zone = ZONES[0];
+  ZONES.forEach(z => { if (hero.level >= z.levelReq) zone = z; });
+  return zone;
+}
+
+function arenaBlockReason(){
+  const hero = state.hero;
+  if (hero.injuries >= MAX_INJURIES) return "Badly hurt — must rest";
+  if (state.activity.type === "rest") return "Resting";
+  if (isBusyWithContent() && state.activity.type !== "arena") return "Already engaged";
+  return null;
+}
+
+function startArenaRun(){
+  if (state.activity.type === "arena") return;
+  if (arenaBlockReason()) return;
+  if (state.activity.type === "training"){
+    const zone = ZONES.find(z => z.id === state.activity.zoneId);
+    addLog("Stopped training" + (zone ? " at " + zone.name : "") + " to enter the Arena.", "zone");
+  }
+  state.activity = {
+    type: "arena", fightNumber: 1,
+    bankedXp: 0, bankedGold: 0, bankedRenown: 0,
+    monsterName: arenaMonsterName(1), combatLog: [],
+    startedAt: Date.now()
+  };
+  addLog(state.hero.name + " steps onto the Arena sand.", "zone");
+  saveGame();
+  render();
+}
+
+function arenaLogLine(text){
+  const a = state.activity;
+  if (a.type !== "arena") return;
+  a.combatLog.unshift(text);
+  if (a.combatLog.length > ARENA_COMBAT_LOG_LINES) a.combatLog.length = ARENA_COMBAT_LOG_LINES;
+}
+
+// Ends the run and pays out the banked rewards. runData is captured by
+// the caller BEFORE any addInjury() call, because hitting the injury cap
+// resets state.activity to idle.
+function finishArenaRun(reason, runData){
+  const hero = state.hero;
+  if (state.activity.type === "arena"){
+    state.activity = { type:"idle", zoneId:null, startedAt: Date.now(), dropAccumulatorMs: 0 };
+  }
+  grantXp(hero, runData.bankedXp);
+  hero.gold += runData.bankedGold;
+  awardRenown(hero, runData.bankedRenown);
+  const fightsWon = Math.max(0, runData.fightNumber - 1);
+  const reasonText = reason === "yield" ? "yielded" : reason === "injury" ? "carried off injured" : "defeated";
+  addLog("Arena run ends (" + reasonText + ") — " + fightsWon + " win" + (fightsWon === 1 ? "" : "s") +
+    ", banked +" + fmtNumber(runData.bankedXp) + " xp, +" + fmtNumber(runData.bankedGold) + " gold" +
+    (runData.bankedRenown > 0 ? ", +" + runData.bankedRenown + " renown" : "") + ".",
+    reason === "yield" ? "zone" : "system");
+  saveGame();
+  render();
+}
+
+function arenaFight(){
+  const a = state.activity;
+  if (a.type !== "arena") return;
+  const hero = state.hero;
+
+  const heroPower = computePower(hero);
+  const monsterPower = arenaMonsterPower(hero, a.fightNumber);
+  const winChance = successChance(heroPower / monsterPower);
+
+  if (Math.random() >= winChance){
+    // Defeat: injury, run ends, banked rewards still paid out.
+    arenaLogLine("Fight " + a.fightNumber + ": the " + a.monsterName + " overwhelms you.");
+    const runData = { fightNumber: a.fightNumber, bankedXp: a.bankedXp, bankedGold: a.bankedGold, bankedRenown: a.bankedRenown };
+    addInjury(hero, "the Arena");
+    finishArenaRun("defeat", runData);
+    return;
+  }
+
+  // Win: bank rewards. Zone gold/hour is authored at half the zone's
+  // xp/hour, so using the same fraction yields "gold half that".
+  const zone = arenaRewardZone(hero);
+  const rewardMult = getRewardMultiplier(hero);
+  const xpWin = zone.xpPerHour * ARENA_XP_ZONE_FRACTION * a.fightNumber * rewardMult * getXpMultiplier(hero);
+  const goldWin = zone.goldPerHour * ARENA_XP_ZONE_FRACTION * a.fightNumber * rewardMult * getGoldMultiplier(hero);
+  a.bankedXp += xpWin;
+  a.bankedGold += goldWin;
+  if (a.fightNumber % ARENA_RENOWN_FIGHT_INTERVAL === 0) a.bankedRenown += 1;
+  arenaLogLine("Fight " + a.fightNumber + ": you strike down the " + a.monsterName + "! (+" + fmtNumber(xpWin) + " xp banked)");
+
+  // Post-win injury roll — skipped entirely for the earliest fights
+  // covered by racial/evolution arenaExtraFights (Orc: 1).
+  const safeFights = getArenaExtraFights(hero);
+  if (a.fightNumber <= safeFights){
+    arenaLogLine(getRace(hero).id === "orc"
+      ? "Your orcish blood shrugs off the first blow — no wound can end this fight."
+      : "Your conditioning shrugs off the blow — no injury risk this early.");
+  } else {
+    const injuryChance = (ARENA_INJURY_CHANCE_BASE + ARENA_INJURY_CHANCE_STEP * a.fightNumber) * getInjuryChanceMultiplier(hero);
+    if (Math.random() < injuryChance){
+      arenaLogLine("You take a wound in the winning — the crowd roars as you're forced to yield.");
+      const runData = { fightNumber: a.fightNumber + 1, bankedXp: a.bankedXp, bankedGold: a.bankedGold, bankedRenown: a.bankedRenown };
+      addInjury(hero, "the Arena");
+      finishArenaRun("injury", runData);
+      return;
+    }
+  }
+
+  a.fightNumber += 1;
+  a.monsterName = arenaMonsterName(a.fightNumber);
+  saveGame();
+  render();
+}
+
+function arenaYield(){
+  const a = state.activity;
+  if (a.type !== "arena") return;
+  finishArenaRun("yield", { fightNumber: a.fightNumber, bankedXp: a.bankedXp, bankedGold: a.bankedGold, bankedRenown: a.bankedRenown });
+}
+
+/* ---- v2 phase 2: class evolutions ---- */
+
+function chooseEvolution(evoId){
+  const hero = state.hero;
+  const evo = evolutionOptions(hero).find(e => e.id === evoId);
+  if (!evo) return; // not currently a legal choice — gating is authoritative here
+  hero.evolutions = (hero.evolutions || []).concat([evo.id]);
+  addLog(hero.name + " evolves into a " + evo.name + "! New arms: " + evo.weapon +
+    ". New skills: " + evo.skillNames.join(", ") + ".", "levelup");
+  saveGame();
+  render();
+}
+
+/* ---- v2: gear — equip / unequip / sell ---- */
+
+function equipItem(itemId){
+  const idx = state.inventory.findIndex(i => i.id === itemId);
+  if (idx < 0) return;
+  const item = state.inventory[idx];
+  const slot = item.slot;
+  state.inventory.splice(idx, 1);
+  const prev = state.hero.equipment[slot];
+  state.hero.equipment[slot] = item;
+  if (prev) state.inventory.push(prev);
+  addLog("Equipped " + item.name + ".", "system");
+  saveGame();
+  render();
+}
+
+function unequipItem(slot){
+  const item = state.hero.equipment[slot];
+  if (!item) return;
+  state.hero.equipment[slot] = null;
+  state.inventory.push(item);
+  addLog("Unequipped " + item.name + ".", "system");
+  saveGame();
+  render();
+}
+
+function sellItem(itemId){
+  const idx = state.inventory.findIndex(i => i.id === itemId);
+  if (idx < 0) return;
+  const item = state.inventory[idx];
+  const value = itemSellValue(item); // no gold-mult on sales
+  state.inventory.splice(idx, 1);
+  state.hero.gold += value;
+  addLog("Sold " + item.name + " for " + value + " gold.", "system");
+  saveGame();
+  render();
+}
+
+/* ---- v2: town hub — shop ---- */
+
+function buyShopItem(itemId){
+  const idx = state.shop.stock.findIndex(i => i.id === itemId);
+  if (idx < 0) return;
+  const item = state.shop.stock[idx];
+  const price = itemShopPrice(item, state.hero);
+  if (state.hero.gold < price) return;
+  state.hero.gold -= price;
+  state.shop.stock.splice(idx, 1);
+  state.inventory.push(Object.assign({}, item, { id: "item_" + Date.now() + "_" + Math.floor(Math.random()*100000), foundAt: Date.now() }));
+  addLog("Bought " + itemDisplayName(item) + " from the shop.", "system");
+  saveGame();
+  render();
+}
+
+/* ---- v2: town hub — blacksmith ---- */
+
+function blacksmithUpgradeCost(item){
+  const tierMult = BLACKSMITH_TIER_COST_MULT[item.tierId] || 1;
+  return Math.round(BLACKSMITH_BASE_COST * Math.pow(BLACKSMITH_COST_GROWTH, item.upgradeLevel || 0) * tierMult);
+}
+
+function findGearById(itemId){
+  const inInv = state.inventory.find(i => i.id === itemId);
+  if (inInv) return inInv;
+  for (let i = 0; i < SLOTS.length; i++){
+    const item = state.hero.equipment[SLOTS[i]];
+    if (item && item.id === itemId) return item;
+  }
+  return null;
+}
+
+function upgradeItem(itemId){
+  const item = findGearById(itemId);
+  if (!item) return;
+  if ((item.upgradeLevel || 0) >= BLACKSMITH_MAX_UPGRADE) return;
+  const cost = blacksmithUpgradeCost(item);
+  if (state.hero.gold < cost) return;
+  state.hero.gold -= cost;
+  item.upgradeLevel = (item.upgradeLevel || 0) + 1;
+  addLog("Upgraded " + item.name + " to +" + item.upgradeLevel + ".", "system");
+  saveGame();
+  render();
+}
+
+/* ---- v2: town hub — medic ---- */
+
+function medicHealCost(hero){
+  return Math.round(MEDIC_HEAL_COST_PER_LEVEL * hero.level);
+}
+
+function medicCutCost(hero){
+  return Math.round(MEDIC_CUT_COST_PER_LEVEL * hero.level);
+}
+
+function medicHealInjury(){
+  const hero = state.hero;
+  if (hero.injuries <= 0) return;
+  const cost = medicHealCost(hero);
+  if (hero.gold < cost) return;
+  hero.gold -= cost;
+  hero.injuries -= 1;
+  addLog("Paid the medic to heal an injury.", "system");
+  saveGame();
+  render();
+}
+
+function medicCutRestTime(){
+  if (state.activity.type !== "rest") return;
+  const hero = state.hero;
+  const cost = medicCutCost(hero);
+  if (hero.gold < cost) return;
+  hero.gold -= cost;
+  const now = Date.now();
+  const remaining = Math.max(0, state.activity.endsAt - now);
+  state.activity.endsAt = now + Math.floor(remaining / 2);
+  addLog("Paid the medic to cut your rest time in half.", "system");
+  saveGame();
+  render();
+}
+
+/* ---- v2: town hub — tavern ---- */
+
+function tavernBuffCost(def, hero){
+  return def.cost; // flat price — the pack's costs are already level-agnostic
+}
+
+// Human-readable effect line built from the buff's effect {key, value}.
+function tavernEffectDesc(def){
+  const pct = Math.round(Math.abs(def.effect.value - 1) * 100);
+  const sign = def.effect.value >= 1 ? "+" : "-";
+  return sign + pct + "% " + (RELIC_LABELS[def.effect.key] || def.effect.key) + " for " + def.durationMin + " min";
+}
+
+function buyTavernBuff(buffId){
+  const def = TAVERN_BUFFS.find(b => b.id === buffId);
+  if (!def) return;
+  const hero = state.hero;
+  const cost = tavernBuffCost(def, hero);
+  if (hero.gold < cost) return;
+  hero.gold -= cost;
+  const now = Date.now();
+  hero.buffs = (hero.buffs || []).filter(b => b.key !== def.effect.key); // one active per key; rebuying refreshes
+  hero.buffs.push({ id: def.id, key: def.effect.key, value: def.effect.value, expiresAt: now + def.durationMin * 60000, name: def.name });
+  addLog("Bought a round of " + def.name + " at the tavern.", "system");
   saveGame();
   render();
 }
@@ -1050,6 +3150,7 @@ function wireCreationScreen(){
 
     state = createDefaultState(name, creationChoice.raceId, creationChoice.classId);
     addLog(name + " sets out from Millbrook, journey begun.", "zone");
+    maybeRestockShop();
     saveGame();
     showGameScreen();
     render();
@@ -1059,6 +3160,8 @@ function wireCreationScreen(){
 
 function wireGameScreen(){
   document.getElementById("stop-training-btn").addEventListener("click", stopTraining);
+  document.getElementById("rest-short-btn").addEventListener("click", () => startRest("short"));
+  document.getElementById("rest-long-btn").addEventListener("click", () => startRest("long"));
 
   const gearBtn = document.getElementById("gear-btn");
   const settingsMenu = document.getElementById("settings-menu");
@@ -1072,6 +3175,23 @@ function wireGameScreen(){
   document.getElementById("reset-save-btn").addEventListener("click", () => {
     settingsMenu.classList.add("hidden");
     openResetModal();
+  });
+
+  wireTabs();
+  wireAdventureSubtabs();
+  wireEvolutionModal();
+  wireContentResultModal();
+}
+
+function wireTabs(){
+  document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const tab = btn.dataset.tab;
+      document.getElementById("adventure-tab").classList.toggle("hidden", tab !== "adventure");
+      document.getElementById("town-tab").classList.toggle("hidden", tab !== "town");
+    });
   });
 }
 
@@ -1095,6 +3215,7 @@ function wireResetModal(){
     deleteSave();
     state = null;
     zonesRenderSig = inventoryRenderSig = logRenderSig = null;
+    Object.keys(contentRenderSigs).forEach(k => { delete contentRenderSigs[k]; });
     document.getElementById("reset-modal").classList.add("hidden");
     creationChoice.raceId = null;
     creationChoice.classId = null;
@@ -1131,10 +3252,35 @@ function showWelcomeBackModal(summary){
   if (summary.itemsFound.length > 0){
     itemsEl.innerHTML = summary.itemsFound.map(item => {
       const tier = ITEM_TIERS.find(t => t.id === item.tierId) || ITEM_TIERS[0];
-      return "<div style=\"color:" + tier.color + "\">" + escapeHtml(tier.name + " " + item.name) + "</div>";
+      return "<div style=\"color:" + tier.color + "\">" + escapeHtml(itemDisplayName(item)) + "</div>";
     }).join("");
   } else {
     itemsEl.innerHTML = "";
+  }
+
+  // A dungeon/raid/quest that resolved while away gets reported here
+  // instead of the live result modal.
+  const contentNoteEl = document.getElementById("wb-content-note");
+  const cr = summary.contentResolved;
+  if (cr){
+    const typeLabel = cr.type === "dungeon" ? "dungeon" : cr.type === "raid" ? "raid" : "quest";
+    contentNoteEl.textContent =
+      "Your " + typeLabel + ": " + cr.name + " — " + (cr.success ? "Success!" : "Failure.") +
+      " +" + fmtNumber(cr.xp) + " xp, +" + fmtNumber(cr.gold) + " gold" +
+      (cr.renown > 0 ? ", +" + cr.renown + " renown" : "") +
+      (cr.items.length > 0 ? ", " + cr.items.length + " item" + (cr.items.length === 1 ? "" : "s") : "") +
+      (cr.injured ? ". You were injured." : ".");
+    contentNoteEl.classList.remove("hidden");
+  } else {
+    contentNoteEl.classList.add("hidden");
+  }
+
+  const restNoteEl = document.getElementById("wb-rest-note");
+  if (summary.restCompleted){
+    restNoteEl.textContent = summary.restCompleted === "long" ? "You are rested and healed." : "You are rested and feel a little better.";
+    restNoteEl.classList.remove("hidden");
+  } else {
+    restNoteEl.classList.add("hidden");
   }
 
   document.getElementById("welcome-back-modal").classList.remove("hidden");
@@ -1178,14 +3324,24 @@ function boot(){
     return;
   }
 
-  const data = loaded.data;
+  const data = migrateSave(loaded.data);
   state = {
     hero: data.hero,
     activity: data.activity,
     inventory: data.inventory,
     log: Array.isArray(data.log) ? data.log : [],
+    shop: data.shop || { stock: [], nextRestockAt: 0 },
+    questProgress: (typeof data.questProgress === "number") ? data.questProgress : 0,
     lastTick: data.lastTick || Date.now()
   };
+
+  // An Arena run doesn't accrue while the game is closed — a run left
+  // open resolves as a yield on load, banking whatever was earned.
+  if (state.activity.type === "arena"){
+    const a = state.activity;
+    addLog("The Arena run was left unfinished — " + state.hero.name + " yields and collects the banked spoils.", "system");
+    finishArenaRun("yield", { fightNumber: a.fightNumber, bankedXp: a.bankedXp || 0, bankedGold: a.bankedGold || 0, bankedRenown: a.bankedRenown || 0 });
+  }
 
   const offlineSummary = applyOfflineProgress();
 
@@ -1199,6 +3355,39 @@ function boot(){
     showWelcomeBackModal(offlineSummary);
   }
 }
+
+/* ================================================================
+   DEV HOOK (for manual testing — not part of normal play)
+================================================================ */
+
+window.rwDebug = {
+  addInjury: function(sourceLabel){
+    if (!state) return;
+    addInjury(state.hero, sourceLabel || "debug");
+    saveGame();
+    render();
+  },
+  setLevel: function(level){
+    if (!state) return;
+    state.hero.level = level;
+    state.hero.xp = 0;
+    saveGame();
+    render();
+  },
+  addRenown: function(amount){
+    if (!state) return;
+    awardRenown(state.hero, amount);
+    saveGame();
+    render();
+  },
+  // Pull a running rest/dungeon/raid/quest's endsAt into the past so the
+  // next tick resolves it.
+  finishActivity: function(){
+    if (!state || !state.activity.endsAt) return;
+    state.activity.endsAt = Date.now() - 1000;
+    saveGame();
+  }
+};
 
 boot();
 
