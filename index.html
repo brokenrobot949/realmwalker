@@ -214,6 +214,9 @@
   .zone-stats span b{ color:var(--parchment); }
   .zone-action{ min-width:110px; text-align:right; }
 
+  .training-progress{ margin-bottom:0.9rem; padding:0.6rem 0.8rem; background:var(--bg-1); border:1px solid var(--panel-border); border-radius:8px; }
+  .training-progress .xp-bar-label span:first-child{ font-style:italic; color:var(--parchment-dim); }
+
   .inventory-list{ display:flex; flex-direction:column; gap:0.4rem; max-height:260px; overflow-y:auto; padding-right:0.3rem; }
   .inv-item{
     display:flex; justify-content:space-between; background:var(--bg-1); border:1px solid var(--panel-border);
@@ -394,7 +397,10 @@
     <div class="panel">
       <div class="field-row">
         <label for="hero-name-input">Hero Name</label>
-        <input id="hero-name-input" type="text" maxlength="20" placeholder="Enter your hero's name...">
+        <div style="display:flex; gap:0.5rem;">
+          <input id="hero-name-input" type="text" maxlength="20" placeholder="Enter your hero's name..." style="flex:1;">
+          <button type="button" class="btn secondary" id="name-reroll-btn" title="Roll a random name">Reroll</button>
+        </div>
       </div>
 
       <div class="section-label">Choose your race</div>
@@ -448,6 +454,9 @@
       <div class="settings-corner">
         <button class="gear-btn" id="gear-btn" title="Settings">&#9881;</button>
         <div id="settings-menu" class="settings-menu hidden">
+          <button class="btn small secondary" id="export-save-btn" style="width:100%;">Export save</button>
+          <button class="btn small secondary" id="import-save-btn" style="width:100%;">Import save</button>
+          <div id="export-status" class="hidden" style="font-size:0.75rem; color:var(--green); margin:0.2rem 0 0.4rem; text-align:center;"></div>
           <button class="btn small danger" id="reset-save-btn" style="width:100%;">Reset / delete save</button>
         </div>
       </div>
@@ -455,6 +464,8 @@
 
     <div class="tab-row">
       <button class="tab-btn active" id="tab-btn-adventure" data-tab="adventure">Adventure</button>
+      <button class="tab-btn" id="tab-btn-inventory" data-tab="inventory">Inventory</button>
+      <button class="tab-btn" id="tab-btn-character" data-tab="character">Character</button>
       <button class="tab-btn" id="tab-btn-town" data-tab="town">Town</button>
     </div>
 
@@ -482,6 +493,13 @@
           </div>
           <div id="adv-training" class="adv-subpanel">
             <h3>Training Zones</h3>
+            <div id="training-progress-panel" class="training-progress hidden">
+              <div class="xp-bar-label">
+                <span id="training-task-label"></span>
+                <span id="training-progress-label"></span>
+              </div>
+              <div class="xp-bar-bg"><div class="xp-bar-fill" id="training-progress-fill" style="width:0%"></div></div>
+            </div>
             <div id="zone-list" class="zone-list"></div>
           </div>
           <div id="adv-dungeons" class="adv-subpanel hidden">
@@ -504,25 +522,43 @@
 
         <div class="side-col">
           <div class="panel">
-            <h3>Renown</h3>
-            <div id="renown-body"></div>
-          </div>
-
-          <div class="panel">
-            <h3>Equipped Gear</h3>
-            <div id="equipment-list" class="equipment-list"></div>
-          </div>
-
-          <div class="panel">
-            <h3>Inventory</h3>
-            <div id="inventory-list" class="inventory-list"></div>
-            <div class="inv-note">Equip gear to raise your power, or sell it to the shop for gold.</div>
-          </div>
-
-          <div class="panel">
             <h3>Chronicle</h3>
             <div id="log-list" class="log-list"></div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="inventory-tab" class="tab-panel hidden">
+      <div class="town-grid">
+        <div class="panel">
+          <h3>Equipped Gear</h3>
+          <div id="equipment-list" class="equipment-list"></div>
+        </div>
+
+        <div class="panel">
+          <h3>Inventory</h3>
+          <div id="inventory-list" class="inventory-list"></div>
+          <div class="inv-note">Equip gear to raise your power, or sell it to the shop for gold.</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="character-tab" class="tab-panel hidden">
+      <div class="town-grid">
+        <div class="panel">
+          <h3>Renown</h3>
+          <div id="renown-body"></div>
+        </div>
+
+        <div class="panel">
+          <h3>Character</h3>
+          <div id="character-info-body"></div>
+        </div>
+
+        <div class="panel" style="grid-column:1 / -1;">
+          <h3>Lifetime Statistics</h3>
+          <div id="stats-body" class="modal-stat-grid" style="margin:0;"></div>
         </div>
       </div>
     </div>
@@ -568,6 +604,8 @@
       </div>
       <div id="wb-items" class="modal-items"></div>
       <div id="wb-content-note" class="wb-content-note hidden"></div>
+      <div id="wb-arena-note" class="wb-content-note hidden"></div>
+      <div id="wb-training-note" class="wb-content-note hidden"></div>
       <div id="wb-rest-note" class="wb-rest-note hidden"></div>
       <div class="modal-actions"><button class="btn" id="wb-close-btn">Continue your journey</button></div>
     </div>
@@ -590,6 +628,23 @@
       <div id="cr-items" class="modal-items"></div>
       <div id="cr-injury" class="modal-warning hidden" style="text-align:center;"></div>
       <div class="modal-actions"><button class="btn" id="cr-close-btn">Continue</button></div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       ARENA RUN RESULT MODAL
+  ============================================================ -->
+  <div id="arena-result-modal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3>Arena run ends</h3>
+      <div id="ar-outcome" style="text-align:center; font-family:Georgia,'Times New Roman',serif; font-size:1.2rem; margin-bottom:0.4rem;"></div>
+      <div class="modal-stat-grid">
+        <div class="k">Fights won</div><div class="v" id="ar-fights"></div>
+        <div class="k">Experience banked</div><div class="v" id="ar-xp"></div>
+        <div class="k">Gold banked</div><div class="v" id="ar-gold"></div>
+        <div class="k">Renown banked</div><div class="v" id="ar-renown"></div>
+      </div>
+      <div class="modal-actions"><button class="btn" id="ar-close-btn">Continue</button></div>
     </div>
   </div>
 
@@ -636,6 +691,27 @@
     </div>
   </div>
 
+  <!-- ============================================================
+       IMPORT SAVE MODAL
+  ============================================================ -->
+  <div id="import-modal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3>Import save</h3>
+      <p style="text-align:center; color:var(--parchment-dim); font-size:0.9rem;">Paste save JSON below, or choose a file. Importing overwrites your current journey.</p>
+      <input type="file" id="import-file-input" accept="application/json,.json" style="width:100%; margin-bottom:0.6rem; color:var(--parchment-dim);">
+      <textarea id="import-textarea" placeholder="Paste save JSON here..." style="width:100%; height:130px; background:var(--bg-1); border:1px solid var(--panel-border); color:var(--parchment); border-radius:6px; font-family:monospace; font-size:0.8rem; padding:0.5rem;"></textarea>
+      <div id="import-error" class="modal-warning hidden" style="text-align:center;"></div>
+      <div id="import-confirm-box" class="hidden" style="text-align:center; margin-top:0.6rem;">
+        <p style="color:var(--parchment-dim);">Import <b id="import-hero-name" style="color:var(--gold-bright)"></b> (Level <span id="import-hero-level"></span>)? This overwrites your current save and cannot be undone.</p>
+      </div>
+      <div class="modal-actions" style="display:flex; gap:0.6rem; justify-content:center;">
+        <button class="btn secondary" id="import-cancel-btn">Cancel</button>
+        <button class="btn" id="import-validate-btn">Validate</button>
+        <button class="btn danger hidden" id="import-confirm-btn">Overwrite &amp; Import</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -651,7 +727,7 @@
 
 const SAVE_KEY = "realmwalker_save";
 const SAVE_KEY_CORRUPT = "realmwalker_save_corrupt";
-const SAVE_VERSION = 3;
+const SAVE_VERSION = 4;
 
 const RACES = {
   human: {
@@ -735,17 +811,24 @@ const CLASSES = {
 };
 
 const ZONES = [
-  { id:"millbrook",  name:"Millbrook Fields",   tier:1, levelReq:1,  xpPerHour:600,   goldPerHour:300,   dropChance:0.05 },
-  { id:"thornwood",  name:"Thornwood Edge",     tier:2, levelReq:5,  xpPerHour:1500,  goldPerHour:750,   dropChance:0.06 },
-  { id:"cragside",   name:"Cragside Quarry",    tier:3, levelReq:12, xpPerHour:3200,  goldPerHour:1600,  dropChance:0.07 },
-  { id:"marsh",      name:"The Sunken Marsh",   tier:4, levelReq:20, xpPerHour:6000,  goldPerHour:3000,  dropChance:0.08 },
-  { id:"emberfall",  name:"Emberfall Ruins",    tier:5, levelReq:30, xpPerHour:11000, goldPerHour:5500,  dropChance:0.09 },
-  { id:"peaks",      name:"The Shattered Peaks",tier:6, levelReq:45, xpPerHour:20000, goldPerHour:10000, dropChance:0.10 }
+  { id:"millbrook",  name:"Millbrook Fields",   tier:1, levelReq:1,  xpPerHour:600,   goldPerHour:30,   dropChance:0.05,
+    tasks:["Culling rats in the millhouse","Chasing a fox from the henyard","Mending a fence the goats keep breaking","Hauling grain sacks up from the cellar","Standing watch over the Millbrook road"] },
+  { id:"thornwood",  name:"Thornwood Edge",     tier:2, levelReq:5,  xpPerHour:1500,  goldPerHour:75,   dropChance:0.06,
+    tasks:["Clearing bramble-wolves from the tree line","Tracking a poacher through the deep wood","Cutting a path through choking thornvine","Standing guard over a woodcutter's camp","Chasing off a pack of coin-thieving pixies"] },
+  { id:"cragside",   name:"Cragside Quarry",    tier:3, levelReq:12, xpPerHour:3200,  goldPerHour:160,  dropChance:0.07,
+    tasks:["Clearing rockslide debris from the quarry road","Fighting off crag-lurkers in the lower pits","Hauling ore carts up the switchback trail","Shoring up a tunnel before it collapses","Driving off a cave troll gone territorial"] },
+  { id:"marsh",      name:"The Sunken Marsh",   tier:4, levelReq:20, xpPerHour:6000,  goldPerHour:300,  dropChance:0.08,
+    tasks:["Wading through the mire after a drowned relic","Fending off marsh leeches the size of dogs","Tracking a will-o'-wisp toward solid ground","Freeing a wagon sunk to its axles","Standing off a bog hag's territorial curse"] },
+  { id:"emberfall",  name:"Emberfall Ruins",    tier:5, levelReq:30, xpPerHour:11000, goldPerHour:550,  dropChance:0.09,
+    tasks:["Sifting cinders for anything unmelted","Driving cinder-jackals from the collapsed archive","Holding a line against the Hollow Choir's scouts","Prying open a sealed vault door","Outlasting the heat of the inner ruins"] },
+  { id:"peaks",      name:"The Shattered Peaks",tier:6, levelReq:45, xpPerHour:20000, goldPerHour:1000, dropChance:0.10,
+    tasks:["Fighting a hollow revenant off the pass","Scaling a wind-scoured ridge","Holding footing against the mountain's own gales","Standing vigil near the sealed Threshold","Driving back something that used to be a person"] }
 ];
 
 const DROP_INTERVAL_MS = 60 * 1000; // one drop roll per minute of training
 const MAX_OFFLINE_DROPS = 20;
 const MAX_LOG_ENTRIES = 50;
+const TRAINING_CAP_MS = 8 * 60 * 60 * 1000; // a training session auto-ends after 8 hours
 
 const ITEM_TIERS = [
   { id:"common",    name:"Common",    color:"var(--tier-common)",    weight:70 },
@@ -784,7 +867,7 @@ const RELIC_LABELS = {
   injuryChanceMult: "Injury Chance", restTimeMult: "Rest Time"
 };
 
-const SELL_VALUE_BY_TIER = { common:10, uncommon:30, rare:100, epic:300, legendary:1000 };
+const SELL_VALUE_BY_TIER = { common:1, uncommon:3, rare:10, epic:30, legendary:100 };
 const SHOP_PRICE_MULT = 5;
 
 const ITEM_NAMES_V2 = {
@@ -815,21 +898,21 @@ const SHOP_RESTOCK_INTERVAL_MS = 6 * 60 * 60 * 1000;
 
 // Blacksmith
 const BLACKSMITH_MAX_UPGRADE = 5;
-const BLACKSMITH_BASE_COST = 100;
+const BLACKSMITH_BASE_COST = 10;
 const BLACKSMITH_COST_GROWTH = 3;
 const BLACKSMITH_TIER_COST_MULT = { common:1, uncommon:2, rare:4, epic:8, legendary:16 };
 const BLACKSMITH_UPGRADE_POWER_STEP = 0.2; // +20% of base power per upgrade level
 
 // Medic
-const MEDIC_HEAL_COST_PER_LEVEL = 50;
-const MEDIC_CUT_COST_PER_LEVEL = 25;
+const MEDIC_HEAL_COST_PER_LEVEL = 5;
+const MEDIC_CUT_COST_FRACTION = 0.5; // rest-cut costs half the heal price, rounded up
 
 // Tavern — temporary buffs. One active per effect key; rebuying refreshes duration.
 const TAVERN_BUFFS = [
-  { id: "emberroot_ale", name: "Emberroot Ale", flavor: "A slow-burning brew that keeps a hero sharp long after the fire's gone out.", durationMin: 60, effect: { key: "xpMult", value: 1.10 }, cost: 500 },
-  { id: "gilded_mead", name: "Gilded Mead", flavor: "Sweet, expensive, and known to loosen the purse-strings of anyone selling to you.", durationMin: 90, effect: { key: "goldMult", value: 1.15 }, cost: 900 },
-  { id: "foxglove_tonic", name: "Foxglove Tonic", flavor: "Bitter and faintly poisonous; drinkers swear it sharpens their eye for anything worth stealing.", durationMin: 90, effect: { key: "dropMult", value: 1.20 }, cost: 1400 },
-  { id: "widows_brew", name: "Widow's Brew", flavor: "Named for the tavern-keeper who claims it's kept her burying fewer regulars than she should.", durationMin: 120, effect: { key: "injuryChanceMult", value: 0.80 }, cost: 2000 }
+  { id: "emberroot_ale", name: "Emberroot Ale", flavor: "A slow-burning brew that keeps a hero sharp long after the fire's gone out.", durationMin: 60, effect: { key: "xpMult", value: 1.10 }, cost: 50 },
+  { id: "gilded_mead", name: "Gilded Mead", flavor: "Sweet, expensive, and known to loosen the purse-strings of anyone selling to you.", durationMin: 90, effect: { key: "goldMult", value: 1.15 }, cost: 90 },
+  { id: "foxglove_tonic", name: "Foxglove Tonic", flavor: "Bitter and faintly poisonous; drinkers swear it sharpens their eye for anything worth stealing.", durationMin: 90, effect: { key: "dropMult", value: 1.20 }, cost: 140 },
+  { id: "widows_brew", name: "Widow's Brew", flavor: "Named for the tavern-keeper who claims it's kept her burying fewer regulars than she should.", durationMin: 120, effect: { key: "injuryChanceMult", value: 0.80 }, cost: 200 }
 ];
 
 /* ---- v2 phase 2: evolutions, timed content, renown, arena ---- */
@@ -967,21 +1050,21 @@ const EVOLUTIONS = {
 };
 
 const DUNGEONS = [
-  { id: "ashen_crypt", name: "The Ashen Crypt", flavor: "A collapsed mausoleum on the Millbrook road, its dead restless since the roof came down.", durationMin: 15, difficulty: 40, levelReq: 1, xp: 260, gold: 130, renown: 3, dropRolls: 2, dropTierBonus: 0 },
-  { id: "wolfsbane_hollow", name: "Wolfsbane Hollow", flavor: "A poisoned dell where the wolves stopped dying and started waiting.", durationMin: 20, difficulty: 65, levelReq: 6, xp: 850, gold: 420, renown: 4, dropRolls: 2, dropTierBonus: 0 },
-  { id: "drowned_chapel", name: "The Drowned Chapel", flavor: "A chapel the marsh swallowed whole, its bell still ringing when the water goes still.", durationMin: 25, difficulty: 100, levelReq: 12, xp: 2100, gold: 1050, renown: 5, dropRolls: 3, dropTierBonus: 1 },
-  { id: "gallows_hill", name: "Gallows Hill", flavor: "Executions stopped here a century ago; the gallows never got the message.", durationMin: 30, difficulty: 150, levelReq: 20, xp: 4800, gold: 2400, renown: 6, dropRolls: 3, dropTierBonus: 1 },
-  { id: "emberfall_catacombs", name: "Emberfall Catacombs", flavor: "Beneath the ruins, tunnels the old empire dug for reasons no one wrote down.", durationMin: 40, difficulty: 210, levelReq: 30, xp: 12000, gold: 6000, renown: 8, dropRolls: 3, dropTierBonus: 1 },
-  { id: "cinder_maw", name: "The Cinder Maw", flavor: "A fissure of permanent fire at Emberfall's heart, said to breathe like something alive.", durationMin: 45, difficulty: 290, levelReq: 38, xp: 19800, gold: 9900, renown: 10, dropRolls: 4, dropTierBonus: 2 },
-  { id: "frostbound_vault", name: "Frostbound Vault", flavor: "A treasury sealed in ice long before anyone alive was born, still guarding what it was told to guard.", durationMin: 55, difficulty: 370, levelReq: 50, xp: 42000, gold: 21000, renown: 13, dropRolls: 4, dropTierBonus: 2 },
-  { id: "shattered_throne", name: "The Shattered Throne", flavor: "The Peaks' broken summit hides a throne room that was never meant to be found again.", durationMin: 60, difficulty: 450, levelReq: 60, xp: 50000, gold: 25000, renown: 16, dropRolls: 4, dropTierBonus: 2 }
+  { id: "ashen_crypt", name: "The Ashen Crypt", flavor: "A collapsed mausoleum on the Millbrook road, its dead restless since the roof came down.", durationMin: 15, difficulty: 40, levelReq: 1, xp: 260, gold: 13, renown: 3, dropRolls: 2, dropTierBonus: 0 },
+  { id: "wolfsbane_hollow", name: "Wolfsbane Hollow", flavor: "A poisoned dell where the wolves stopped dying and started waiting.", durationMin: 20, difficulty: 65, levelReq: 6, xp: 850, gold: 42, renown: 4, dropRolls: 2, dropTierBonus: 0 },
+  { id: "drowned_chapel", name: "The Drowned Chapel", flavor: "A chapel the marsh swallowed whole, its bell still ringing when the water goes still.", durationMin: 25, difficulty: 100, levelReq: 12, xp: 2100, gold: 105, renown: 5, dropRolls: 3, dropTierBonus: 1 },
+  { id: "gallows_hill", name: "Gallows Hill", flavor: "Executions stopped here a century ago; the gallows never got the message.", durationMin: 30, difficulty: 150, levelReq: 20, xp: 4800, gold: 240, renown: 6, dropRolls: 3, dropTierBonus: 1 },
+  { id: "emberfall_catacombs", name: "Emberfall Catacombs", flavor: "Beneath the ruins, tunnels the old empire dug for reasons no one wrote down.", durationMin: 40, difficulty: 210, levelReq: 30, xp: 12000, gold: 600, renown: 8, dropRolls: 3, dropTierBonus: 1 },
+  { id: "cinder_maw", name: "The Cinder Maw", flavor: "A fissure of permanent fire at Emberfall's heart, said to breathe like something alive.", durationMin: 45, difficulty: 290, levelReq: 38, xp: 19800, gold: 990, renown: 10, dropRolls: 4, dropTierBonus: 2 },
+  { id: "frostbound_vault", name: "Frostbound Vault", flavor: "A treasury sealed in ice long before anyone alive was born, still guarding what it was told to guard.", durationMin: 55, difficulty: 370, levelReq: 50, xp: 42000, gold: 2100, renown: 13, dropRolls: 4, dropTierBonus: 2 },
+  { id: "shattered_throne", name: "The Shattered Throne", flavor: "The Peaks' broken summit hides a throne room that was never meant to be found again.", durationMin: 60, difficulty: 450, levelReq: 60, xp: 50000, gold: 2500, renown: 16, dropRolls: 4, dropTierBonus: 2 }
 ];
 
 const RAIDS = [
-  { id: "siege_of_thornwood_keep", name: "Siege of Thornwood Keep", flavor: "A ruined keep retaken by something organized enough to post sentries.", durationMin: 120, difficulty: 120, levelReq: 15, xp: 15700, gold: 7850, renown: 21, dropRolls: 4, dropTierBonus: 1 },
-  { id: "the_sunken_court", name: "The Sunken Court", flavor: "A drowned noble house beneath the Marsh, holding court for guests who never leave.", durationMin: 150, difficulty: 250, levelReq: 30, xp: 67000, gold: 33500, renown: 35, dropRolls: 5, dropTierBonus: 2 },
-  { id: "the_ember_conclave", name: "The Ember Conclave", flavor: "A gathering of the Hollow Choir's faithful, deep in Emberfall's burning heart.", durationMin: 200, difficulty: 400, levelReq: 45, xp: 167000, gold: 83500, renown: 46, dropRolls: 5, dropTierBonus: 3 },
-  { id: "the_shattered_vigil", name: "The Shattered Vigil", flavor: "What's left of an army that marched into the Peaks and forgot to march back out.", durationMin: 240, difficulty: 550, levelReq: 60, xp: 204000, gold: 102000, renown: 58, dropRolls: 6, dropTierBonus: 3 }
+  { id: "siege_of_thornwood_keep", name: "Siege of Thornwood Keep", flavor: "A ruined keep retaken by something organized enough to post sentries.", durationMin: 120, difficulty: 120, levelReq: 15, xp: 15700, gold: 785, renown: 21, dropRolls: 4, dropTierBonus: 1 },
+  { id: "the_sunken_court", name: "The Sunken Court", flavor: "A drowned noble house beneath the Marsh, holding court for guests who never leave.", durationMin: 150, difficulty: 250, levelReq: 30, xp: 67000, gold: 3350, renown: 35, dropRolls: 5, dropTierBonus: 2 },
+  { id: "the_ember_conclave", name: "The Ember Conclave", flavor: "A gathering of the Hollow Choir's faithful, deep in Emberfall's burning heart.", durationMin: 200, difficulty: 400, levelReq: 45, xp: 167000, gold: 8350, renown: 46, dropRolls: 5, dropTierBonus: 3 },
+  { id: "the_shattered_vigil", name: "The Shattered Vigil", flavor: "What's left of an army that marched into the Peaks and forgot to march back out.", durationMin: 240, difficulty: 550, levelReq: 60, xp: 204000, gold: 10200, renown: 58, dropRolls: 6, dropTierBonus: 3 }
 ];
 
 const QUEST_CHAPTERS = [
@@ -989,61 +1072,61 @@ const QUEST_CHAPTERS = [
     id: "ch1_empty_road", chapter: 1, title: "The Empty Road",
     intro: "Warden Mira Ashcombe flags you down at the Millbrook crossroads, dust still settling behind her horse. Three merchant caravans have missed their dates on the road to Thornwood, and her riders have found nothing — not a wheel track past a certain bend, not a body, not a clue.",
     outro: "You find the fourth caravan exactly where the others vanished: horses tethered and calm, cargo untouched, and not a single person left to claim it. Mira crouches by the wheel and goes quiet for a long moment. \"Something took them without taking anything else,\" she says. \"That's worse than bandits.\"",
-    mission: { name: "Walk the Vanishing Road", durationMin: 20, difficulty: 35, xp: 460, gold: 230, renown: 5 }
+    mission: { name: "Walk the Vanishing Road", durationMin: 20, difficulty: 35, xp: 460, gold: 23, renown: 5 }
   },
   {
     id: "ch2_marks_in_mud", chapter: 2, title: "Marks in the Mud",
     intro: "Mira asks you to walk the vanishing-point again, this time on hands and knees. Somewhere in that stretch of road, whatever happened left a sign — she's certain of it, and she hates being certain of things she can't explain.",
     outro: "Pressed into the drying mud past the tree line: a symbol, deliberate and old, scratched by more than one set of hands. Mira doesn't recognize it, but she knows someone who might — a hermit scholar who left Thornwood decades ago and never came back.",
-    mission: { name: "Tracks Before Dawn", durationMin: 25, difficulty: 55, xp: 1440, gold: 720, renown: 6 }
+    mission: { name: "Tracks Before Dawn", durationMin: 25, difficulty: 55, xp: 1440, gold: 72, renown: 6 }
   },
   {
     id: "ch3_hermits_warning", chapter: 3, title: "The Hermit's Warning",
     intro: "Aldric Vane lives alone at the edge of Thornwood, surrounded by books he swears are the only honest company he's found in forty years. He looks at your rubbing of the symbol for a long time before he speaks.",
     outro: "\"The Hollow Choir,\" Aldric says finally, like the words cost him something. \"A cult I thought the Church burned out a lifetime ago. They don't kill their converts, Warden — they collect them.\" He agrees to help, on the condition that no one calls it retirement.",
-    mission: { name: "The Hermit's Archive", durationMin: 30, difficulty: 80, xp: 3030, gold: 1515, renown: 8 }
+    mission: { name: "The Hermit's Archive", durationMin: 30, difficulty: 80, xp: 3030, gold: 152, renown: 8 }
   },
   {
     id: "ch4_tithe_road", chapter: 4, title: "The Tithe Road",
     intro: "Aldric's research points to a cult waystation past Cragside, where the missing are gathered before being moved onward. Mira wants it burned to the ground. Aldric wants it questioned first.",
     outro: "The waystation gives up both answers: crude ledgers tracking a \"tithe,\" and a terrified robed acolyte who claims the tithes are all walked toward one destination. He won't say the name of it without shaking. He doesn't have to — you already know which direction he's pointing.",
-    mission: { name: "Raid the Waystation", durationMin: 35, difficulty: 110, xp: 5550, gold: 2775, renown: 10 }
+    mission: { name: "Raid the Waystation", durationMin: 35, difficulty: 110, xp: 5550, gold: 278, renown: 10 }
   },
   {
     id: "ch5_marsh_keeps", chapter: 5, title: "What the Marsh Keeps",
     intro: "The tithe road cuts through the Sunken Marsh, where a caravan of the missing is said to be moving under guard tonight. Mira insists on riding with you this time; Aldric, for once, doesn't argue.",
     outro: "You free one survivor from the marsh column — an old woman who won't stop describing \"a door that breathes\" somewhere beneath the Peaks. Mira wraps a blanket around her shoulders and won't meet your eyes. She's starting to believe this is bigger than a cult.",
-    mission: { name: "The Marsh Column", durationMin: 45, difficulty: 150, xp: 10800, gold: 5400, renown: 13 }
+    mission: { name: "The Marsh Column", durationMin: 45, difficulty: 150, xp: 10800, gold: 540, renown: 13 }
   },
   {
     id: "ch6_unmade_king", chapter: 6, title: "The Unmade King",
     intro: "Aldric finally tells the story he's clearly been avoiding: before the Peaks were shattered, they crowned a king named Kaeloth, who bargained with something older than the mountains to escape his own death. The mountains broke soon after. Kaeloth did not.",
     outro: "\"The Choir doesn't worship a memory,\" Aldric says, closing the last of his books. \"They worship a king who is still, technically, alive. And they mean to wake him properly.\" For the first time since you've known him, he looks afraid of his own research.",
-    mission: { name: "Beneath the Old Crown", durationMin: 50, difficulty: 195, xp: 19500, gold: 9750, renown: 16 }
+    mission: { name: "Beneath the Old Crown", durationMin: 50, difficulty: 195, xp: 19500, gold: 975, renown: 16 }
   },
   {
     id: "ch7_cinders_secrets", chapter: 7, title: "Cinders and Secrets",
     intro: "The Hollow Choir keeps a stronghold burning quietly inside Emberfall Ruins. Mira wants a look at their ritual calendar before deciding whether to bring the full Wardenry down on the place.",
     outro: "The calendar you recover marks a completion date in the language of moons and tides, and it isn't far off. Worse, it names a location the Choir calls the Threshold — a name Aldric recognizes from older, uglier texts as the seam where Kaeloth was sealed.",
-    mission: { name: "The Choir's Calendar", durationMin: 60, difficulty: 250, xp: 33000, gold: 16500, renown: 20 }
+    mission: { name: "The Choir's Calendar", durationMin: 60, difficulty: 250, xp: 33000, gold: 1650, renown: 20 }
   },
   {
     id: "ch8_wardens_price", chapter: 8, title: "The Warden's Price",
     intro: "Mira rides ahead to scout the pass into the Peaks alone, against every piece of advice you and Aldric can offer her. She doesn't return by nightfall.",
     outro: "You find her alive but broken-boned, disarmed by something she describes only as \"faster than it should have been able to move.\" She grips your arm before you leave without her. \"Finish it,\" she says. \"Don't wait for me to heal first.\"",
-    mission: { name: "Recover the Warden", durationMin: 70, difficulty: 320, xp: 50700, gold: 25350, renown: 25 }
+    mission: { name: "Recover the Warden", durationMin: 70, difficulty: 320, xp: 50700, gold: 2535, renown: 25 }
   },
   {
     id: "ch9_into_the_peaks", chapter: 9, title: "Into the Shattered Peaks",
     intro: "Alone now but for Aldric's letters of guidance, you climb into the Peaks toward the Threshold, where the Hollow Choir's high priest is already mid-ritual, chanting Kaeloth's unmade name into the dark.",
     outro: "The ritual breaks apart around you — chants cut short, the high priest silenced, the gathered Choir scattered or worse. But the seam beneath the mountain has already cracked open, and something vast and patient exhales through it before the stone grinds shut again.",
-    mission: { name: "The Threshold Ritual", durationMin: 80, difficulty: 400, xp: 81300, gold: 40650, renown: 32 }
+    mission: { name: "The Threshold Ritual", durationMin: 80, difficulty: 400, xp: 81300, gold: 4065, renown: 32 }
   },
   {
     id: "ch10_sleeper_stirs", chapter: 10, title: "The Sleeper Stirs",
     intro: "With the Threshold sealed but not repaired, Aldric insists on one final descent to confirm Kaeloth is still bound. Mira, healed enough to travel, refuses to let you go down there without her.",
     outro: "The seal holds — for now. But the chamber beneath the Peaks is emptier than it should be, and the impression left in ancient stone is shaped like a throne with no one sitting in it. Mira asks if you noticed the footprints leading away from it, and out, toward the lowlands. Neither of you has an answer yet.",
-    mission: { name: "What the Throne Remembers", durationMin: 90, difficulty: 500, xp: 136000, gold: 68000, renown: 40 }
+    mission: { name: "What the Throne Remembers", durationMin: 90, difficulty: 500, xp: 136000, gold: 6800, renown: 40 }
   }
 ];
 
@@ -1081,6 +1164,45 @@ const ARENA_INJURY_CHANCE_STEP = 0.03;
 const ARENA_RENOWN_FIGHT_INTERVAL = 3;   // +1 banked renown per this many fights won
 const ARENA_EPITHET_INTERVAL = 5;        // every Nth fight's monster carries an epithet
 const ARENA_COMBAT_LOG_LINES = 6;
+const ARENA_FIGHT_MS = 15 * 1000;        // each Arena fight auto-resolves 15s after it begins
+const ARENA_MAX_FIGHTS_PER_CATCHUP = 5000; // safety clamp for a huge offline gap
+
+/* ---- v2.1: fantasy name generator ---- */
+
+const NAME_PARTS = {
+  human: {
+    given: ["Rowan","Ashen","Brynn","Corwin","Eda","Finnian","Halric","Isolde","Joss","Kestrel","Landon","Mira","Nyle","Osric","Perrin","Quenna","Roswen","Selwyn","Tamsin","Wren"],
+    surname: {
+      martial: ["Stormwatch","Ironhale","Ashborne","Farrow","Thorne","Winters","Blackmoor"],
+      magical: ["Ashveil","Moonwright","Duskbane","Farsight","Grayrune","Nightshade"],
+      general: ["Ashford","Marrow","Hale","Duskwood","Thorn","Reyes","Winters"]
+    }
+  },
+  dwarf: {
+    given: ["Brunhild","Thrain","Dagna","Borin","Grynna","Kordek","Ulfrida","Baldrek","Hrolf","Sigga","Dworin","Fenna","Gromli","Astra","Karrek"],
+    surname: { general: ["Ironvein","Stonehammer","Deepdelve","Ashenforge","Coalbeard","Granitehew","Oreheart","Anvilborn"] }
+  },
+  elf: {
+    given: ["Aelithra","Sylvaen","Ithariel","Miralune","Faelien","Ysendra","Caelith","Thessaly","Nimeth","Vaelith","Oriseth","Lyraen","Ashariel","Quilyn","Serathiel"],
+    surname: { general: ["Windwhisper","Duskmere","Starfall","Silverleaf"] }
+  },
+  orc: {
+    given: ["Grashka","Uzgor","Mogrukk","Krashna","Vorgath","Zulgra","Drakka","Nokthar","Yezga","Throkka","Mazgul","Ruknar","Skarga","Ognath"],
+    surname: { general: ["Skullcleaver","Bonecrusher","Ironjaw","Bloodfang","Doomhide","Gorehowl"] }
+  },
+  halfling: {
+    given: ["Poppy","Milo","Rosie","Tobin","Daisy","Wendell","Marigold","Barnaby","Nettle","Ferdinand","Briar","Pip","Clover","Ottoline","Bramwell"],
+    surname: { general: ["Underhill","Goodbarrel","Thistlewood","Applegate","Tealeaf","Hollyfoot","Greenbottle"] }
+  },
+  tiefling: {
+    given: ["Mephisia","Zarielle","Corvaine","Ashra","Vheldrin","Nyxandra","Talros","Seraphine","Kael","Morwyn","Dravena","Ixchel","Belphine"],
+    surname: { general: ["Duskthorn","Emberveil","Blackflame","Hollowgrace","Nightbargain"] }
+  },
+  general: {
+    given: ["Aldric","Brenna","Cassian","Delphine","Edmund","Fira","Garrick","Helewise","Ingram","Jocelyn","Kendrick","Lysandra","Norwen","Odette"],
+    surname: { general: ["Ashfield","Blackwood","Cairnholt","Duskmere","Farrow","Grayvale","Hollowmere","Ironwake"] }
+  }
+};
 
 /* ================================================================
    STATE
@@ -1118,7 +1240,21 @@ function createDefaultState(name, raceId, classId){
     log: [],
     shop: { stock: [], nextRestockAt: 0 },
     questProgress: 0, // number of completed story chapters (0-10)
+    stats: createEmptyStats(),
     lastTick: Date.now()
+  };
+}
+
+// Lifetime statistics — purely informational (Character tab), never gated
+// on. History before v2.1 is not reconstructable, so migrated saves start
+// every counter at 0.
+function createEmptyStats(){
+  return {
+    goldEarned: 0, goldSpent: 0, xpEarned: 0, itemsFound: 0, timesInjured: 0,
+    arenaFightsWon: 0, arenaRuns: 0,
+    dungeonsCompleted: 0, dungeonsFailed: 0,
+    raidsCompleted: 0, raidsFailed: 0,
+    questChaptersCompleted: 0, restsCompleted: 0
   };
 }
 
@@ -1364,6 +1500,7 @@ function successChance(ratio){
 // Adds xp and runs the level-up loop (handles multiple levels at once).
 // Returns the number of levels gained.
 function grantXp(hero, xp){
+  if (xp > 0 && state.stats) state.stats.xpEarned += xp;
   hero.xp += xp;
   let levels = 0;
   while (hero.xp >= xpNeeded(hero.level)){
@@ -1373,6 +1510,20 @@ function grantXp(hero, xp){
     addLog("Reached level " + hero.level + "!", "levelup");
   }
   return levels;
+}
+
+// Central gold award/spend points so lifetime stats (Character tab) stay
+// accurate no matter which system moves the gold.
+function awardGold(hero, amount){
+  if (!(amount > 0)) return;
+  hero.gold += amount;
+  if (state.stats) state.stats.goldEarned += amount;
+}
+
+function spendGold(hero, amount){
+  if (!(amount > 0)) return;
+  hero.gold -= amount;
+  if (state.stats) state.stats.goldSpent += amount;
 }
 
 // Renown is earned ONLY from dungeons, raids, quests, and the Arena —
@@ -1411,6 +1562,7 @@ function addLog(message, type){
 function addInjury(hero, sourceLabel){
   const before = hero.injuries || 0;
   hero.injuries = Math.min(MAX_INJURIES, before + 1);
+  if (state.stats) state.stats.timesInjured += 1;
   addLog(hero.name + " suffers an injury" + (sourceLabel ? " (" + sourceLabel + ")" : "") + ".", "system");
 
   if (hero.injuries >= MAX_INJURIES && before < MAX_INJURIES){
@@ -1556,26 +1708,52 @@ function applyProgress(elapsedMs, opts){
   opts = opts || {};
   const maxDrops = (typeof opts.maxDrops === "number") ? opts.maxDrops : Infinity;
 
-  const summary = { xpGained: 0, goldGained: 0, levelsGained: 0, itemsFound: [], restCompleted: null, contentResolved: null };
+  const summary = { xpGained: 0, goldGained: 0, levelsGained: 0, itemsFound: [], restCompleted: null, contentResolved: null, trainingCapped: false, arenaResolved: null };
   if (elapsedMs <= 0) return summary;
 
   const activity = state.activity;
 
   if (activity.type === "training"){
-    applyTrainingProgress(elapsedMs, maxDrops, summary);
+    applyTrainingProgressWithCap(elapsedMs, maxDrops, summary);
   } else if (activity.type === "rest"){
     applyRestProgress(summary);
   } else if (activity.type === "dungeon" || activity.type === "raid" || activity.type === "quest"){
     applyTimedContentProgress(summary);
   } else if (activity.type === "arena"){
-    // Arena runs are interactive and accrue nothing with time — online
-    // or offline. A run left open by closing the page is resolved as a
-    // yield at boot (see boot()), not here.
+    // Fights resolve automatically as elapsed time crosses each
+    // nextFightAt — this same dispatch runs for the 1s online tick and
+    // the offline catch-up span, so a closed-page run keeps fighting.
+    applyArenaProgress(summary);
   } else if (activity.type === "idle"){
     // nothing accrues while idle
   }
 
   return summary;
+}
+
+// A training session auto-ends at startedAt + TRAINING_CAP_MS. Works
+// identically whether the whole elapsed span fits within the cap, a
+// single 1s online tick overshoots it, or an offline segment (bounded at
+// the cap instant, see applyOfflineProgress) lands exactly on it: only
+// the pre-cap portion of elapsedMs is ever paid out.
+function applyTrainingProgressWithCap(elapsedMs, maxDrops, summary){
+  const hero = state.hero;
+  const activity = state.activity;
+  const capAt = activity.startedAt + TRAINING_CAP_MS;
+  const nowAt = state.lastTick; // already advanced to "now" by the caller
+
+  if (nowAt >= capAt){
+    const segmentStart = nowAt - elapsedMs;
+    const cappedElapsed = Math.max(0, capAt - segmentStart);
+    if (cappedElapsed > 0) applyTrainingProgress(cappedElapsed, maxDrops, summary);
+    const zone = ZONES.find(z => z.id === activity.zoneId);
+    addLog(hero.name + "'s training session at " + (zone ? zone.name : "the field") +
+      " ends — even heroes need to look up from the grindstone.", "system");
+    state.activity = { type:"idle", zoneId:null, startedAt: capAt, dropAccumulatorMs: 0 };
+    summary.trainingCapped = true;
+  } else {
+    applyTrainingProgress(elapsedMs, maxDrops, summary);
+  }
 }
 
 // Rest doesn't scale with elapsedMs like training does — it just checks
@@ -1596,6 +1774,7 @@ function applyRestProgress(summary){
   state.activity = { type:"idle", zoneId:null, startedAt: state.lastTick, dropAccumulatorMs: 0 };
   addLog("Finished a " + (kind === "short" ? "short" : "long") + " rest and " +
     (hero.injuries === 0 ? "feel fully healed" : "feel a little better") + ".", "system");
+  if (state.stats) state.stats.restsCompleted += 1;
   summary.restCompleted = kind;
 }
 
@@ -1663,6 +1842,7 @@ function applyTimedContentProgress(summary){
       items.push(item);
       addLog("Recovered " + itemDisplayName(item) + " from " + def.name + ".", "drop");
     }
+    if (state.stats) state.stats.itemsFound += items.length;
     injured = Math.random() < CONTENT_INJURY_CHANCE_SUCCESS * getInjuryChanceMultiplier(hero);
   } else {
     xpGain *= CONTENT_FAILURE_REWARD_FRACTION;
@@ -1671,10 +1851,15 @@ function applyTimedContentProgress(summary){
     injured = Math.random() < CONTENT_INJURY_CHANCE_FAILURE * getInjuryChanceMultiplier(hero);
   }
 
+  if (state.stats){
+    if (type === "dungeon") state.stats[success ? "dungeonsCompleted" : "dungeonsFailed"] += 1;
+    else if (type === "raid") state.stats[success ? "raidsCompleted" : "raidsFailed"] += 1;
+  }
+
   summary.xpGained += xpGain;
   summary.goldGained += goldGain;
   summary.levelsGained += grantXp(hero, xpGain);
-  hero.gold += goldGain;
+  awardGold(hero, goldGain);
   awardRenown(hero, renownGain);
   summary.itemsFound = summary.itemsFound.concat(items);
 
@@ -1689,7 +1874,10 @@ function applyTimedContentProgress(summary){
     const ch = QUEST_CHAPTERS.find(q => q.id === def.id);
     if (success && ch){
       // Advance the story spine only if this chapter is still the frontier.
-      if ((state.questProgress || 0) === ch.chapter - 1) state.questProgress = ch.chapter;
+      if ((state.questProgress || 0) === ch.chapter - 1){
+        state.questProgress = ch.chapter;
+        if (state.stats) state.stats.questChaptersCompleted += 1;
+      }
       outro = ch.outro;
       addLog("Chapter " + ch.chapter + " complete: \"" + ch.title + "\".", "levelup");
     } else if (ch){
@@ -1707,6 +1895,12 @@ function applyTimedContentProgress(summary){
   };
 }
 
+// Random flavor task for the training progress bar, themed to the zone.
+function pickTrainingTask(zone){
+  const pool = (zone && zone.tasks && zone.tasks.length) ? zone.tasks : ["Training in the field"];
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
 function applyTrainingProgress(elapsedMs, maxDrops, summary){
   const hero = state.hero;
   const activity = state.activity;
@@ -1717,7 +1911,7 @@ function applyTrainingProgress(elapsedMs, maxDrops, summary){
   const xpGain = zone.xpPerHour * hours * getXpMultiplier(hero);
   const goldGain = zone.goldPerHour * hours * getGoldMultiplier(hero);
 
-  hero.gold += goldGain;
+  awardGold(hero, goldGain);
   summary.xpGained += xpGain;
   summary.goldGained += goldGain;
   // grantXp runs the level-up loop (handles multiple levels in one span)
@@ -1739,18 +1933,24 @@ function applyTrainingProgress(elapsedMs, maxDrops, summary){
       const item = rollItem(zone, hero);
       state.inventory.push(item);
       summary.itemsFound.push(item);
+      if (state.stats) state.stats.itemsFound += 1;
       addLog("Found " + itemDisplayName(item) + " at " + zone.name + ".", "drop");
     }
   }
+
+  // A completed drop-roll cycle re-rolls the displayed flavor task — the
+  // bar itself (dropAccumulatorMs) already reset above via the modulo.
+  if (intervals > 0) activity.task = pickTrainingTask(zone);
 }
 
 /* ================================================================
    SAVE / LOAD
 ================================================================ */
 
-function saveGame(){
-  if (!state) return;
-  const payload = {
+// Shared by saveGame() and the settings-menu "Export save" action so the
+// exported JSON is byte-for-byte what actually gets persisted.
+function buildSavePayload(){
+  return {
     version: SAVE_VERSION,
     hero: state.hero,
     activity: state.activity,
@@ -1758,8 +1958,14 @@ function saveGame(){
     log: state.log,
     shop: state.shop,
     questProgress: state.questProgress || 0,
+    stats: state.stats || createEmptyStats(),
     lastTick: Date.now()
   };
+}
+
+function saveGame(){
+  if (!state) return;
+  const payload = buildSavePayload();
   try {
     localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
   } catch (e) {
@@ -1802,6 +2008,7 @@ function migrateSave(data){
   if (!d.version) d.version = 1;
   if (d.version === 1) d = migrateV1toV2(d);
   if (d.version === 2) d = migrateV2toV3(d);
+  if (d.version === 3) d = migrateV3toV4(d);
   return d;
 }
 
@@ -1828,6 +2035,30 @@ function migrateV2toV3(data){
   if (!Array.isArray(hero.evolutions)) hero.evolutions = [];
   if (typeof data.questProgress !== "number") data.questProgress = 0;
   data.version = 3;
+  return data;
+}
+
+// v2.1 deflated every gold value in the game by 10x (see ZONES,
+// DUNGEONS, RAIDS, QUEST_CHAPTERS, sell/shop/blacksmith/medic/tavern
+// pricing) so a hero's banked gold is converted to match. It also
+// introduces lifetime statistics (state.stats) and the automatic Arena
+// (activity.nextFightAt) and training session cap (activity.task) —
+// null-safe defaults so older saves pick up the new fields cleanly.
+function migrateV3toV4(data){
+  const hero = data.hero;
+  hero.gold = Math.round((hero.gold || 0) / 10);
+  data.stats = createEmptyStats();
+
+  const a = data.activity;
+  if (a && a.type === "arena" && typeof a.nextFightAt !== "number"){
+    a.nextFightAt = (data.lastTick || Date.now()) + ARENA_FIGHT_MS;
+  }
+  if (a && a.type === "training" && !a.task){
+    const zone = ZONES.find(z => z.id === a.zoneId);
+    a.task = pickTrainingTask(zone);
+  }
+
+  data.version = 4;
   return data;
 }
 
@@ -1868,6 +2099,12 @@ function tick(){
   if (summary && summary.contentResolved){
     saveGame();
     showContentResultModal(summary.contentResolved);
+  }
+  // An Arena run that just ended live (defeat/injury while the tab was
+  // open) gets its own summary modal the same way.
+  if (summary && summary.arenaResolved){
+    saveGame();
+    showArenaResultModal(summary.arenaResolved);
   }
 }
 
@@ -1912,6 +2149,8 @@ function applyOfflineProgress(){
   const a = state.activity;
   if ((a.type === "rest" || a.type === "dungeon" || a.type === "raid" || a.type === "quest") && a.endsAt){
     rawBoundaries.push(a.endsAt);
+  } else if (a.type === "training"){
+    rawBoundaries.push(a.startedAt + TRAINING_CAP_MS);
   }
   const boundaries = rawBoundaries
     .filter(t => t > start && t < now)
@@ -1919,7 +2158,7 @@ function applyOfflineProgress(){
     .filter((t, i, arr) => i === 0 || t !== arr[i - 1]); // unique
   boundaries.push(now);
 
-  const total = { xpGained: 0, goldGained: 0, levelsGained: 0, itemsFound: [], restCompleted: null, contentResolved: null };
+  const total = { xpGained: 0, goldGained: 0, levelsGained: 0, itemsFound: [], restCompleted: null, contentResolved: null, trainingCapped: false, arenaResolved: null };
   let dropsBudget = MAX_OFFLINE_DROPS;
   let prev = start;
   boundaries.forEach(t => {
@@ -1931,6 +2170,8 @@ function applyOfflineProgress(){
     total.itemsFound = total.itemsFound.concat(seg.itemsFound);
     if (seg.restCompleted) total.restCompleted = seg.restCompleted;
     if (seg.contentResolved) total.contentResolved = seg.contentResolved;
+    if (seg.trainingCapped) total.trainingCapped = true;
+    if (seg.arenaResolved) total.arenaResolved = seg.arenaResolved;
     dropsBudget -= seg.itemsFound.length;
     pruneExpiredBuffs(state.hero, t);
     prev = t;
@@ -2027,6 +2268,35 @@ function renderRaceClassGrids(){
 
 const creationChoice = { raceId: null, classId: null };
 
+function pickRandomFrom(arr){
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// Race-aware fantasy name generator for the character-creation reroll
+// button. Composes a given name (elves lean on flowing single names) and,
+// where the race's style takes one, a surname flavored subtly by the
+// hero's class (martial/magical surname pools) — always trimmed to the
+// 20-char limit the name field enforces everywhere else.
+function generateRandomName(raceId, classId){
+  const pool = NAME_PARTS[raceId] || NAME_PARTS.general;
+  const given = pickRandomFrom(pool.given);
+  const cls = CLASSES[classId];
+
+  let surnamePool = pool.surname.general || [];
+  if (cls && pool.surname[cls.type] && pool.surname[cls.type].length > 0){
+    surnamePool = pool.surname[cls.type];
+  }
+
+  let full = given;
+  // Elves lean on flowing single names — only sometimes take a surname.
+  const wantsSurname = surnamePool.length > 0 && (raceId !== "elf" || Math.random() < 0.35);
+  if (wantsSurname){
+    const attempt = given + " " + pickRandomFrom(surnamePool);
+    if (attempt.length <= 20) full = attempt;
+  }
+  return full.length > 20 ? full.slice(0, 20) : full;
+}
+
 function validateCreationForm(){
   const name = document.getElementById("hero-name-input").value.trim();
   const ok = name.length > 0 && name.length <= 20 && creationChoice.raceId && creationChoice.classId;
@@ -2054,7 +2324,8 @@ function renderHeroPanel(){
   const act = state.activity;
   if (act.type === "training"){
     const zone = ZONES.find(z => z.id === act.zoneId);
-    activityEl.textContent = "Training at " + (zone ? zone.name : "Unknown");
+    const remaining = Math.max(0, (act.startedAt + TRAINING_CAP_MS) - Date.now());
+    activityEl.textContent = "Training at " + (zone ? zone.name : "Unknown") + " — " + fmtCountdown(remaining) + " left in session";
   } else if (act.type === "rest"){
     activityEl.textContent = (act.restKind === "short" ? "Resting (short)" : "Resting (long)");
   } else if (act.type === "dungeon" || act.type === "raid" || act.type === "quest"){
@@ -2247,6 +2518,26 @@ function renderTavernPanel(){
   });
 }
 
+// The training progress bar tracks activity.dropAccumulatorMs directly —
+// the same counter applyTrainingProgress rolls drops against — so it's
+// always truthful to the actual find-chance cycle, resets the instant a
+// cycle completes, and survives save/load with no separate timer.
+function renderTrainingProgress(){
+  const panel = document.getElementById("training-progress-panel");
+  const act = state.activity;
+  if (act.type !== "training"){
+    panel.classList.add("hidden");
+    return;
+  }
+  panel.classList.remove("hidden");
+  const accum = act.dropAccumulatorMs || 0;
+  const pct = Math.max(0, Math.min(100, (accum / DROP_INTERVAL_MS) * 100));
+  document.getElementById("training-progress-fill").style.width = pct.toFixed(1) + "%";
+  document.getElementById("training-task-label").textContent = act.task || "Training";
+  const remainingMs = Math.max(0, DROP_INTERVAL_MS - accum);
+  document.getElementById("training-progress-label").textContent = Math.ceil(remainingMs / 1000) + "s to next find check";
+}
+
 function renderZones(){
   const hero = state.hero;
   const hurtLocked = hero.injuries >= MAX_INJURIES;
@@ -2433,7 +2724,8 @@ function renderArena(){
   const act = state.activity;
   const inRun = act.type === "arena";
   const power = computePower(hero);
-  const sig = inRun + "|" + (inRun ? act.fightNumber + "|" + Math.round(act.bankedXp) + "|" + (act.combatLog[0] || "") + "|" + act.monsterName : "") +
+  const fightRemaining = inRun ? Math.max(0, act.nextFightAt - Date.now()) : 0;
+  const sig = inRun + "|" + (inRun ? act.fightNumber + "|" + Math.round(act.bankedXp) + "|" + (act.combatLog[0] || "") + "|" + act.monsterName + "|" + Math.floor(fightRemaining / 250) : "") +
     "|" + power + "|" + hero.injuries + "|" + act.type + "|" + getArenaExtraFights(hero);
   if (contentRenderSigs["arena-body"] === sig) return;
   contentRenderSigs["arena-body"] = sig;
@@ -2462,10 +2754,13 @@ function renderArena(){
   const monsterPower = arenaMonsterPower(hero, act.fightNumber);
   const winPct = Math.round(successChance(power / monsterPower) * 100);
   const protectedFight = act.fightNumber <= safeFights;
+  const fightPct = Math.max(0, Math.min(100, ((ARENA_FIGHT_MS - fightRemaining) / ARENA_FIGHT_MS) * 100));
   body.innerHTML =
-    "<div class=\"arena-monster\">Fight " + act.fightNumber + ": " + escapeHtml(act.monsterName) +
+    "<div class=\"arena-monster\">Fight " + act.fightNumber + ": fighting the " + escapeHtml(act.monsterName) +
       "<div class=\"sub\">Monster power <b>" + fmtNumber(monsterPower) + "</b> vs yours <b>" + fmtNumber(power) + "</b> — " + winPct + "% to win</div>" +
       (protectedFight ? "<div class=\"sub\" style=\"color:var(--green)\">" + (getRace(hero).id === "orc" ? "Your orcish blood shrugs off the first blow — no injury risk this fight." : "No injury risk this fight.") + "</div>" : "") +
+      "<div class=\"xp-bar-bg\" style=\"height:10px; margin-top:0.6rem;\"><div class=\"xp-bar-fill\" style=\"width:" + fightPct.toFixed(1) + "%\"></div></div>" +
+      "<div class=\"sub\">Resolves in " + fmtCountdown(fightRemaining) + "</div>" +
     "</div>" +
     "<div class=\"arena-status-grid\">" +
       "<div class=\"k\">Banked XP</div><div class=\"v\">" + fmtNumber(act.bankedXp) + "</div>" +
@@ -2473,13 +2768,11 @@ function renderArena(){
       "<div class=\"k\">Banked renown</div><div class=\"v\">" + act.bankedRenown + "</div>" +
     "</div>" +
     "<div class=\"arena-actions\">" +
-      "<button class=\"btn\" id=\"arena-fight-btn\">Fight</button>" +
       "<button class=\"btn secondary\" id=\"arena-yield-btn\">Yield (bank rewards)</button>" +
     "</div>" +
     "<div class=\"arena-combat-log\">" +
       act.combatLog.map(l => "<div class=\"line\">" + escapeHtml(l) + "</div>").join("") +
     "</div>";
-  document.getElementById("arena-fight-btn").addEventListener("click", arenaFight);
   document.getElementById("arena-yield-btn").addEventListener("click", arenaYield);
 }
 
@@ -2511,6 +2804,65 @@ function renderRenownPanel(){
     html += "<div class=\"renown-bonus-list\">Renown is earned from dungeons, raids, quests, and the Arena — never from training.</div>";
   }
   body.innerHTML = html;
+}
+
+// Character tab — race, class lineage, level, and the power breakdown
+// (base + gear, times the central power multiplier).
+function renderCharacterInfoPanel(){
+  const hero = state.hero;
+  const race = getRace(hero);
+  const baseClass = getClass(hero);
+  const evos = getEvolutionDefs(hero);
+  const lineage = [baseClass.name].concat(evos.map(e => e.name)).join(" → ");
+  const basePower = 10 + hero.level * 5;
+  let gearPower = 0;
+  SLOTS.forEach(slot => { const item = hero.equipment[slot]; if (item) gearPower += displayItemPower(item); });
+  const mult = getPowerMultiplier(hero);
+  const total = computePower(hero);
+
+  const sig = hero.level + "|" + lineage + "|" + gearPower + "|" + mult;
+  if (contentRenderSigs["character-info-body"] === sig) return;
+  contentRenderSigs["character-info-body"] = sig;
+
+  const body = document.getElementById("character-info-body");
+  body.innerHTML =
+    "<div class=\"modal-stat-grid\" style=\"margin:0;\">" +
+      "<div class=\"k\">Race</div><div class=\"v\">" + escapeHtml(race.name) + "</div>" +
+      "<div class=\"k\">Level</div><div class=\"v\">" + hero.level + "</div>" +
+      "<div class=\"k\">Class lineage</div><div class=\"v\">" + escapeHtml(lineage) + "</div>" +
+      "<div class=\"k\">Base power</div><div class=\"v\">" + fmtNumber(basePower) + "</div>" +
+      "<div class=\"k\">Gear power</div><div class=\"v\">+" + fmtNumber(gearPower) + "</div>" +
+      "<div class=\"k\">Multiplier</div><div class=\"v\">×" + mult.toFixed(2) + "</div>" +
+      "<div class=\"k\">Total power</div><div class=\"v\" style=\"color:var(--gold)\">" + fmtNumber(total) + "</div>" +
+    "</div>";
+}
+
+// Character tab — lifetime counters (state.stats). History before v2.1
+// isn't reconstructable, so migrated saves simply start every counter
+// at 0 (see migrateV3toV4).
+function renderStatsPanel(){
+  const s = state.stats || createEmptyStats();
+  const sig = Object.keys(s).map(k => s[k]).join("|");
+  if (contentRenderSigs["stats-body"] === sig) return;
+  contentRenderSigs["stats-body"] = sig;
+
+  const rows = [
+    ["Gold earned", fmtNumber(s.goldEarned)],
+    ["Gold spent", fmtNumber(s.goldSpent)],
+    ["XP earned", fmtNumber(s.xpEarned)],
+    ["Items found", fmtNumber(s.itemsFound)],
+    ["Times injured", fmtNumber(s.timesInjured)],
+    ["Arena fights won", fmtNumber(s.arenaFightsWon)],
+    ["Arena runs", fmtNumber(s.arenaRuns)],
+    ["Dungeons completed", fmtNumber(s.dungeonsCompleted)],
+    ["Dungeons failed", fmtNumber(s.dungeonsFailed)],
+    ["Raids completed", fmtNumber(s.raidsCompleted)],
+    ["Raids failed", fmtNumber(s.raidsFailed)],
+    ["Quest chapters completed", fmtNumber(s.questChaptersCompleted)],
+    ["Rests completed", fmtNumber(s.restsCompleted)]
+  ];
+  document.getElementById("stats-body").innerHTML =
+    rows.map(r => "<div class=\"k\">" + r[0] + "</div><div class=\"v\">" + r[1] + "</div>").join("");
 }
 
 function renderEvolutionBanner(){
@@ -2643,6 +2995,25 @@ function wireContentResultModal(){
   });
 }
 
+// Summary modal shown whenever a live Arena run ends (yield, injury, or
+// defeat). An offline-resolved run is folded into the welcome-back modal
+// instead (see showWelcomeBackModal) rather than shown here.
+function showArenaResultModal(result){
+  const reasonText = result.reason === "yield" ? "You yielded." : result.reason === "injury" ? "You were carried off, injured." : "You were defeated.";
+  document.getElementById("ar-outcome").textContent = reasonText;
+  document.getElementById("ar-fights").textContent = result.fightsWon;
+  document.getElementById("ar-xp").textContent = fmtNumber(result.xp);
+  document.getElementById("ar-gold").textContent = fmtNumber(result.gold);
+  document.getElementById("ar-renown").textContent = result.renown > 0 ? "+" + result.renown : "0";
+  document.getElementById("arena-result-modal").classList.remove("hidden");
+}
+
+function wireArenaResultModal(){
+  document.getElementById("ar-close-btn").addEventListener("click", () => {
+    document.getElementById("arena-result-modal").classList.add("hidden");
+  });
+}
+
 function wireAdventureSubtabs(){
   document.querySelectorAll(".subtab-btn").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -2723,12 +3094,15 @@ function renderLog(){
 function render(){
   if (!state) return;
   renderHeroPanel();
+  renderTrainingProgress();
   renderZones();
   renderTimedContentList("dungeon", DUNGEONS, "dungeon-list");
   renderTimedContentList("raid", RAIDS, "raid-list");
   renderQuests();
   renderArena();
   renderRenownPanel();
+  renderCharacterInfoPanel();
+  renderStatsPanel();
   renderEvolutionBanner();
   renderInventory();
   renderEquipment();
@@ -2750,7 +3124,7 @@ function startTraining(zoneId){
   if (state.hero.injuries >= MAX_INJURIES) return; // badly hurt — locked out until rested
   if (isBusyWithContent()) return; // expeditions and Arena runs aren't abandoned by training
 
-  state.activity = { type:"training", zoneId: zoneId, startedAt: Date.now(), dropAccumulatorMs: 0 };
+  state.activity = { type:"training", zoneId: zoneId, startedAt: Date.now(), dropAccumulatorMs: 0, task: pickTrainingTask(zone) };
   addLog("Began training at " + zone.name + ".", "zone");
   saveGame();
   render();
@@ -2863,12 +3237,14 @@ function startArenaRun(){
     const zone = ZONES.find(z => z.id === state.activity.zoneId);
     addLog("Stopped training" + (zone ? " at " + zone.name : "") + " to enter the Arena.", "zone");
   }
+  const now = Date.now();
   state.activity = {
     type: "arena", fightNumber: 1,
     bankedXp: 0, bankedGold: 0, bankedRenown: 0,
     monsterName: arenaMonsterName(1), combatLog: [],
-    startedAt: Date.now()
+    startedAt: now, nextFightAt: now + ARENA_FIGHT_MS
   };
+  if (state.stats) state.stats.arenaRuns += 1;
   addLog(state.hero.name + " steps onto the Arena sand.", "zone");
   saveGame();
   render();
@@ -2881,43 +3257,20 @@ function arenaLogLine(text){
   if (a.combatLog.length > ARENA_COMBAT_LOG_LINES) a.combatLog.length = ARENA_COMBAT_LOG_LINES;
 }
 
-// Ends the run and pays out the banked rewards. runData is captured by
-// the caller BEFORE any addInjury() call, because hitting the injury cap
-// resets state.activity to idle.
-function finishArenaRun(reason, runData){
+// Resolves exactly one fight against the current activity's monster,
+// mutating banked rewards/log in place. Returns { ended, reason } where
+// reason is "defeat" | "injury" when the run is over, or null if it
+// continues (a.fightNumber/monsterName/nextFightAt are already advanced
+// for the next fight in that case).
+function resolveArenaFight(a){
   const hero = state.hero;
-  if (state.activity.type === "arena"){
-    state.activity = { type:"idle", zoneId:null, startedAt: Date.now(), dropAccumulatorMs: 0 };
-  }
-  grantXp(hero, runData.bankedXp);
-  hero.gold += runData.bankedGold;
-  awardRenown(hero, runData.bankedRenown);
-  const fightsWon = Math.max(0, runData.fightNumber - 1);
-  const reasonText = reason === "yield" ? "yielded" : reason === "injury" ? "carried off injured" : "defeated";
-  addLog("Arena run ends (" + reasonText + ") — " + fightsWon + " win" + (fightsWon === 1 ? "" : "s") +
-    ", banked +" + fmtNumber(runData.bankedXp) + " xp, +" + fmtNumber(runData.bankedGold) + " gold" +
-    (runData.bankedRenown > 0 ? ", +" + runData.bankedRenown + " renown" : "") + ".",
-    reason === "yield" ? "zone" : "system");
-  saveGame();
-  render();
-}
-
-function arenaFight(){
-  const a = state.activity;
-  if (a.type !== "arena") return;
-  const hero = state.hero;
-
   const heroPower = computePower(hero);
   const monsterPower = arenaMonsterPower(hero, a.fightNumber);
   const winChance = successChance(heroPower / monsterPower);
 
   if (Math.random() >= winChance){
-    // Defeat: injury, run ends, banked rewards still paid out.
     arenaLogLine("Fight " + a.fightNumber + ": the " + a.monsterName + " overwhelms you.");
-    const runData = { fightNumber: a.fightNumber, bankedXp: a.bankedXp, bankedGold: a.bankedGold, bankedRenown: a.bankedRenown };
-    addInjury(hero, "the Arena");
-    finishArenaRun("defeat", runData);
-    return;
+    return { ended: true, reason: "defeat", fightNumber: a.fightNumber };
   }
 
   // Win: bank rewards. Zone gold/hour is authored at half the zone's
@@ -2929,6 +3282,7 @@ function arenaFight(){
   a.bankedXp += xpWin;
   a.bankedGold += goldWin;
   if (a.fightNumber % ARENA_RENOWN_FIGHT_INTERVAL === 0) a.bankedRenown += 1;
+  if (state.stats) state.stats.arenaFightsWon += 1;
   arenaLogLine("Fight " + a.fightNumber + ": you strike down the " + a.monsterName + "! (+" + fmtNumber(xpWin) + " xp banked)");
 
   // Post-win injury roll — skipped entirely for the earliest fights
@@ -2942,17 +3296,65 @@ function arenaFight(){
     const injuryChance = (ARENA_INJURY_CHANCE_BASE + ARENA_INJURY_CHANCE_STEP * a.fightNumber) * getInjuryChanceMultiplier(hero);
     if (Math.random() < injuryChance){
       arenaLogLine("You take a wound in the winning — the crowd roars as you're forced to yield.");
-      const runData = { fightNumber: a.fightNumber + 1, bankedXp: a.bankedXp, bankedGold: a.bankedGold, bankedRenown: a.bankedRenown };
-      addInjury(hero, "the Arena");
-      finishArenaRun("injury", runData);
-      return;
+      return { ended: true, reason: "injury", fightNumber: a.fightNumber + 1 };
     }
   }
 
   a.fightNumber += 1;
   a.monsterName = arenaMonsterName(a.fightNumber);
+  a.nextFightAt += ARENA_FIGHT_MS;
+  return { ended: false };
+}
+
+// Banks the run's rewards into the hero, logs it, and returns to idle.
+// Does NOT save/render — callers that resolve live (arenaYield) or as
+// part of a tick/offline pass wrap this with their own save/render/modal.
+function resolveArenaRunEnd(reason, runData){
+  const hero = state.hero;
+  if (state.activity.type === "arena"){
+    state.activity = { type:"idle", zoneId:null, startedAt: Date.now(), dropAccumulatorMs: 0 };
+  }
+  grantXp(hero, runData.bankedXp);
+  awardGold(hero, runData.bankedGold);
+  awardRenown(hero, runData.bankedRenown);
+  const fightsWon = Math.max(0, runData.fightNumber - 1);
+  const reasonText = reason === "yield" ? "yielded" : reason === "injury" ? "carried off injured" : "defeated";
+  addLog("Arena run ends (" + reasonText + ") — " + fightsWon + " win" + (fightsWon === 1 ? "" : "s") +
+    ", banked +" + fmtNumber(runData.bankedXp) + " xp, +" + fmtNumber(runData.bankedGold) + " gold" +
+    (runData.bankedRenown > 0 ? ", +" + runData.bankedRenown + " renown" : "") + ".",
+    reason === "yield" ? "zone" : "system");
+  return { reason: reason, fightsWon: fightsWon, xp: runData.bankedXp, gold: runData.bankedGold, renown: runData.bankedRenown };
+}
+
+// Live-path wrapper (Yield button): resolves the run, saves, re-renders,
+// and shows the summary modal.
+function finishArenaRun(reason, runData){
+  const result = resolveArenaRunEnd(reason, runData);
   saveGame();
   render();
+  showArenaResultModal(result);
+  return result;
+}
+
+// Dispatch target for activity.type === "arena". Resolves as many fights
+// as fit before state.lastTick (the 1s online tick, or an offline
+// catch-up segment), one at a time through the exact same per-fight code
+// path — so a run left running when the page closed keeps fighting and
+// resolves (or catches back up mid-fight) entirely on its own.
+function applyArenaProgress(summary){
+  let iterations = 0;
+  while (state.activity.type === "arena" && state.lastTick >= state.activity.nextFightAt && iterations < ARENA_MAX_FIGHTS_PER_CATCHUP){
+    iterations++;
+    const a = state.activity;
+    const result = resolveArenaFight(a);
+    if (result.ended){
+      const hero = state.hero;
+      addInjury(hero, "the Arena");
+      const runData = { fightNumber: result.fightNumber, bankedXp: a.bankedXp, bankedGold: a.bankedGold, bankedRenown: a.bankedRenown };
+      summary.arenaResolved = resolveArenaRunEnd(result.reason, runData);
+      break;
+    }
+  }
 }
 
 function arenaYield(){
@@ -3006,7 +3408,7 @@ function sellItem(itemId){
   const item = state.inventory[idx];
   const value = itemSellValue(item); // no gold-mult on sales
   state.inventory.splice(idx, 1);
-  state.hero.gold += value;
+  awardGold(state.hero, value);
   addLog("Sold " + item.name + " for " + value + " gold.", "system");
   saveGame();
   render();
@@ -3020,7 +3422,7 @@ function buyShopItem(itemId){
   const item = state.shop.stock[idx];
   const price = itemShopPrice(item, state.hero);
   if (state.hero.gold < price) return;
-  state.hero.gold -= price;
+  spendGold(state.hero, price);
   state.shop.stock.splice(idx, 1);
   state.inventory.push(Object.assign({}, item, { id: "item_" + Date.now() + "_" + Math.floor(Math.random()*100000), foundAt: Date.now() }));
   addLog("Bought " + itemDisplayName(item) + " from the shop.", "system");
@@ -3051,7 +3453,7 @@ function upgradeItem(itemId){
   if ((item.upgradeLevel || 0) >= BLACKSMITH_MAX_UPGRADE) return;
   const cost = blacksmithUpgradeCost(item);
   if (state.hero.gold < cost) return;
-  state.hero.gold -= cost;
+  spendGold(state.hero, cost);
   item.upgradeLevel = (item.upgradeLevel || 0) + 1;
   addLog("Upgraded " + item.name + " to +" + item.upgradeLevel + ".", "system");
   saveGame();
@@ -3064,8 +3466,9 @@ function medicHealCost(hero){
   return Math.round(MEDIC_HEAL_COST_PER_LEVEL * hero.level);
 }
 
+// Half the heal price, rounded up.
 function medicCutCost(hero){
-  return Math.round(MEDIC_CUT_COST_PER_LEVEL * hero.level);
+  return Math.ceil(medicHealCost(hero) * MEDIC_CUT_COST_FRACTION);
 }
 
 function medicHealInjury(){
@@ -3073,7 +3476,7 @@ function medicHealInjury(){
   if (hero.injuries <= 0) return;
   const cost = medicHealCost(hero);
   if (hero.gold < cost) return;
-  hero.gold -= cost;
+  spendGold(hero, cost);
   hero.injuries -= 1;
   addLog("Paid the medic to heal an injury.", "system");
   saveGame();
@@ -3085,7 +3488,7 @@ function medicCutRestTime(){
   const hero = state.hero;
   const cost = medicCutCost(hero);
   if (hero.gold < cost) return;
-  hero.gold -= cost;
+  spendGold(hero, cost);
   const now = Date.now();
   const remaining = Math.max(0, state.activity.endsAt - now);
   state.activity.endsAt = now + Math.floor(remaining / 2);
@@ -3113,7 +3516,7 @@ function buyTavernBuff(buffId){
   const hero = state.hero;
   const cost = tavernBuffCost(def, hero);
   if (hero.gold < cost) return;
-  hero.gold -= cost;
+  spendGold(hero, cost);
   const now = Date.now();
   hero.buffs = (hero.buffs || []).filter(b => b.key !== def.effect.key); // one active per key; rebuying refreshes
   hero.buffs.push({ id: def.id, key: def.effect.key, value: def.effect.value, expiresAt: now + def.durationMin * 60000, name: def.name });
@@ -3144,6 +3547,12 @@ function wireCreationScreen(){
   renderRaceClassGrids();
   document.getElementById("hero-name-input").addEventListener("input", validateCreationForm);
 
+  document.getElementById("name-reroll-btn").addEventListener("click", () => {
+    const input = document.getElementById("hero-name-input");
+    input.value = generateRandomName(creationChoice.raceId, creationChoice.classId);
+    input.dispatchEvent(new Event("input"));
+  });
+
   document.getElementById("begin-btn").addEventListener("click", () => {
     const name = document.getElementById("hero-name-input").value.trim().slice(0, 20);
     if (!name || !creationChoice.raceId || !creationChoice.classId) return;
@@ -3155,6 +3564,157 @@ function wireCreationScreen(){
     showGameScreen();
     render();
     startLoops();
+  });
+}
+
+/* ---- v2.1: save export / import ---- */
+
+function todayStamp(){
+  const d = new Date();
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+
+function exportSave(){
+  const payload = buildSavePayload();
+  const json = JSON.stringify(payload, null, 2);
+  const statusEl = document.getElementById("export-status");
+
+  try {
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "realmwalker-save-" + todayStamp() + ".json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    console.error("Realmwalker: export download failed.", e);
+  }
+
+  const reportStatus = (copied) => {
+    statusEl.textContent = "Save downloaded" + (copied ? " and copied to clipboard." : ".");
+    statusEl.classList.remove("hidden");
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(json).then(() => reportStatus(true)).catch(() => reportStatus(false));
+  } else {
+    reportStatus(false);
+  }
+}
+
+// Shape-checks a parsed save object the same way loadRawSave does, then
+// runs it through the normal migration chain. Returns { ok:true, data }
+// or { ok:false, error }. Never touches localStorage — that only happens
+// once the user confirms the import.
+function validateImportedSave(parsed){
+  if (!parsed || typeof parsed !== "object" || !parsed.hero || !parsed.activity || !Array.isArray(parsed.inventory)){
+    return { ok:false, error:"That doesn't look like a Realmwalker save (missing hero/activity/inventory)." };
+  }
+  if (!RACES[parsed.hero.raceId] || !CLASSES[parsed.hero.classId]){
+    return { ok:false, error:"Unrecognized race or class in that save." };
+  }
+  const version = parsed.version || 1;
+  if (version > SAVE_VERSION){
+    return { ok:false, error:"That save is from a newer version of Realmwalker (v" + version + ") than this page supports (v" + SAVE_VERSION + ")." };
+  }
+  try {
+    const migrated = migrateSave(JSON.parse(JSON.stringify(parsed))); // migrate a deep copy
+    return { ok:true, data: migrated };
+  } catch (e) {
+    return { ok:false, error:"Could not read that save: " + e.message };
+  }
+}
+
+let pendingImportData = null;
+
+function wireExportImport(){
+  document.getElementById("export-save-btn").addEventListener("click", () => {
+    document.getElementById("export-status").classList.add("hidden");
+    exportSave();
+  });
+
+  const modal = document.getElementById("import-modal");
+  const textarea = document.getElementById("import-textarea");
+  const fileInput = document.getElementById("import-file-input");
+  const errorEl = document.getElementById("import-error");
+  const confirmBox = document.getElementById("import-confirm-box");
+  const validateBtn = document.getElementById("import-validate-btn");
+  const confirmBtn = document.getElementById("import-confirm-btn");
+
+  function resetImportModal(){
+    textarea.value = "";
+    fileInput.value = "";
+    errorEl.classList.add("hidden");
+    errorEl.textContent = "";
+    confirmBox.classList.add("hidden");
+    confirmBtn.classList.add("hidden");
+    pendingImportData = null;
+  }
+
+  document.getElementById("import-save-btn").addEventListener("click", () => {
+    document.getElementById("settings-menu").classList.add("hidden");
+    resetImportModal();
+    modal.classList.remove("hidden");
+  });
+
+  fileInput.addEventListener("change", () => {
+    const file = fileInput.files && fileInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => { textarea.value = String(reader.result || ""); };
+    reader.readAsText(file);
+  });
+
+  validateBtn.addEventListener("click", () => {
+    errorEl.classList.add("hidden");
+    confirmBox.classList.add("hidden");
+    confirmBtn.classList.add("hidden");
+    pendingImportData = null;
+
+    let parsed;
+    try {
+      parsed = JSON.parse(textarea.value);
+    } catch (e) {
+      errorEl.textContent = "That isn't valid JSON.";
+      errorEl.classList.remove("hidden");
+      return;
+    }
+    const result = validateImportedSave(parsed);
+    if (!result.ok){
+      errorEl.textContent = result.error;
+      errorEl.classList.remove("hidden");
+      return;
+    }
+    pendingImportData = result.data;
+    document.getElementById("import-hero-name").textContent = result.data.hero.name;
+    document.getElementById("import-hero-level").textContent = result.data.hero.level;
+    confirmBox.classList.remove("hidden");
+    confirmBtn.classList.remove("hidden");
+  });
+
+  confirmBtn.addEventListener("click", () => {
+    if (!pendingImportData) return;
+    const payload = Object.assign({}, pendingImportData, { version: SAVE_VERSION, lastTick: Date.now() });
+    if (tickHandle) clearInterval(tickHandle);
+    if (autosaveHandle) clearInterval(autosaveHandle);
+    // Null the in-memory state BEFORE writing, so the beforeunload save
+    // hook (which no-ops when state is null) can't clobber the import.
+    state = null;
+    try {
+      localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
+    } catch (e) {
+      errorEl.textContent = "Could not write the imported save: " + e.message;
+      errorEl.classList.remove("hidden");
+      return;
+    }
+    location.reload();
+  });
+
+  document.getElementById("import-cancel-btn").addEventListener("click", () => {
+    modal.classList.add("hidden");
+    resetImportModal();
   });
 }
 
@@ -3181,7 +3741,11 @@ function wireGameScreen(){
   wireAdventureSubtabs();
   wireEvolutionModal();
   wireContentResultModal();
+  wireArenaResultModal();
+  wireExportImport();
 }
+
+const TOP_TABS = ["adventure", "inventory", "character", "town"];
 
 function wireTabs(){
   document.querySelectorAll(".tab-btn").forEach(btn => {
@@ -3189,8 +3753,9 @@ function wireTabs(){
       document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       const tab = btn.dataset.tab;
-      document.getElementById("adventure-tab").classList.toggle("hidden", tab !== "adventure");
-      document.getElementById("town-tab").classList.toggle("hidden", tab !== "town");
+      TOP_TABS.forEach(t => {
+        document.getElementById(t + "-tab").classList.toggle("hidden", t !== tab);
+      });
     });
   });
 }
@@ -3283,6 +3848,31 @@ function showWelcomeBackModal(summary){
     restNoteEl.classList.add("hidden");
   }
 
+  // The training session hit its 8-hour cap while you were away.
+  const trainingNoteEl = document.getElementById("wb-training-note");
+  if (summary.trainingCapped){
+    trainingNoteEl.textContent = "Your training ended after 8 hours — even heroes need to look up from the grindstone.";
+    trainingNoteEl.classList.remove("hidden");
+  } else {
+    trainingNoteEl.classList.add("hidden");
+  }
+
+  // An Arena run that resolved (or ended) entirely while you were away
+  // gets folded in here instead of its own live summary modal.
+  const arenaNoteEl = document.getElementById("wb-arena-note");
+  const ar = summary.arenaResolved;
+  if (ar){
+    const reasonText = ar.reason === "yield" ? "yielded" : ar.reason === "injury" ? "carried off injured" : "defeated";
+    arenaNoteEl.textContent =
+      "Your Arena run ended while you were away (" + reasonText + ") — " +
+      ar.fightsWon + " win" + (ar.fightsWon === 1 ? "" : "s") + ", banked +" +
+      fmtNumber(ar.xp) + " xp, +" + fmtNumber(ar.gold) + " gold" +
+      (ar.renown > 0 ? ", +" + ar.renown + " renown" : "") + ".";
+    arenaNoteEl.classList.remove("hidden");
+  } else {
+    arenaNoteEl.classList.add("hidden");
+  }
+
   document.getElementById("welcome-back-modal").classList.remove("hidden");
 }
 
@@ -3332,17 +3922,13 @@ function boot(){
     log: Array.isArray(data.log) ? data.log : [],
     shop: data.shop || { stock: [], nextRestockAt: 0 },
     questProgress: (typeof data.questProgress === "number") ? data.questProgress : 0,
+    stats: data.stats || createEmptyStats(),
     lastTick: data.lastTick || Date.now()
   };
 
-  // An Arena run doesn't accrue while the game is closed — a run left
-  // open resolves as a yield on load, banking whatever was earned.
-  if (state.activity.type === "arena"){
-    const a = state.activity;
-    addLog("The Arena run was left unfinished — " + state.hero.name + " yields and collects the banked spoils.", "system");
-    finishArenaRun("yield", { fightNumber: a.fightNumber, bankedXp: a.bankedXp || 0, bankedGold: a.bankedGold || 0, bankedRenown: a.bankedRenown || 0 });
-  }
-
+  // An Arena run left running resolves entirely through applyOfflineProgress
+  // below (fight-by-fight, via applyArenaProgress) — no special boot-time
+  // handling needed; it either finishes naturally or catches up mid-fight.
   const offlineSummary = applyOfflineProgress();
 
   showGameScreen();
