@@ -293,6 +293,7 @@
   .equip-slot-power{ font-size:0.78rem; color:var(--parchment-dim); }
 
   .inv-meta{ color:var(--text-muted); font-size:0.75rem; margin-left:0.5rem; }
+  .gear-delta{ font-weight:700; font-size:0.75rem; margin-left:0.4rem; }
   .inv-row-main{ display:flex; flex-direction:column; }
   .inv-actions{ display:flex; gap:0.4rem; align-items:center; }
 
@@ -345,6 +346,7 @@
   .quest-current{
     background:var(--bg-1); border:1px solid var(--gold-dim); border-radius:8px; padding:0.8rem 1rem;
   }
+  .quest-current.locked{ opacity:0.55; border-color:var(--panel-border); }
   .quest-current h4{ margin:0 0 0.35rem 0; }
   .quest-intro{ font-style:italic; color:var(--parchment-dim); font-size:0.85rem; margin-bottom:0.6rem; line-height:1.45; }
   .quest-story{ font-style:italic; color:var(--parchment-dim); font-size:0.9rem; line-height:1.5; margin:0.8rem 0; max-height:180px; overflow-y:auto; }
@@ -727,7 +729,53 @@
 
 const SAVE_KEY = "realmwalker_save";
 const SAVE_KEY_CORRUPT = "realmwalker_save_corrupt";
-const SAVE_VERSION = 4;
+const SAVE_VERSION = 5;
+
+/* ================================================================
+   POWER MODEL  (v5 content-era rebalance)
+   ----------------------------------------------------------------
+   Built BEFORE any difficulty/xp numbers below were chosen. Every
+   dungeon/raid/quest difficulty and every zone xpPerHour in this file
+   is anchored against the table at the bottom of this block.
+
+   computePower(hero) = round( (10 + level*5 + gearPower) * powerMult )
+   gearPower = sum of displayItemPower(item) over equipped slots
+   displayItemPower(item) = round( item.power * (1 + 0.1 * upgradeLevel) )
+     -- BLACKSMITH_UPGRADE_POWER_STEP nerfed 0.2 -> 0.1 below, so the
+        +5 cap now tops out at x1.5 gear power instead of x2.
+   powerMult = race power bonus (ignored here; assumed neutral race) *
+               evolution perk powerMult (none pre-25, ~1.09 avg tier-2,
+               ~1.15 avg tier-3, per the design brief)
+
+   "Typical gear" assumption: a hero equips ~3.5 of the 6 gear slots
+   with drops rolled at their current best-unlocked zone tier
+   (zoneTierForHero), using rollItemTier's ACTUAL weighted tier odds
+   at that zoneTier (not just "uncommon") averaged against
+   POWER_RANGES and computeItemPower's zoneTier scaling, then
+   blacksmith-upgraded to an average of +2 (post-nerf x1.2 power).
+
+   Anchor levels (era checkpoints) with this typical gear:
+
+     Level | Era | Best zone tier      | Avg item pwr (post-BS) | Base(10+5L) | EvoMult | Power
+     ------+-----+---------------------+------------------------+-------------+---------+-------
+       24  |  1  | T4 Sunken Marsh     |         ~15.5          |     130     |  1.00   | ~184
+       40  |  2  | T5 Emberfall Ruins  |         ~19.2          |     210     |  1.09   | ~302
+       60  |  3  | T7 The Threshold    |         ~27.9          |     310     |  1.15   | ~469
+        (gearPower = avg item pwr * 3.5 equipped items)
+
+   Difficulty anchors below were chosen so ratio = power/difficulty
+   lands near 1.0-1.15 (successChance ~70-95%, see successChance())
+   for a hero freshly into a given content's own era, and well under
+   0.6 (~<30%) for a hero attempting content a full era ahead of their
+   own (e.g. a level-10, still-Era-1 hero vs Era-2 content). Content
+   sitting at the EXACT floor level of a freshly-opened era (e.g. a
+   level-60 hero vs level60-gated Era-3 finale content) will read
+   Challenging (40-65%) rather than the full 70-85% band — that's
+   intentional: the hardest thing in a brand-new era should feel hard
+   on day one of that era, and eases into the 70-95% band within a
+   handful of levels. See the balance report for the full simulated
+   successChance table across levels 24/40/60.
+================================================================ */
 
 const RACES = {
   human: {
@@ -815,14 +863,16 @@ const ZONES = [
     tasks:["Culling rats in the millhouse","Chasing a fox from the henyard","Mending a fence the goats keep breaking","Hauling grain sacks up from the cellar","Standing watch over the Millbrook road"] },
   { id:"thornwood",  name:"Thornwood Edge",     tier:2, levelReq:5,  xpPerHour:1500,  goldPerHour:75,   dropChance:0.06,
     tasks:["Clearing bramble-wolves from the tree line","Tracking a poacher through the deep wood","Cutting a path through choking thornvine","Standing guard over a woodcutter's camp","Chasing off a pack of coin-thieving pixies"] },
-  { id:"cragside",   name:"Cragside Quarry",    tier:3, levelReq:12, xpPerHour:3200,  goldPerHour:160,  dropChance:0.07,
+  { id:"cragside",   name:"Cragside Quarry",    tier:3, levelReq:12, xpPerHour:14000, goldPerHour:700,  dropChance:0.07,
     tasks:["Clearing rockslide debris from the quarry road","Fighting off crag-lurkers in the lower pits","Hauling ore carts up the switchback trail","Shoring up a tunnel before it collapses","Driving off a cave troll gone territorial"] },
-  { id:"marsh",      name:"The Sunken Marsh",   tier:4, levelReq:20, xpPerHour:6000,  goldPerHour:300,  dropChance:0.08,
+  { id:"marsh",      name:"The Sunken Marsh",   tier:4, levelReq:20, xpPerHour:21000, goldPerHour:1050, dropChance:0.08,
     tasks:["Wading through the mire after a drowned relic","Fending off marsh leeches the size of dogs","Tracking a will-o'-wisp toward solid ground","Freeing a wagon sunk to its axles","Standing off a bog hag's territorial curse"] },
-  { id:"emberfall",  name:"Emberfall Ruins",    tier:5, levelReq:30, xpPerHour:11000, goldPerHour:550,  dropChance:0.09,
+  { id:"emberfall",  name:"Emberfall Ruins",    tier:5, levelReq:28, xpPerHour:30000, goldPerHour:1500, dropChance:0.09,
     tasks:["Sifting cinders for anything unmelted","Driving cinder-jackals from the collapsed archive","Holding a line against the Hollow Choir's scouts","Prying open a sealed vault door","Outlasting the heat of the inner ruins"] },
-  { id:"peaks",      name:"The Shattered Peaks",tier:6, levelReq:45, xpPerHour:20000, goldPerHour:1000, dropChance:0.10,
-    tasks:["Fighting a hollow revenant off the pass","Scaling a wind-scoured ridge","Holding footing against the mountain's own gales","Standing vigil near the sealed Threshold","Driving back something that used to be a person"] }
+  { id:"peaks",      name:"The Shattered Peaks",tier:6, levelReq:45, xpPerHour:48000, goldPerHour:2400, dropChance:0.10,
+    tasks:["Fighting a hollow revenant off the pass","Scaling a wind-scoured ridge","Holding footing against the mountain's own gales","Standing vigil near the sealed Threshold","Driving back something that used to be a person"] },
+  { id:"threshold_watch", name:"The Threshold Watch", tier:7, levelReq:55, xpPerHour:75000, goldPerHour:3750, dropChance:0.11,
+    tasks:["Standing the long watch over the seam beneath the Peaks","Turning back pilgrims still chasing the Hollow Choir's promises","Binding a crack in the stone before something notices it's open","Putting down whatever crawled through before the seal caught it","Listening to the Threshold breathe, and reporting that it still does"] }
 ];
 
 const DROP_INTERVAL_MS = 60 * 1000; // one drop roll per minute of training
@@ -901,7 +951,7 @@ const BLACKSMITH_MAX_UPGRADE = 5;
 const BLACKSMITH_BASE_COST = 10;
 const BLACKSMITH_COST_GROWTH = 3;
 const BLACKSMITH_TIER_COST_MULT = { common:1, uncommon:2, rare:4, epic:8, legendary:16 };
-const BLACKSMITH_UPGRADE_POWER_STEP = 0.2; // +20% of base power per upgrade level
+const BLACKSMITH_UPGRADE_POWER_STEP = 0.1; // +10% of base power per upgrade level (nerfed from 0.2 in v5 — cap is now x1.5, not x2)
 
 // Medic
 const MEDIC_HEAL_COST_PER_LEVEL = 5;
@@ -1050,83 +1100,83 @@ const EVOLUTIONS = {
 };
 
 const DUNGEONS = [
-  { id: "ashen_crypt", name: "The Ashen Crypt", flavor: "A collapsed mausoleum on the Millbrook road, its dead restless since the roof came down.", durationMin: 15, difficulty: 40, levelReq: 1, xp: 260, gold: 13, renown: 3, dropRolls: 2, dropTierBonus: 0 },
-  { id: "wolfsbane_hollow", name: "Wolfsbane Hollow", flavor: "A poisoned dell where the wolves stopped dying and started waiting.", durationMin: 20, difficulty: 65, levelReq: 6, xp: 850, gold: 42, renown: 4, dropRolls: 2, dropTierBonus: 0 },
-  { id: "drowned_chapel", name: "The Drowned Chapel", flavor: "A chapel the marsh swallowed whole, its bell still ringing when the water goes still.", durationMin: 25, difficulty: 100, levelReq: 12, xp: 2100, gold: 105, renown: 5, dropRolls: 3, dropTierBonus: 1 },
-  { id: "gallows_hill", name: "Gallows Hill", flavor: "Executions stopped here a century ago; the gallows never got the message.", durationMin: 30, difficulty: 150, levelReq: 20, xp: 4800, gold: 240, renown: 6, dropRolls: 3, dropTierBonus: 1 },
-  { id: "emberfall_catacombs", name: "Emberfall Catacombs", flavor: "Beneath the ruins, tunnels the old empire dug for reasons no one wrote down.", durationMin: 40, difficulty: 210, levelReq: 30, xp: 12000, gold: 600, renown: 8, dropRolls: 3, dropTierBonus: 1 },
-  { id: "cinder_maw", name: "The Cinder Maw", flavor: "A fissure of permanent fire at Emberfall's heart, said to breathe like something alive.", durationMin: 45, difficulty: 290, levelReq: 38, xp: 19800, gold: 990, renown: 10, dropRolls: 4, dropTierBonus: 2 },
-  { id: "frostbound_vault", name: "Frostbound Vault", flavor: "A treasury sealed in ice long before anyone alive was born, still guarding what it was told to guard.", durationMin: 55, difficulty: 370, levelReq: 50, xp: 42000, gold: 2100, renown: 13, dropRolls: 4, dropTierBonus: 2 },
-  { id: "shattered_throne", name: "The Shattered Throne", flavor: "The Peaks' broken summit hides a throne room that was never meant to be found again.", durationMin: 60, difficulty: 450, levelReq: 60, xp: 50000, gold: 2500, renown: 16, dropRolls: 4, dropTierBonus: 2 }
+  { id: "ashen_crypt", name: "The Ashen Crypt", flavor: "A collapsed mausoleum on the Millbrook road, its dead restless since the roof came down.", durationMin: 15, difficulty: 40, levelReq: 1, xp: 300, gold: 15, renown: 3, dropRolls: 2, dropTierBonus: 0 },
+  { id: "wolfsbane_hollow", name: "Wolfsbane Hollow", flavor: "A poisoned dell where the wolves stopped dying and started waiting.", durationMin: 20, difficulty: 65, levelReq: 6, xp: 1000, gold: 50, renown: 4, dropRolls: 2, dropTierBonus: 0 },
+  { id: "drowned_chapel", name: "The Drowned Chapel", flavor: "A chapel the marsh swallowed whole, its bell still ringing when the water goes still.", durationMin: 25, difficulty: 100, levelReq: 12, xp: 11667, gold: 583, renown: 5, dropRolls: 3, dropTierBonus: 1 },
+  { id: "gallows_hill", name: "Gallows Hill", flavor: "Executions stopped here a century ago; the gallows never got the message.", durationMin: 30, difficulty: 170, levelReq: 26, xp: 21000, gold: 1050, renown: 6, dropRolls: 3, dropTierBonus: 1 },
+  { id: "emberfall_catacombs", name: "Emberfall Catacombs", flavor: "Beneath the ruins, tunnels the old empire dug for reasons no one wrote down.", durationMin: 40, difficulty: 240, levelReq: 32, xp: 40000, gold: 2000, renown: 8, dropRolls: 3, dropTierBonus: 1 },
+  { id: "cinder_maw", name: "The Cinder Maw", flavor: "A fissure of permanent fire at Emberfall's heart, said to breathe like something alive.", durationMin: 45, difficulty: 330, levelReq: 40, xp: 45000, gold: 2250, renown: 10, dropRolls: 4, dropTierBonus: 2 },
+  { id: "frostbound_vault", name: "Frostbound Vault", flavor: "A treasury sealed in ice long before anyone alive was born, still guarding what it was told to guard.", durationMin: 55, difficulty: 480, levelReq: 55, xp: 137500, gold: 6875, renown: 13, dropRolls: 4, dropTierBonus: 2 },
+  { id: "shattered_throne", name: "The Shattered Throne", flavor: "The Peaks' broken summit hides a throne room that was never meant to be found again.", durationMin: 60, difficulty: 600, levelReq: 60, xp: 150000, gold: 7500, renown: 16, dropRolls: 4, dropTierBonus: 2 }
 ];
 
 const RAIDS = [
-  { id: "siege_of_thornwood_keep", name: "Siege of Thornwood Keep", flavor: "A ruined keep retaken by something organized enough to post sentries.", durationMin: 120, difficulty: 120, levelReq: 15, xp: 15700, gold: 785, renown: 21, dropRolls: 4, dropTierBonus: 1 },
-  { id: "the_sunken_court", name: "The Sunken Court", flavor: "A drowned noble house beneath the Marsh, holding court for guests who never leave.", durationMin: 150, difficulty: 250, levelReq: 30, xp: 67000, gold: 3350, renown: 35, dropRolls: 5, dropTierBonus: 2 },
-  { id: "the_ember_conclave", name: "The Ember Conclave", flavor: "A gathering of the Hollow Choir's faithful, deep in Emberfall's burning heart.", durationMin: 200, difficulty: 400, levelReq: 45, xp: 167000, gold: 8350, renown: 46, dropRolls: 5, dropTierBonus: 3 },
-  { id: "the_shattered_vigil", name: "The Shattered Vigil", flavor: "What's left of an army that marched into the Peaks and forgot to march back out.", durationMin: 240, difficulty: 550, levelReq: 60, xp: 204000, gold: 10200, renown: 58, dropRolls: 6, dropTierBonus: 3 }
+  { id: "siege_of_thornwood_keep", name: "Siege of Thornwood Keep", flavor: "A ruined keep retaken by something organized enough to post sentries.", durationMin: 120, difficulty: 120, levelReq: 15, xp: 70000, gold: 3500, renown: 21, dropRolls: 4, dropTierBonus: 1 },
+  { id: "the_sunken_court", name: "The Sunken Court", flavor: "A drowned noble house beneath the Marsh, holding court for guests who never leave.", durationMin: 150, difficulty: 280, levelReq: 28, xp: 187500, gold: 9375, renown: 35, dropRolls: 5, dropTierBonus: 2 },
+  { id: "the_ember_conclave", name: "The Ember Conclave", flavor: "A gathering of the Hollow Choir's faithful, deep in Emberfall's burning heart.", durationMin: 200, difficulty: 430, levelReq: 45, xp: 400000, gold: 20000, renown: 46, dropRolls: 5, dropTierBonus: 3 },
+  { id: "the_shattered_vigil", name: "The Shattered Vigil", flavor: "What's left of an army that marched into the Peaks and forgot to march back out.", durationMin: 240, difficulty: 700, levelReq: 60, xp: 750000, gold: 37500, renown: 58, dropRolls: 6, dropTierBonus: 3 }
 ];
 
 const QUEST_CHAPTERS = [
   {
-    id: "ch1_empty_road", chapter: 1, title: "The Empty Road",
+    id: "ch1_empty_road", chapter: 1, title: "The Empty Road", levelReq: 1,
     intro: "Warden Mira Ashcombe flags you down at the Millbrook crossroads, dust still settling behind her horse. Three merchant caravans have missed their dates on the road to Thornwood, and her riders have found nothing — not a wheel track past a certain bend, not a body, not a clue.",
     outro: "You find the fourth caravan exactly where the others vanished: horses tethered and calm, cargo untouched, and not a single person left to claim it. Mira crouches by the wheel and goes quiet for a long moment. \"Something took them without taking anything else,\" she says. \"That's worse than bandits.\"",
-    mission: { name: "Walk the Vanishing Road", durationMin: 20, difficulty: 35, xp: 460, gold: 23, renown: 5 }
+    mission: { name: "Walk the Vanishing Road", durationMin: 20, difficulty: 35, xp: 600, gold: 30, renown: 5 }
   },
   {
-    id: "ch2_marks_in_mud", chapter: 2, title: "Marks in the Mud",
+    id: "ch2_marks_in_mud", chapter: 2, title: "Marks in the Mud", levelReq: 8,
     intro: "Mira asks you to walk the vanishing-point again, this time on hands and knees. Somewhere in that stretch of road, whatever happened left a sign — she's certain of it, and she hates being certain of things she can't explain.",
     outro: "Pressed into the drying mud past the tree line: a symbol, deliberate and old, scratched by more than one set of hands. Mira doesn't recognize it, but she knows someone who might — a hermit scholar who left Thornwood decades ago and never came back.",
-    mission: { name: "Tracks Before Dawn", durationMin: 25, difficulty: 55, xp: 1440, gold: 72, renown: 6 }
+    mission: { name: "Tracks Before Dawn", durationMin: 25, difficulty: 55, xp: 1875, gold: 94, renown: 6 }
   },
   {
-    id: "ch3_hermits_warning", chapter: 3, title: "The Hermit's Warning",
+    id: "ch3_hermits_warning", chapter: 3, title: "The Hermit's Warning", levelReq: 16,
     intro: "Aldric Vane lives alone at the edge of Thornwood, surrounded by books he swears are the only honest company he's found in forty years. He looks at your rubbing of the symbol for a long time before he speaks.",
     outro: "\"The Hollow Choir,\" Aldric says finally, like the words cost him something. \"A cult I thought the Church burned out a lifetime ago. They don't kill their converts, Warden — they collect them.\" He agrees to help, on the condition that no one calls it retirement.",
-    mission: { name: "The Hermit's Archive", durationMin: 30, difficulty: 80, xp: 3030, gold: 152, renown: 8 }
+    mission: { name: "The Hermit's Archive", durationMin: 30, difficulty: 80, xp: 21000, gold: 1050, renown: 8 }
   },
   {
-    id: "ch4_tithe_road", chapter: 4, title: "The Tithe Road",
+    id: "ch4_tithe_road", chapter: 4, title: "The Tithe Road", levelReq: 25,
     intro: "Aldric's research points to a cult waystation past Cragside, where the missing are gathered before being moved onward. Mira wants it burned to the ground. Aldric wants it questioned first.",
     outro: "The waystation gives up both answers: crude ledgers tracking a \"tithe,\" and a terrified robed acolyte who claims the tithes are all walked toward one destination. He won't say the name of it without shaking. He doesn't have to — you already know which direction he's pointing.",
-    mission: { name: "Raid the Waystation", durationMin: 35, difficulty: 110, xp: 5550, gold: 278, renown: 10 }
+    mission: { name: "Raid the Waystation", durationMin: 35, difficulty: 130, xp: 36750, gold: 1838, renown: 10 }
   },
   {
-    id: "ch5_marsh_keeps", chapter: 5, title: "What the Marsh Keeps",
+    id: "ch5_marsh_keeps", chapter: 5, title: "What the Marsh Keeps", levelReq: 30,
     intro: "The tithe road cuts through the Sunken Marsh, where a caravan of the missing is said to be moving under guard tonight. Mira insists on riding with you this time; Aldric, for once, doesn't argue.",
     outro: "You free one survivor from the marsh column — an old woman who won't stop describing \"a door that breathes\" somewhere beneath the Peaks. Mira wraps a blanket around her shoulders and won't meet your eyes. She's starting to believe this is bigger than a cult.",
-    mission: { name: "The Marsh Column", durationMin: 45, difficulty: 150, xp: 10800, gold: 540, renown: 13 }
+    mission: { name: "The Marsh Column", durationMin: 45, difficulty: 190, xp: 67500, gold: 3375, renown: 13 }
   },
   {
-    id: "ch6_unmade_king", chapter: 6, title: "The Unmade King",
+    id: "ch6_unmade_king", chapter: 6, title: "The Unmade King", levelReq: 38,
     intro: "Aldric finally tells the story he's clearly been avoiding: before the Peaks were shattered, they crowned a king named Kaeloth, who bargained with something older than the mountains to escape his own death. The mountains broke soon after. Kaeloth did not.",
     outro: "\"The Choir doesn't worship a memory,\" Aldric says, closing the last of his books. \"They worship a king who is still, technically, alive. And they mean to wake him properly.\" For the first time since you've known him, he looks afraid of his own research.",
-    mission: { name: "Beneath the Old Crown", durationMin: 50, difficulty: 195, xp: 19500, gold: 975, renown: 16 }
+    mission: { name: "Beneath the Old Crown", durationMin: 50, difficulty: 250, xp: 75000, gold: 3750, renown: 16 }
   },
   {
-    id: "ch7_cinders_secrets", chapter: 7, title: "Cinders and Secrets",
+    id: "ch7_cinders_secrets", chapter: 7, title: "Cinders and Secrets", levelReq: 46,
     intro: "The Hollow Choir keeps a stronghold burning quietly inside Emberfall Ruins. Mira wants a look at their ritual calendar before deciding whether to bring the full Wardenry down on the place.",
     outro: "The calendar you recover marks a completion date in the language of moons and tides, and it isn't far off. Worse, it names a location the Choir calls the Threshold — a name Aldric recognizes from older, uglier texts as the seam where Kaeloth was sealed.",
-    mission: { name: "The Choir's Calendar", durationMin: 60, difficulty: 250, xp: 33000, gold: 1650, renown: 20 }
+    mission: { name: "The Choir's Calendar", durationMin: 60, difficulty: 330, xp: 144000, gold: 7200, renown: 20 }
   },
   {
-    id: "ch8_wardens_price", chapter: 8, title: "The Warden's Price",
+    id: "ch8_wardens_price", chapter: 8, title: "The Warden's Price", levelReq: 55,
     intro: "Mira rides ahead to scout the pass into the Peaks alone, against every piece of advice you and Aldric can offer her. She doesn't return by nightfall.",
     outro: "You find her alive but broken-boned, disarmed by something she describes only as \"faster than it should have been able to move.\" She grips your arm before you leave without her. \"Finish it,\" she says. \"Don't wait for me to heal first.\"",
-    mission: { name: "Recover the Warden", durationMin: 70, difficulty: 320, xp: 50700, gold: 2535, renown: 25 }
+    mission: { name: "Recover the Warden", durationMin: 70, difficulty: 480, xp: 262500, gold: 13125, renown: 25 }
   },
   {
-    id: "ch9_into_the_peaks", chapter: 9, title: "Into the Shattered Peaks",
+    id: "ch9_into_the_peaks", chapter: 9, title: "Into the Shattered Peaks", levelReq: 58,
     intro: "Alone now but for Aldric's letters of guidance, you climb into the Peaks toward the Threshold, where the Hollow Choir's high priest is already mid-ritual, chanting Kaeloth's unmade name into the dark.",
     outro: "The ritual breaks apart around you — chants cut short, the high priest silenced, the gathered Choir scattered or worse. But the seam beneath the mountain has already cracked open, and something vast and patient exhales through it before the stone grinds shut again.",
-    mission: { name: "The Threshold Ritual", durationMin: 80, difficulty: 400, xp: 81300, gold: 4065, renown: 32 }
+    mission: { name: "The Threshold Ritual", durationMin: 80, difficulty: 580, xp: 300000, gold: 15000, renown: 32 }
   },
   {
-    id: "ch10_sleeper_stirs", chapter: 10, title: "The Sleeper Stirs",
+    id: "ch10_sleeper_stirs", chapter: 10, title: "The Sleeper Stirs", levelReq: 60,
     intro: "With the Threshold sealed but not repaired, Aldric insists on one final descent to confirm Kaeloth is still bound. Mira, healed enough to travel, refuses to let you go down there without her.",
     outro: "The seal holds — for now. But the chamber beneath the Peaks is emptier than it should be, and the impression left in ancient stone is shaped like a throne with no one sitting in it. Mira asks if you noticed the footprints leading away from it, and out, toward the lowlands. Neither of you has an answer yet.",
-    mission: { name: "What the Throne Remembers", durationMin: 90, difficulty: 500, xp: 136000, gold: 6800, renown: 40 }
+    mission: { name: "What the Throne Remembers", durationMin: 90, difficulty: 700, xp: 337500, gold: 16875, renown: 40 }
   }
 ];
 
@@ -1792,7 +1842,7 @@ function getTimedContentDef(type, contentId){
     return {
       id: ch.id, name: ch.mission.name, chapter: ch.chapter, title: ch.title,
       durationMin: ch.mission.durationMin, difficulty: ch.mission.difficulty,
-      levelReq: 1, xp: ch.mission.xp, gold: ch.mission.gold, renown: ch.mission.renown,
+      levelReq: ch.levelReq || 1, xp: ch.mission.xp, gold: ch.mission.gold, renown: ch.mission.renown,
       dropRolls: QUEST_DROP_ROLLS, dropTierBonus: QUEST_DROP_TIER_BONUS
     };
   }
@@ -2009,6 +2059,7 @@ function migrateSave(data){
   if (d.version === 1) d = migrateV1toV2(d);
   if (d.version === 2) d = migrateV2toV3(d);
   if (d.version === 3) d = migrateV3toV4(d);
+  if (d.version === 4) d = migrateV4toV5(d);
   return d;
 }
 
@@ -2059,6 +2110,39 @@ function migrateV3toV4(data){
   }
 
   data.version = 4;
+  return data;
+}
+
+// v5 re-anchors content difficulty/xp across three eras and nerfs the
+// blacksmith's power step (0.2 -> 0.1, cap x2 -> x1.5). No stored fields
+// change shape — upgradeLevels carry over as-is and displayItemPower()
+// recomputes automatically against the new step everywhere it's read.
+// Two things do need a one-time note/fixup on load:
+function migrateV4toV5(data){
+  const hero = data.hero;
+  if (!Array.isArray(data.log)) data.log = [];
+
+  data.log.unshift({ t: Date.now(), msg:
+    "The realm's blacksmiths have recalibrated their craft — every hammered enchantment settles to a steadier, more modest strength.",
+    type: "system" });
+
+  // Defensive: if a zone's levelReq ever rose past a hero already
+  // training there (none do in this pass — Emberfall's only fell,
+  // 30 -> 28 — but a future retune might), don't leave them "training"
+  // at a now-locked zone forever. Drop to idle gracefully instead.
+  const a = data.activity;
+  if (a && a.type === "training"){
+    const zone = ZONES.find(z => z.id === a.zoneId);
+    if (!zone || hero.level < zone.levelReq){
+      data.activity = { type:"idle", zoneId:null, startedAt: data.lastTick || Date.now(), dropAccumulatorMs: 0 };
+      data.log.unshift({ t: Date.now(), msg:
+        "Training at " + (zone ? zone.name : "the old grounds") + " comes to a halt — the roads out that way have changed since you last set out.",
+        type: "system" });
+    }
+  }
+
+  if (data.log.length > MAX_LOG_ENTRIES) data.log.length = MAX_LOG_ENTRIES;
+  data.version = 5;
   return data;
 }
 
@@ -2219,10 +2303,36 @@ function relicBonusLabel(bonus){
   return sign + pct + "% " + (RELIC_LABELS[bonus.key] || bonus.key);
 }
 
+// Compact slot:itemId:upgradeLevel fingerprint of the whole equipped set —
+// folded into render signatures so equip/unequip/upgrade invalidate caches
+// that display gear comparisons, even when they don't touch inventory/stock.
+function equipmentSignature(){
+  return SLOTS.map(slot => {
+    const it = state.hero.equipment[slot];
+    return slot + ":" + (it ? (it.id + ":" + (it.upgradeLevel || 0)) : "");
+  }).join(",");
+}
+
+// Compact colored badge comparing an unequipped item's power against
+// whatever currently occupies its slot (Inventory list + Town shop stock).
+function gearDeltaBadge(item){
+  const equipped = state.hero.equipment[item.slot];
+  const candidatePower = displayItemPower(item);
+  const equippedPower = equipped ? displayItemPower(equipped) : 0;
+  const delta = candidatePower - equippedPower;
+  const label = equipped ? ("vs equipped " + equipped.name + " (Pwr " + equippedPower + ")") : "empty slot";
+  let color, text;
+  if (delta > 0){ color = "var(--green)"; text = "+" + delta; }
+  else if (delta < 0){ color = "var(--red)"; text = "−" + Math.abs(delta); }
+  else { color = "var(--text-muted)"; text = "±0"; }
+  return "<span class=\"gear-delta\" style=\"color:" + color + ";\" title=\"" + escapeHtml(label) + "\">" + text + "</span>";
+}
+
 // render signatures — skip DOM rebuilds when displayed data is unchanged
 let zonesRenderSig = null;
 let inventoryRenderSig = null;
 let logRenderSig = null;
+let shopRenderSig = null;
 
 function renderRaceClassGrids(){
   const raceGrid = document.getElementById("race-grid");
@@ -2416,6 +2526,11 @@ function renderShopPanel(){
   const remaining = Math.max(0, state.shop.nextRestockAt - Date.now());
   document.getElementById("shop-restock-label").textContent = "Restocks in " + fmtCountdown(remaining);
 
+  const stockIds = (state.shop.stock || []).map(i => i.id).join(",");
+  const sig = stockIds + "|" + state.hero.gold + "|" + equipmentSignature();
+  if (sig === shopRenderSig) return;
+  shopRenderSig = sig;
+
   const list = document.getElementById("shop-list");
   list.innerHTML = "";
   if (!state.shop.stock || state.shop.stock.length === 0){
@@ -2431,7 +2546,7 @@ function renderShopPanel(){
     row.className = "shop-item";
     row.innerHTML =
       "<span><span style=\"color:" + tier.color + "\">" + escapeHtml(itemDisplayName(item)) + "</span>" +
-      "<span class=\"inv-meta\">" + capitalize(item.slot) + " · Pwr " + item.power + bonusText + "</span></span>" +
+      "<span class=\"inv-meta\">" + capitalize(item.slot) + " · Pwr " + item.power + gearDeltaBadge(item) + bonusText + "</span></span>" +
       "<button class=\"btn small\" " + (afford ? "" : "disabled") + " data-buy=\"" + item.id + "\">Buy (" + fmtNumber(price) + "g)</button>";
     list.appendChild(row);
   });
@@ -2679,11 +2794,13 @@ function renderQuests(){
       const band = contentBandInfo(ratio);
       const chancePct = Math.round(successChance(ratio) * 100);
       const dur = Math.round(def.durationMin * 60000 * getTimerMultiplier(hero));
+      const levelLocked = hero.level < def.levelReq && !active;
       const card = document.createElement("div");
-      card.className = "quest-current";
+      card.className = "quest-current" + (levelLocked ? " locked" : "");
       card.innerHTML =
         "<h4>Chapter " + ch.chapter + " — " + escapeHtml(ch.title) + "</h4>" +
         "<div class=\"quest-intro\">" + escapeHtml(ch.intro) + "</div>" +
+        "<div class=\"zone-req\">" + (hero.level < def.levelReq ? "Requires level " + def.levelReq : "Level " + def.levelReq + "+") + "</div>" +
         "<div class=\"zone-stats\">" +
           "<span>Mission: <b>" + escapeHtml(def.name) + "</b></span>" +
           "<span><b>" + humanizeDuration(dur) + "</b></span>" +
@@ -3030,7 +3147,7 @@ function wireAdventureSubtabs(){
 function renderInventory(){
   const newest = state.inventory.length > 0 ? state.inventory[state.inventory.length - 1].id : "";
   const upgradeSum = state.inventory.reduce((a, i) => a + (i.upgradeLevel || 0), 0);
-  const sig = state.inventory.length + "|" + newest + "|" + upgradeSum;
+  const sig = state.inventory.length + "|" + newest + "|" + upgradeSum + "|" + equipmentSignature();
   if (sig === inventoryRenderSig) return;
   inventoryRenderSig = sig;
 
@@ -3050,7 +3167,7 @@ function renderInventory(){
     row.innerHTML =
       "<span class=\"inv-row-main\">" +
         "<span style=\"color:" + tier.color + "\">" + escapeHtml(itemDisplayName(item)) + (item.upgradeLevel ? " +" + item.upgradeLevel : "") + "</span>" +
-        "<span class=\"inv-meta\">" + capitalize(item.slot) + " · Pwr " + displayItemPower(item) + bonusText + "</span>" +
+        "<span class=\"inv-meta\">" + capitalize(item.slot) + " · Pwr " + displayItemPower(item) + gearDeltaBadge(item) + bonusText + "</span>" +
       "</span>" +
       "<span class=\"inv-actions\">" +
         "<button class=\"btn small\" data-equip=\"" + item.id + "\">Equip</button>" +
@@ -3779,7 +3896,7 @@ function wireResetModal(){
     if (autosaveHandle) clearInterval(autosaveHandle);
     deleteSave();
     state = null;
-    zonesRenderSig = inventoryRenderSig = logRenderSig = null;
+    zonesRenderSig = inventoryRenderSig = logRenderSig = shopRenderSig = null;
     Object.keys(contentRenderSigs).forEach(k => { delete contentRenderSigs[k]; });
     document.getElementById("reset-modal").classList.add("hidden");
     creationChoice.raceId = null;
