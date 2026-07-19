@@ -166,12 +166,13 @@
     box-shadow:0 0 8px rgba(212,175,55,0.4);
   }
 
-  .settings-corner{ position:relative; }
+  .settings-corner{ position:relative; display:flex; gap:0.5rem; }
   .gear-btn{
     background:var(--panel); border:1px solid var(--panel-border); color:var(--parchment-dim);
     width:38px; height:38px; border-radius:8px; cursor:pointer; font-size:1.1rem;
   }
   .gear-btn:hover{ border-color:var(--gold-dim); color:var(--gold); }
+  .section-flair{ color:var(--text-muted); font-style:italic; font-size:0.85rem; margin:0 0 0.6rem; }
   .settings-menu{
     position:absolute; right:0; top:44px; background:var(--panel); border:1px solid var(--panel-border);
     border-radius:8px; padding:0.6rem; min-width:170px; z-index:20; box-shadow:0 6px 18px rgba(0,0,0,0.5);
@@ -253,6 +254,10 @@
   .wb-rest-note{ text-align:center; color:var(--green); font-size:0.9rem; margin-top:0.6rem; font-style:italic; }
   .wb-content-note{ text-align:center; color:var(--gold-bright); font-size:0.9rem; margin-top:0.6rem; }
   #cr-outcome{ text-align:center; font-family:Georgia,'Times New Roman',serif; font-size:1.2rem; margin-bottom:0.4rem; }
+  #codex-modal .modal-box{ max-width:560px; max-height:70vh; overflow-y:auto; }
+  #codex-modal .codex-section{ margin-bottom:0.85rem; font-size:0.9rem; color:var(--parchment-dim); }
+  #codex-modal .codex-section:last-child{ margin-bottom:0; }
+  #codex-modal .codex-section b{ color:var(--gold-bright); }
 
   /* ================= TABS ================= */
   .tab-row{ display:flex; gap:0.5rem; }
@@ -446,7 +451,7 @@
           <span class="injury-status" id="injury-status"></span>
           <div class="rest-actions" id="rest-actions">
             <button class="btn small secondary" id="rest-short-btn">Short Rest (4h)</button>
-            <button class="btn small secondary" id="rest-long-btn">Long Rest (8h)</button>
+            <button class="btn small secondary" id="rest-long-btn">Long Rest (6h)</button>
           </div>
           <div class="rest-countdown hidden" id="rest-countdown"></div>
         </div>
@@ -454,6 +459,7 @@
       </div>
 
       <div class="settings-corner">
+        <button class="gear-btn" id="codex-btn" title="Realm Codex">?</button>
         <button class="gear-btn" id="gear-btn" title="Settings">&#9881;</button>
         <div id="settings-menu" class="settings-menu hidden">
           <button class="btn small secondary" id="export-save-btn" style="width:100%;">Export save</button>
@@ -477,6 +483,7 @@
     </div>
 
     <div id="adventure-tab" class="tab-panel">
+      <p class="section-flair">The road does not wait for the reluctant.</p>
       <div class="main-grid">
         <div class="panel">
           <div class="activity-banner">
@@ -484,17 +491,18 @@
               <div class="label">Currently</div>
               <div class="value" id="activity-value">Idle</div>
             </div>
-            <button class="btn secondary small" id="stop-training-btn">Stop training</button>
+            <button class="btn secondary small" id="stop-training-btn">Stop questing</button>
           </div>
           <div class="adv-subtab-row">
-            <button class="subtab-btn active" data-subtab="training">Training</button>
+            <button class="subtab-btn active" data-subtab="training">Quests</button>
             <button class="subtab-btn" data-subtab="dungeons">Dungeons</button>
             <button class="subtab-btn" data-subtab="raids">Raids</button>
-            <button class="subtab-btn" data-subtab="quests">Quests</button>
+            <button class="subtab-btn" data-subtab="quests">Campaign</button>
             <button class="subtab-btn" data-subtab="arena">Arena</button>
           </div>
           <div id="adv-training" class="adv-subpanel">
-            <h3>Training Zones</h3>
+            <h3>Questing Zones</h3>
+            <p class="section-flair">Coin and calluses, earned one patient hour at a time.</p>
             <div id="training-progress-panel" class="training-progress hidden">
               <div class="xp-bar-label">
                 <span id="training-task-label"></span>
@@ -506,18 +514,22 @@
           </div>
           <div id="adv-dungeons" class="adv-subpanel hidden">
             <h3>Dungeons</h3>
+            <p class="section-flair">Old stone keeps its secrets, and its dead, close.</p>
             <div id="dungeon-list" class="zone-list"></div>
           </div>
           <div id="adv-raids" class="adv-subpanel hidden">
             <h3>Raids</h3>
+            <p class="section-flair">Strength in numbers, or so the survivors claim.</p>
             <div id="raid-list" class="zone-list"></div>
           </div>
           <div id="adv-quests" class="adv-subpanel hidden">
-            <h3>Quests</h3>
+            <h3>Campaign</h3>
+            <p class="section-flair">A story the realm itself is waiting to finish.</p>
             <div id="quest-list" class="zone-list"></div>
           </div>
           <div id="adv-arena" class="adv-subpanel hidden">
             <h3>The Arena</h3>
+            <p class="section-flair">The gate locks behind you; only victory or ruin opens it again.</p>
             <div id="arena-body"></div>
           </div>
         </div>
@@ -532,6 +544,7 @@
     </div>
 
     <div id="inventory-tab" class="tab-panel hidden">
+      <p class="section-flair">What you carry into the dark decides what walks back out.</p>
       <div class="town-grid">
         <div class="panel">
           <h3>Equipped Gear</h3>
@@ -547,44 +560,53 @@
     </div>
 
     <div id="character-tab" class="tab-panel hidden">
+      <p class="section-flair">The realm remembers every hero, even the ones it forgets.</p>
       <div class="town-grid">
         <div class="panel">
           <h3>Renown</h3>
+          <p class="section-flair">A name is worth little until strangers start repeating it.</p>
           <div id="renown-body"></div>
         </div>
 
         <div class="panel">
           <h3>Character</h3>
+          <p class="section-flair">Blood, training, and steel — the sum of what stands before the dark.</p>
           <div id="character-info-body"></div>
         </div>
 
         <div class="panel" style="grid-column:1 / -1;">
           <h3>Lifetime Statistics</h3>
+          <p class="section-flair">Every ledger tells a story, if you know how to read the ink.</p>
           <div id="stats-body" class="modal-stat-grid" style="margin:0;"></div>
         </div>
       </div>
     </div>
 
     <div id="town-tab" class="tab-panel hidden">
+      <p class="section-flair">Within these walls, even a hero can catch their breath.</p>
       <div class="town-grid">
         <div class="panel" id="shop-panel">
           <h3>Shop</h3>
+          <p class="section-flair">The merchant's shelves change with the caravans and the rumors.</p>
           <div class="shop-restock" id="shop-restock-label"></div>
           <div id="shop-list" class="shop-list"></div>
         </div>
 
         <div class="panel" id="blacksmith-panel">
           <h3>Blacksmith</h3>
+          <p class="section-flair">The forge asks a price, and pays it back in edge and weight.</p>
           <div id="blacksmith-list" class="blacksmith-list"></div>
         </div>
 
         <div class="panel" id="medic-panel">
           <h3>Medic</h3>
+          <p class="section-flair">Needle, poultice, and a steady hand against the wounds you carry home.</p>
           <div id="medic-body"></div>
         </div>
 
         <div class="panel" id="tavern-panel">
           <h3>Tavern</h3>
+          <p class="section-flair">Ale loosens tongues, and sometimes sharpens a hero's nerve.</p>
           <div id="tavern-list" class="tavern-list"></div>
         </div>
       </div>
@@ -645,6 +667,7 @@
         <div class="k">Experience banked</div><div class="v" id="ar-xp"></div>
         <div class="k">Gold banked</div><div class="v" id="ar-gold"></div>
         <div class="k">Renown banked</div><div class="v" id="ar-renown"></div>
+        <div class="k">Survival bonus</div><div class="v" id="ar-bonus"></div>
       </div>
       <div class="modal-actions"><button class="btn" id="ar-close-btn">Continue</button></div>
     </div>
@@ -714,6 +737,23 @@
     </div>
   </div>
 
+  <!-- ============================================================
+       REALM CODEX MODAL
+  ============================================================ -->
+  <div id="codex-modal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3>Realm Codex</h3>
+      <div class="codex-section"><b>The basics.</b> You guide a single hero through an idle realm — progress continues while the game is closed.</div>
+      <div class="codex-section"><b>Questing Zones.</b> Pick a zone under Adventure to quest passively for XP, gold, and item drops; a questing session caps at 8 hours.</div>
+      <div class="codex-section"><b>Dungeons, Raids, Campaign.</b> Timed ventures on the Adventure tab that resolve after a set duration, win or lose; the Campaign advances chapter by chapter. Renown comes from these and the Arena — never from questing.</div>
+      <div class="codex-section"><b>The Arena.</b> Fights resolve every 10 seconds against escalating monsters, and there is no retreat — you fight until a wound or a beating carries you out. Wins bank XP, gold, and renown, and the longer you last, the bigger the survival bonus on your spoils (up to +50%).</div>
+      <div class="codex-section"><b>Injuries &amp; Rest.</b> Injuries lock you out of adventuring at 2; rest to heal — a Short Rest takes 4 hours, a Long Rest takes 6.</div>
+      <div class="codex-section"><b>Town.</b> The Shop restocks over time, the Blacksmith upgrades gear, the Medic heals injuries or cuts remaining rest time for gold, and the Tavern sells buffs.</div>
+      <div class="codex-section"><b>Saving.</b> Your journey saves automatically to this browser; use the gear menu to export or import a backup, or to reset.</div>
+      <div class="modal-actions"><button class="btn" id="codex-close-btn">Close</button></div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -775,6 +815,21 @@ const SAVE_VERSION = 5;
    on day one of that era, and eases into the 70-95% band within a
    handful of levels. See the balance report for the full simulated
    successChance table across levels 24/40/60.
+
+   Era-1 leveling pace (pure zone training, no xp mults; discrete
+   sums of xpNeeded(L) = round(100 * L^1.9) over each level band):
+
+     Levels | Zone                    | xp needed | xp/hr  | Hours
+     -------+-------------------------+-----------+--------+------
+      1-5   | T1 Millbrook Fields     |     2,672 |    600 |  4.5
+      5-9   | T2 Thornwood Edge       |    14,369 |  2,000 |  7.2
+      9-12  | T2 The Warden's Ford    |    23,965 |  5,500 |  4.4
+     12-20  | T3 Cragside Quarry      |   148,856 | 14,000 | 10.6
+     20-25  | T4 The Sunken Marsh     |   178,281 | 21,000 |  8.5
+
+   Levels 1-12: ~16.0h. Total 1-25: ~35.1h. (Pre-smoothing this was
+   ~30h to 12 and ~49h to 25 — the 1,500 -> 14,000 xp/hr cliff at
+   Thornwood/Cragside is what The Warden's Ford exists to bridge.)
 ================================================================ */
 
 const RACES = {
@@ -861,8 +916,10 @@ const CLASSES = {
 const ZONES = [
   { id:"millbrook",  name:"Millbrook Fields",   tier:1, levelReq:1,  xpPerHour:600,   goldPerHour:30,   dropChance:0.05,
     tasks:["Culling rats in the millhouse","Chasing a fox from the henyard","Mending a fence the goats keep breaking","Hauling grain sacks up from the cellar","Standing watch over the Millbrook road"] },
-  { id:"thornwood",  name:"Thornwood Edge",     tier:2, levelReq:5,  xpPerHour:1500,  goldPerHour:75,   dropChance:0.06,
+  { id:"thornwood",  name:"Thornwood Edge",     tier:2, levelReq:5,  xpPerHour:2000,  goldPerHour:100,  dropChance:0.06,
     tasks:["Clearing bramble-wolves from the tree line","Tracking a poacher through the deep wood","Cutting a path through choking thornvine","Standing guard over a woodcutter's camp","Chasing off a pack of coin-thieving pixies"] },
+  { id:"wardens_ford", name:"The Warden's Ford", tier:2, levelReq:9,  xpPerHour:5500,  goldPerHour:275,  dropChance:0.065,
+    tasks:["Riding patrol with Warden Mira's outriders","Escorting a nervous caravan past the vanishing-point","Dredging the shallows for cargo the road gave up","Standing night watch where the wheel tracks end","Turning back travelers who won't heed the Warden's signs"] },
   { id:"cragside",   name:"Cragside Quarry",    tier:3, levelReq:12, xpPerHour:14000, goldPerHour:700,  dropChance:0.07,
     tasks:["Clearing rockslide debris from the quarry road","Fighting off crag-lurkers in the lower pits","Hauling ore carts up the switchback trail","Shoring up a tunnel before it collapses","Driving off a cave troll gone territorial"] },
   { id:"marsh",      name:"The Sunken Marsh",   tier:4, levelReq:20, xpPerHour:21000, goldPerHour:1050, dropChance:0.08,
@@ -940,7 +997,7 @@ const MAX_INJURIES = 2;
 
 // Rest
 const REST_SHORT_MS = 4 * 60 * 60 * 1000;
-const REST_LONG_MS = 8 * 60 * 60 * 1000;
+const REST_LONG_MS = 6 * 60 * 60 * 1000;
 
 // Shop
 const SHOP_STOCK_SIZE = 4;
@@ -954,7 +1011,7 @@ const BLACKSMITH_TIER_COST_MULT = { common:1, uncommon:2, rare:4, epic:8, legend
 const BLACKSMITH_UPGRADE_POWER_STEP = 0.1; // +10% of base power per upgrade level (nerfed from 0.2 in v5 — cap is now x1.5, not x2)
 
 // Medic
-const MEDIC_HEAL_COST_PER_LEVEL = 5;
+const MEDIC_HEAL_COST_PER_LEVEL = 8;
 const MEDIC_CUT_COST_FRACTION = 0.5; // rest-cut costs half the heal price, rounded up
 
 // Tavern — temporary buffs. One active per effect key; rebuying refreshes duration.
@@ -1101,7 +1158,7 @@ const EVOLUTIONS = {
 
 const DUNGEONS = [
   { id: "ashen_crypt", name: "The Ashen Crypt", flavor: "A collapsed mausoleum on the Millbrook road, its dead restless since the roof came down.", durationMin: 15, difficulty: 40, levelReq: 1, xp: 300, gold: 15, renown: 3, dropRolls: 2, dropTierBonus: 0 },
-  { id: "wolfsbane_hollow", name: "Wolfsbane Hollow", flavor: "A poisoned dell where the wolves stopped dying and started waiting.", durationMin: 20, difficulty: 65, levelReq: 6, xp: 1000, gold: 50, renown: 4, dropRolls: 2, dropTierBonus: 0 },
+  { id: "wolfsbane_hollow", name: "Wolfsbane Hollow", flavor: "A poisoned dell where the wolves stopped dying and started waiting.", durationMin: 20, difficulty: 65, levelReq: 6, xp: 1333, gold: 67, renown: 4, dropRolls: 2, dropTierBonus: 0 },
   { id: "drowned_chapel", name: "The Drowned Chapel", flavor: "A chapel the marsh swallowed whole, its bell still ringing when the water goes still.", durationMin: 25, difficulty: 100, levelReq: 12, xp: 11667, gold: 583, renown: 5, dropRolls: 3, dropTierBonus: 1 },
   { id: "gallows_hill", name: "Gallows Hill", flavor: "Executions stopped here a century ago; the gallows never got the message.", durationMin: 30, difficulty: 170, levelReq: 26, xp: 21000, gold: 1050, renown: 6, dropRolls: 3, dropTierBonus: 1 },
   { id: "emberfall_catacombs", name: "Emberfall Catacombs", flavor: "Beneath the ruins, tunnels the old empire dug for reasons no one wrote down.", durationMin: 40, difficulty: 240, levelReq: 32, xp: 40000, gold: 2000, renown: 8, dropRolls: 3, dropTierBonus: 1 },
@@ -1128,7 +1185,7 @@ const QUEST_CHAPTERS = [
     id: "ch2_marks_in_mud", chapter: 2, title: "Marks in the Mud", levelReq: 8,
     intro: "Mira asks you to walk the vanishing-point again, this time on hands and knees. Somewhere in that stretch of road, whatever happened left a sign — she's certain of it, and she hates being certain of things she can't explain.",
     outro: "Pressed into the drying mud past the tree line: a symbol, deliberate and old, scratched by more than one set of hands. Mira doesn't recognize it, but she knows someone who might — a hermit scholar who left Thornwood decades ago and never came back.",
-    mission: { name: "Tracks Before Dawn", durationMin: 25, difficulty: 55, xp: 1875, gold: 94, renown: 6 }
+    mission: { name: "Tracks Before Dawn", durationMin: 25, difficulty: 55, xp: 2500, gold: 125, renown: 6 }
   },
   {
     id: "ch3_hermits_warning", chapter: 3, title: "The Hermit's Warning", levelReq: 16,
@@ -1208,14 +1265,16 @@ const QUEST_DROP_TIER_BONUS = 1;
 // Arena tuning.
 const ARENA_MONSTER_POWER_BASE = 0.6;    // monster power = hero power × (base + step × fightNumber)
 const ARENA_MONSTER_POWER_STEP = 0.12;
-const ARENA_XP_ZONE_FRACTION = 0.15;     // xp per win ≈ zone xp/hour × this × fightNumber
+const ARENA_XP_ZONE_FRACTION = 0.10;     // xp per win ≈ zone xp/hour × this × fightNumber (trimmed from 0.15 for 10s rounds)
 const ARENA_INJURY_CHANCE_BASE = 0.04;   // injury roll after a win: (base + step × fightNumber) × injury mult
 const ARENA_INJURY_CHANCE_STEP = 0.03;
 const ARENA_RENOWN_FIGHT_INTERVAL = 3;   // +1 banked renown per this many fights won
 const ARENA_EPITHET_INTERVAL = 5;        // every Nth fight's monster carries an epithet
 const ARENA_COMBAT_LOG_LINES = 6;
-const ARENA_FIGHT_MS = 15 * 1000;        // each Arena fight auto-resolves 15s after it begins
+const ARENA_FIGHT_MS = 10 * 1000;        // each Arena fight auto-resolves 10s after it begins
 const ARENA_MAX_FIGHTS_PER_CATCHUP = 5000; // safety clamp for a huge offline gap
+const ARENA_SURVIVAL_BONUS_MAX = 0.5;    // run-end survival multiplier ramps from +0% up to this (+50%) on banked xp/gold
+const ARENA_SURVIVAL_BONUS_FIGHTS = 10;  // ...reaching the cap after surviving this many fights
 
 /* ---- v2.1: fantasy name generator ---- */
 
@@ -1797,7 +1856,7 @@ function applyTrainingProgressWithCap(elapsedMs, maxDrops, summary){
     const cappedElapsed = Math.max(0, capAt - segmentStart);
     if (cappedElapsed > 0) applyTrainingProgress(cappedElapsed, maxDrops, summary);
     const zone = ZONES.find(z => z.id === activity.zoneId);
-    addLog(hero.name + "'s training session at " + (zone ? zone.name : "the field") +
+    addLog(hero.name + "'s questing session in " + (zone ? zone.name : "the field") +
       " ends — even heroes need to look up from the grindstone.", "system");
     state.activity = { type:"idle", zoneId:null, startedAt: capAt, dropAccumulatorMs: 0 };
     summary.trainingCapped = true;
@@ -1913,7 +1972,7 @@ function applyTimedContentProgress(summary){
   awardRenown(hero, renownGain);
   summary.itemsFound = summary.itemsFound.concat(items);
 
-  const typeLabel = type === "dungeon" ? "Dungeon" : type === "raid" ? "Raid" : "Quest";
+  const typeLabel = type === "dungeon" ? "Dungeon" : type === "raid" ? "Raid" : "Campaign";
   addLog(typeLabel + " — " + def.name + ": " + (success ? "Success!" : "Failure.") +
     " +" + fmtNumber(xpGain) + " xp, +" + fmtNumber(goldGain) + " gold" +
     (renownGain > 0 ? ", +" + renownGain + " renown" : "") + ".",
@@ -1947,7 +2006,7 @@ function applyTimedContentProgress(summary){
 
 // Random flavor task for the training progress bar, themed to the zone.
 function pickTrainingTask(zone){
-  const pool = (zone && zone.tasks && zone.tasks.length) ? zone.tasks : ["Training in the field"];
+  const pool = (zone && zone.tasks && zone.tasks.length) ? zone.tasks : ["Questing in the field"];
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
@@ -2136,7 +2195,7 @@ function migrateV4toV5(data){
     if (!zone || hero.level < zone.levelReq){
       data.activity = { type:"idle", zoneId:null, startedAt: data.lastTick || Date.now(), dropAccumulatorMs: 0 };
       data.log.unshift({ t: Date.now(), msg:
-        "Training at " + (zone ? zone.name : "the old grounds") + " comes to a halt — the roads out that way have changed since you last set out.",
+        "Questing in " + (zone ? zone.name : "the old grounds") + " comes to a halt — the roads out that way have changed since you last set out.",
         type: "system" });
     }
   }
@@ -2435,12 +2494,12 @@ function renderHeroPanel(){
   if (act.type === "training"){
     const zone = ZONES.find(z => z.id === act.zoneId);
     const remaining = Math.max(0, (act.startedAt + TRAINING_CAP_MS) - Date.now());
-    activityEl.textContent = "Training at " + (zone ? zone.name : "Unknown") + " — " + fmtCountdown(remaining) + " left in session";
+    activityEl.textContent = "Questing in " + (zone ? zone.name : "Unknown") + " — " + fmtCountdown(remaining) + " left in session";
   } else if (act.type === "rest"){
     activityEl.textContent = (act.restKind === "short" ? "Resting (short)" : "Resting (long)");
   } else if (act.type === "dungeon" || act.type === "raid" || act.type === "quest"){
     const def = getTimedContentDef(act.type, act.contentId);
-    const label = act.type === "dungeon" ? "Dungeon" : act.type === "raid" ? "Raid" : "Quest";
+    const label = act.type === "dungeon" ? "Dungeon" : act.type === "raid" ? "Raid" : "Campaign";
     activityEl.textContent = label + ": " + (def ? def.name : "Unknown") + " — " + fmtCountdown(Math.max(0, act.endsAt - Date.now())) + " left";
   } else if (act.type === "arena"){
     activityEl.textContent = "In the Arena — fight " + act.fightNumber;
@@ -2469,8 +2528,8 @@ function renderInjuryStatus(){
   const longBtn = document.getElementById("rest-long-btn");
   shortBtn.disabled = hero.injuries <= 0 || resting || busy;
   longBtn.disabled = hero.injuries <= 0 || resting || busy;
-  shortBtn.title = busy ? "Finish or yield the current venture first" : "";
-  longBtn.title = busy ? "Finish or yield the current venture first" : "";
+  shortBtn.title = busy ? "Finish your current venture first" : "";
+  longBtn.title = busy ? "Finish your current venture first" : "";
 
   const actionsEl = document.getElementById("rest-actions");
   const countdownEl = document.getElementById("rest-countdown");
@@ -2648,7 +2707,7 @@ function renderTrainingProgress(){
   const accum = act.dropAccumulatorMs || 0;
   const pct = Math.max(0, Math.min(100, (accum / DROP_INTERVAL_MS) * 100));
   document.getElementById("training-progress-fill").style.width = pct.toFixed(1) + "%";
-  document.getElementById("training-task-label").textContent = act.task || "Training";
+  document.getElementById("training-task-label").textContent = act.task || "Questing";
   const remainingMs = Math.max(0, DROP_INTERVAL_MS - accum);
   document.getElementById("training-progress-label").textContent = Math.ceil(remainingMs / 1000) + "s to next find check";
 }
@@ -2685,9 +2744,9 @@ function renderZones(){
       "<div class=\"zone-action\">" +
         (locked ? "<span style=\"color:var(--text-muted); font-size:0.8rem;\">Locked</span>" :
           hurtLocked ? "<span style=\"color:var(--red); font-size:0.8rem;\">Must rest</span>" :
-          active ? "<span style=\"color:var(--gold); font-size:0.85rem;\">Training here</span>" :
-          isBusyWithContent() ? "<span style=\"color:var(--text-muted); font-size:0.8rem;\" title=\"Finish or yield the current venture first\">Busy</span>" :
-          "<button class=\"btn small\" data-zone-select=\"" + zone.id + "\">Train here</button>") +
+          active ? "<span style=\"color:var(--gold); font-size:0.85rem;\">Questing here</span>" :
+          isBusyWithContent() ? "<span style=\"color:var(--text-muted); font-size:0.8rem;\" title=\"Finish your current venture first\">Busy</span>" :
+          "<button class=\"btn small\" data-zone-select=\"" + zone.id + "\">Quest here</button>") +
       "</div>";
 
     list.appendChild(card);
@@ -2854,10 +2913,10 @@ function renderArena(){
     const reason = arenaBlockReason();
     const gambling = hero.injuries === 1;
     body.innerHTML =
-      "<div class=\"content-flavor\">Fight randomly drawn monsters of escalating menace. Every win banks XP, gold, and renown — but an injury forces a yield, and only what you banked comes home with you.</div>" +
+      "<div class=\"content-flavor\">Fight randomly drawn monsters of escalating menace. Every win banks XP, gold, and renown — and the longer you last, the richer the spoils. But there is no way out: once you step onto the sand you fight until a wound or a beating drops you, and only then do you carry your winnings home.</div>" +
       (safeFights > 0 ? "<div class=\"arena-note\">" + (getRace(hero).id === "orc" ?
         "Your orcish blood shrugs off the first blow — the first " + (safeFights === 1 ? "fight carries" : safeFights + " fights carry") + " no injury risk." :
-        "Your training grants " + safeFights + " early fight" + (safeFights === 1 ? "" : "s") + " with no injury risk.") + "</div>" : "") +
+        "Your conditioning grants " + safeFights + " early fight" + (safeFights === 1 ? "" : "s") + " with no injury risk.") + "</div>" : "") +
       (gambling && !reason ? "<div class=\"modal-warning\">You carry an injury — one more locks you out of everything until you rest. A calculated gamble.</div>" : "") +
       "<div class=\"arena-actions\">" +
         (reason ? "<span style=\"color:var(--text-muted); font-size:0.85rem;\">" + escapeHtml(reason) + "</span>" :
@@ -2884,13 +2943,10 @@ function renderArena(){
       "<div class=\"k\">Banked gold</div><div class=\"v\">" + fmtNumber(act.bankedGold) + "</div>" +
       "<div class=\"k\">Banked renown</div><div class=\"v\">" + act.bankedRenown + "</div>" +
     "</div>" +
-    "<div class=\"arena-actions\">" +
-      "<button class=\"btn secondary\" id=\"arena-yield-btn\">Yield (bank rewards)</button>" +
-    "</div>" +
+    "<div class=\"arena-note\">No retreat — you fight until a wound or a beating carries you out. Your banked spoils (and a survival bonus for lasting longer) come home either way.</div>" +
     "<div class=\"arena-combat-log\">" +
       act.combatLog.map(l => "<div class=\"line\">" + escapeHtml(l) + "</div>").join("") +
     "</div>";
-  document.getElementById("arena-yield-btn").addEventListener("click", arenaYield);
 }
 
 function renderRenownPanel(){
@@ -2918,7 +2974,7 @@ function renderRenownPanel(){
   if (reached.length > 0){
     html += "<div class=\"renown-bonus-list\">" + reached.map(m => "<div><span class=\"b\">" + escapeHtml(m.bonusText) + "</span> — " + escapeHtml(m.title) + "</div>").join("") + "</div>";
   } else {
-    html += "<div class=\"renown-bonus-list\">Renown is earned from dungeons, raids, quests, and the Arena — never from training.</div>";
+    html += "<div class=\"renown-bonus-list\">Renown is earned from dungeons, raids, the Campaign, and the Arena — never from questing.</div>";
   }
   body.innerHTML = html;
 }
@@ -2975,7 +3031,7 @@ function renderStatsPanel(){
     ["Dungeons failed", fmtNumber(s.dungeonsFailed)],
     ["Raids completed", fmtNumber(s.raidsCompleted)],
     ["Raids failed", fmtNumber(s.raidsFailed)],
-    ["Quest chapters completed", fmtNumber(s.questChaptersCompleted)],
+    ["Campaign chapters completed", fmtNumber(s.questChaptersCompleted)],
     ["Rests completed", fmtNumber(s.restsCompleted)]
   ];
   document.getElementById("stats-body").innerHTML =
@@ -3007,7 +3063,7 @@ function perkLine(perks){
     const labels = {
       powerMult: "Power", xpMult: "XP", goldMult: "Gold", dropMult: "Drop Chance",
       injuryChanceMult: "Injury Chance", restTimeMult: "Rest Time",
-      timerMult: "Dungeon/Raid/Quest Time", rewardMult: "Expedition Rewards"
+      timerMult: "Dungeon/Raid/Campaign Time", rewardMult: "Expedition Rewards"
     };
     const pct = Math.round(Math.abs(v - 1) * 100);
     parts.push((v >= 1 ? "+" : "-") + pct + "% " + (labels[k] || k));
@@ -3065,7 +3121,7 @@ function wireEvolutionModal(){
 /* ---- content result modal (dungeon / raid / quest resolution) ---- */
 
 function showContentResultModal(result){
-  const typeLabel = result.type === "dungeon" ? "Dungeon" : result.type === "raid" ? "Raid" : "Quest";
+  const typeLabel = result.type === "dungeon" ? "Dungeon" : result.type === "raid" ? "Raid" : "Campaign";
   document.getElementById("cr-title").textContent = typeLabel + ": " + result.name;
   const outcomeEl = document.getElementById("cr-outcome");
   outcomeEl.textContent = result.success ? "Success!" : "Failure";
@@ -3112,22 +3168,32 @@ function wireContentResultModal(){
   });
 }
 
-// Summary modal shown whenever a live Arena run ends (yield, injury, or
-// defeat). An offline-resolved run is folded into the welcome-back modal
-// instead (see showWelcomeBackModal) rather than shown here.
+// Summary modal shown whenever a live Arena run ends (injury or defeat).
+// An offline-resolved run is folded into the welcome-back modal instead
+// (see showWelcomeBackModal) rather than shown here.
 function showArenaResultModal(result){
-  const reasonText = result.reason === "yield" ? "You yielded." : result.reason === "injury" ? "You were carried off, injured." : "You were defeated.";
+  const reasonText = result.reason === "injury" ? "You were carried out, injured." : "You were beaten down.";
   document.getElementById("ar-outcome").textContent = reasonText;
   document.getElementById("ar-fights").textContent = result.fightsWon;
   document.getElementById("ar-xp").textContent = fmtNumber(result.xp);
   document.getElementById("ar-gold").textContent = fmtNumber(result.gold);
   document.getElementById("ar-renown").textContent = result.renown > 0 ? "+" + result.renown : "0";
+  const bf = result.bonusFraction || 0;
+  document.getElementById("ar-bonus").textContent = bf > 0
+    ? "×" + (1 + bf).toFixed(2) + " (+" + fmtNumber(result.bonusXp || 0) + " xp, +" + fmtNumber(result.bonusGold || 0) + " gold)"
+    : "—";
   document.getElementById("arena-result-modal").classList.remove("hidden");
 }
 
 function wireArenaResultModal(){
   document.getElementById("ar-close-btn").addEventListener("click", () => {
     document.getElementById("arena-result-modal").classList.add("hidden");
+  });
+}
+
+function wireCodexModal(){
+  document.getElementById("codex-close-btn").addEventListener("click", () => {
+    document.getElementById("codex-modal").classList.add("hidden");
   });
 }
 
@@ -3242,7 +3308,7 @@ function startTraining(zoneId){
   if (isBusyWithContent()) return; // expeditions and Arena runs aren't abandoned by training
 
   state.activity = { type:"training", zoneId: zoneId, startedAt: Date.now(), dropAccumulatorMs: 0, task: pickTrainingTask(zone) };
-  addLog("Began training at " + zone.name + ".", "zone");
+  addLog("Began questing in " + zone.name + ".", "zone");
   saveGame();
   render();
 }
@@ -3251,7 +3317,7 @@ function stopTraining(){
   if (state.activity.type !== "training") return;
   const zone = ZONES.find(z => z.id === state.activity.zoneId);
   state.activity = { type:"idle", zoneId:null, startedAt: Date.now(), dropAccumulatorMs: 0 };
-  addLog("Stopped training" + (zone ? " at " + zone.name : "") + ".", "zone");
+  addLog("Stopped questing" + (zone ? " in " + zone.name : "") + ".", "zone");
   saveGame();
   render();
 }
@@ -3262,18 +3328,18 @@ function startRest(kind){
   const hero = state.hero;
   if (hero.injuries <= 0) return;
   if (state.activity.type === "rest") return;
-  if (isBusyWithContent()) return; // finish (or yield) the current venture first
+  if (isBusyWithContent()) return; // finish the current venture first
 
   if (state.activity.type === "training"){
     const zone = ZONES.find(z => z.id === state.activity.zoneId);
-    addLog("Stopped training" + (zone ? " at " + zone.name : "") + " to rest.", "zone");
+    addLog("Stopped questing" + (zone ? " in " + zone.name : "") + " to rest.", "zone");
   }
 
   const baseMs = kind === "short" ? REST_SHORT_MS : REST_LONG_MS;
   const dur = Math.round(baseMs * getRestTimeMultiplier(hero));
   const now = Date.now();
   state.activity = { type:"rest", restKind: kind, startedAt: now, endsAt: now + dur };
-  addLog("Began a " + (kind === "short" ? "short (4h)" : "long (8h)") + " rest.", "zone");
+  addLog("Began a " + (kind === "short" ? "short (4h)" : "long (6h)") + " rest.", "zone");
   saveGame();
   render();
 }
@@ -3302,7 +3368,7 @@ function startTimedContent(type, contentId){
 
   if (state.activity.type === "training"){
     const zone = ZONES.find(z => z.id === state.activity.zoneId);
-    addLog("Stopped training" + (zone ? " at " + zone.name : "") + " to set out.", "zone");
+    addLog("Stopped questing" + (zone ? " in " + zone.name : "") + " to set out.", "zone");
   }
 
   const now = Date.now();
@@ -3310,7 +3376,7 @@ function startTimedContent(type, contentId){
   const dur = Math.round(def.durationMin * 60000 * getTimerMultiplier(state.hero));
   state.activity = { type: type, contentId: contentId, startedAt: now, endsAt: now + dur };
 
-  const typeLabel = type === "dungeon" ? "the dungeon" : type === "raid" ? "the raid" : "the quest";
+  const typeLabel = type === "dungeon" ? "the dungeon" : type === "raid" ? "the raid" : "the campaign";
   addLog("Set out for " + typeLabel + " \"" + def.name + "\" (" + humanizeDuration(dur) + ").", "zone");
   saveGame();
   render();
@@ -3352,7 +3418,7 @@ function startArenaRun(){
   if (arenaBlockReason()) return;
   if (state.activity.type === "training"){
     const zone = ZONES.find(z => z.id === state.activity.zoneId);
-    addLog("Stopped training" + (zone ? " at " + zone.name : "") + " to enter the Arena.", "zone");
+    addLog("Stopped questing" + (zone ? " in " + zone.name : "") + " to enter the Arena.", "zone");
   }
   const now = Date.now();
   state.activity = {
@@ -3391,7 +3457,7 @@ function resolveArenaFight(a){
   }
 
   // Win: bank rewards. Zone gold/hour is authored at half the zone's
-  // xp/hour, so using the same fraction yields "gold half that".
+  // xp/hour, so using the same fraction gives "gold half that".
   const zone = arenaRewardZone(hero);
   const rewardMult = getRewardMultiplier(hero);
   const xpWin = zone.xpPerHour * ARENA_XP_ZONE_FRACTION * a.fightNumber * rewardMult * getXpMultiplier(hero);
@@ -3412,7 +3478,7 @@ function resolveArenaFight(a){
   } else {
     const injuryChance = (ARENA_INJURY_CHANCE_BASE + ARENA_INJURY_CHANCE_STEP * a.fightNumber) * getInjuryChanceMultiplier(hero);
     if (Math.random() < injuryChance){
-      arenaLogLine("You take a wound in the winning — the crowd roars as you're forced to yield.");
+      arenaLogLine("You take a wound in the winning — the crowd roars as you're carried out.");
       return { ended: true, reason: "injury", fightNumber: a.fightNumber + 1 };
     }
   }
@@ -3424,33 +3490,38 @@ function resolveArenaFight(a){
 }
 
 // Banks the run's rewards into the hero, logs it, and returns to idle.
-// Does NOT save/render — callers that resolve live (arenaYield) or as
-// part of a tick/offline pass wrap this with their own save/render/modal.
+// Does NOT save/render — the tick/offline pass that resolves the run wraps
+// this with its own save/render/modal. The player has no exit choice, so
+// all banked spoils are always granted; lasting longer adds a survival
+// bonus on top of banked xp/gold. Old saves may lack some banked* fields,
+// so every read is defaulted to 0.
 function resolveArenaRunEnd(reason, runData){
   const hero = state.hero;
   if (state.activity.type === "arena"){
     state.activity = { type:"idle", zoneId:null, startedAt: Date.now(), dropAccumulatorMs: 0 };
   }
-  grantXp(hero, runData.bankedXp);
-  awardGold(hero, runData.bankedGold);
-  awardRenown(hero, runData.bankedRenown);
-  const fightsWon = Math.max(0, runData.fightNumber - 1);
-  const reasonText = reason === "yield" ? "yielded" : reason === "injury" ? "carried off injured" : "defeated";
+  const fightsWon = Math.max(0, (runData.fightNumber || 1) - 1);
+  const bankedXp = runData.bankedXp || 0;
+  const bankedGold = runData.bankedGold || 0;
+  const bankedRenown = runData.bankedRenown || 0;
+  // Survival bonus: multiplier ramps from 1.0 up to 1 + ARENA_SURVIVAL_BONUS_MAX
+  // across the first ARENA_SURVIVAL_BONUS_FIGHTS fights, then holds at the cap.
+  const bonusFraction = Math.min(ARENA_SURVIVAL_BONUS_MAX, ARENA_SURVIVAL_BONUS_MAX * fightsWon / ARENA_SURVIVAL_BONUS_FIGHTS);
+  const bonusXp = bankedXp * bonusFraction;
+  const bonusGold = bankedGold * bonusFraction;
+  const totalXp = bankedXp + bonusXp;
+  const totalGold = bankedGold + bonusGold;
+  grantXp(hero, totalXp);
+  awardGold(hero, totalGold);
+  awardRenown(hero, bankedRenown);
+  const reasonText = reason === "injury" ? "carried out injured" : "beaten down";
   addLog("Arena run ends (" + reasonText + ") — " + fightsWon + " win" + (fightsWon === 1 ? "" : "s") +
-    ", banked +" + fmtNumber(runData.bankedXp) + " xp, +" + fmtNumber(runData.bankedGold) + " gold" +
-    (runData.bankedRenown > 0 ? ", +" + runData.bankedRenown + " renown" : "") + ".",
-    reason === "yield" ? "zone" : "system");
-  return { reason: reason, fightsWon: fightsWon, xp: runData.bankedXp, gold: runData.bankedGold, renown: runData.bankedRenown };
-}
-
-// Live-path wrapper (Yield button): resolves the run, saves, re-renders,
-// and shows the summary modal.
-function finishArenaRun(reason, runData){
-  const result = resolveArenaRunEnd(reason, runData);
-  saveGame();
-  render();
-  showArenaResultModal(result);
-  return result;
+    ", +" + fmtNumber(totalXp) + " xp, +" + fmtNumber(totalGold) + " gold" +
+    (bankedRenown > 0 ? ", +" + bankedRenown + " renown" : "") +
+    (bonusFraction > 0 ? " (survival bonus ×" + (1 + bonusFraction).toFixed(2) + ")" : "") + ".",
+    "system");
+  return { reason: reason, fightsWon: fightsWon, xp: totalXp, gold: totalGold, renown: bankedRenown,
+    bonusFraction: bonusFraction, bonusXp: bonusXp, bonusGold: bonusGold };
 }
 
 // Dispatch target for activity.type === "arena". Resolves as many fights
@@ -3472,12 +3543,6 @@ function applyArenaProgress(summary){
       break;
     }
   }
-}
-
-function arenaYield(){
-  const a = state.activity;
-  if (a.type !== "arena") return;
-  finishArenaRun("yield", { fightNumber: a.fightNumber, bankedXp: a.bankedXp, bankedGold: a.bankedGold, bankedRenown: a.bankedRenown });
 }
 
 /* ---- v2 phase 2: class evolutions ---- */
@@ -3849,6 +3914,10 @@ function wireGameScreen(){
   document.addEventListener("click", () => settingsMenu.classList.add("hidden"));
   settingsMenu.addEventListener("click", (e) => e.stopPropagation());
 
+  document.getElementById("codex-btn").addEventListener("click", () => {
+    document.getElementById("codex-modal").classList.remove("hidden");
+  });
+
   document.getElementById("reset-save-btn").addEventListener("click", () => {
     settingsMenu.classList.add("hidden");
     openResetModal();
@@ -3859,6 +3928,7 @@ function wireGameScreen(){
   wireEvolutionModal();
   wireContentResultModal();
   wireArenaResultModal();
+  wireCodexModal();
   wireExportImport();
 }
 
@@ -3945,7 +4015,7 @@ function showWelcomeBackModal(summary){
   const contentNoteEl = document.getElementById("wb-content-note");
   const cr = summary.contentResolved;
   if (cr){
-    const typeLabel = cr.type === "dungeon" ? "dungeon" : cr.type === "raid" ? "raid" : "quest";
+    const typeLabel = cr.type === "dungeon" ? "dungeon" : cr.type === "raid" ? "raid" : "campaign";
     contentNoteEl.textContent =
       "Your " + typeLabel + ": " + cr.name + " — " + (cr.success ? "Success!" : "Failure.") +
       " +" + fmtNumber(cr.xp) + " xp, +" + fmtNumber(cr.gold) + " gold" +
@@ -3968,7 +4038,7 @@ function showWelcomeBackModal(summary){
   // The training session hit its 8-hour cap while you were away.
   const trainingNoteEl = document.getElementById("wb-training-note");
   if (summary.trainingCapped){
-    trainingNoteEl.textContent = "Your training ended after 8 hours — even heroes need to look up from the grindstone.";
+    trainingNoteEl.textContent = "Your questing ended after 8 hours — even heroes need to look up from the grindstone.";
     trainingNoteEl.classList.remove("hidden");
   } else {
     trainingNoteEl.classList.add("hidden");
@@ -3979,12 +4049,13 @@ function showWelcomeBackModal(summary){
   const arenaNoteEl = document.getElementById("wb-arena-note");
   const ar = summary.arenaResolved;
   if (ar){
-    const reasonText = ar.reason === "yield" ? "yielded" : ar.reason === "injury" ? "carried off injured" : "defeated";
+    const reasonText = ar.reason === "injury" ? "carried out injured" : "beaten down";
     arenaNoteEl.textContent =
       "Your Arena run ended while you were away (" + reasonText + ") — " +
-      ar.fightsWon + " win" + (ar.fightsWon === 1 ? "" : "s") + ", banked +" +
+      ar.fightsWon + " win" + (ar.fightsWon === 1 ? "" : "s") + ", +" +
       fmtNumber(ar.xp) + " xp, +" + fmtNumber(ar.gold) + " gold" +
-      (ar.renown > 0 ? ", +" + ar.renown + " renown" : "") + ".";
+      (ar.renown > 0 ? ", +" + ar.renown + " renown" : "") +
+      ((ar.bonusFraction || 0) > 0 ? " (survival bonus ×" + (1 + ar.bonusFraction).toFixed(2) + ")" : "") + ".";
     arenaNoteEl.classList.remove("hidden");
   } else {
     arenaNoteEl.classList.add("hidden");
