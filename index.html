@@ -22,6 +22,10 @@
     --green:#4f9e5c;
     --blue:#4a7fc4;
 
+    --steel:#8fa3b8;
+    --steel-dim:#4a5868;
+    --steel-border:#3d4a56;
+
     --tier-common:#b8b8b8;
     --tier-uncommon:#4fbf5e;
     --tier-rare:#4a90d9;
@@ -42,15 +46,30 @@
 
   h1,h2,h3,h4{
     font-family:Georgia,'Times New Roman',serif;
-    color:var(--gold-bright);
+    color:var(--parchment);
     letter-spacing:0.02em;
     margin:0 0 0.4em 0;
   }
+  h1,h2{ color:var(--gold-bright); }
+
+  /* ================= ICONS ================= */
+  .icon{ display:inline-block; vertical-align:-0.15em; flex-shrink:0; }
+  /* Leading-icon spacing where an icon precedes inline text/labels. */
+  .tab-btn .icon, .subtab-btn .icon, .stat .icon,
+  .injury-status .icon, .buff-chip .icon,
+  #rest-short-btn .icon, #rest-long-btn .icon{ margin-right:0.4em; }
+  h3 .icon{ margin-right:0.45em; vertical-align:-0.18em; }
+  /* Gear corner buttons hold only an icon — no trailing gap, centered. */
+  .gear-btn .icon{ margin-right:0; vertical-align:-0.2em; }
+  /* Tint the hero-row resource icons with the same gold accent as their value. */
+  .stat .icon{ color:var(--gold); }
+  /* Muted slot-icon prefix used on inventory/shop/blacksmith item rows. */
+  .slot-icon{ color:var(--steel-dim); margin-right:0.35rem; }
 
   ::-webkit-scrollbar{ width:10px; height:10px; }
   ::-webkit-scrollbar-track{ background:var(--bg-1); }
   ::-webkit-scrollbar-thumb{ background:var(--panel-border); border-radius:6px; }
-  ::-webkit-scrollbar-thumb:hover{ background:var(--gold-dim); }
+  ::-webkit-scrollbar-thumb:hover{ background:var(--steel-dim); }
 
   #app{ min-height:100vh; padding:1.5rem; max-width:1200px; margin:0 auto; }
 
@@ -86,7 +105,7 @@
   .btn.secondary{
     background:linear-gradient(180deg, #2a2620, #1c1812);
     color:var(--parchment-dim);
-    border-color:var(--panel-border);
+    border-color:var(--steel-border);
   }
   .btn.danger{
     border-color:#5a2424;
@@ -107,16 +126,16 @@
   .title-block p{ color:var(--parchment-dim); font-style:italic; margin:0; }
 
   .field-row{ margin-bottom:1.4rem; }
-  .field-row label{ display:block; margin-bottom:0.4rem; color:var(--gold); font-size:0.95rem; }
+  .field-row label{ display:block; margin-bottom:0.4rem; color:var(--steel); font-size:0.95rem; }
   #hero-name-input{
     width:100%; padding:0.65rem 0.8rem; font-size:1.05rem;
     background:var(--bg-1); border:1px solid var(--panel-border); border-radius:6px;
     color:var(--parchment); font-family:Georgia, serif;
   }
-  #hero-name-input:focus{ outline:none; border-color:var(--gold-dim); }
+  #hero-name-input:focus{ outline:none; border-color:var(--steel-dim); }
 
   .section-label{
-    color:var(--gold); font-size:1.05rem; margin:1.5rem 0 0.7rem;
+    color:var(--steel); font-size:1.05rem; margin:1.5rem 0 0.7rem;
     border-bottom:1px solid var(--panel-border); padding-bottom:0.35rem;
   }
 
@@ -127,7 +146,7 @@
     background:var(--panel); border:1px solid var(--panel-border); border-radius:8px;
     padding:0.9rem; cursor:pointer; transition:all 0.15s ease; position:relative;
   }
-  .pick-card:hover{ border-color:var(--gold-dim); transform:translateY(-2px); }
+  .pick-card:hover{ border-color:var(--steel-dim); transform:translateY(-2px); }
   .pick-card.selected{
     border-color:var(--gold); box-shadow:0 0 0 1px var(--gold), 0 0 14px rgba(212,175,55,0.3);
     background:linear-gradient(180deg, #2a2314, var(--panel));
@@ -171,7 +190,7 @@
     background:var(--panel); border:1px solid var(--panel-border); color:var(--parchment-dim);
     width:38px; height:38px; border-radius:8px; cursor:pointer; font-size:1.1rem;
   }
-  .gear-btn:hover{ border-color:var(--gold-dim); color:var(--gold); }
+  .gear-btn:hover{ border-color:var(--steel-dim); color:var(--steel); }
   .section-flair{ color:var(--text-muted); font-style:italic; font-size:0.85rem; margin:0 0 0.6rem; }
   .settings-menu{
     position:absolute; right:0; top:44px; background:var(--panel); border:1px solid var(--panel-border);
@@ -191,7 +210,7 @@
     border-radius:8px;
   }
   .activity-banner .label{ color:var(--parchment-dim); font-size:0.85rem; }
-  .activity-banner .value{ color:var(--gold-bright); font-family:Georgia, serif; font-size:1.05rem; }
+  .activity-banner .value{ color:var(--parchment); font-family:Georgia, serif; font-size:1.05rem; }
 
   .zone-list{ display:flex; flex-direction:column; gap:0.6rem; }
   .zone-card{
@@ -199,7 +218,7 @@
     background:var(--bg-1); border:1px solid var(--panel-border); border-radius:8px;
     padding:0.75rem 1rem; cursor:pointer; transition:all 0.15s ease; flex-wrap:wrap;
   }
-  .zone-card:hover:not(.locked):not(.active){ border-color:var(--gold-dim); background:var(--bg-2); }
+  .zone-card:hover:not(.locked):not(.active){ border-color:var(--steel-dim); background:var(--bg-2); }
   .zone-card.active{ border-color:var(--gold); box-shadow:0 0 10px rgba(212,175,55,0.25); background:linear-gradient(180deg, #2a2314, var(--bg-1)); }
   .zone-card.locked{ opacity:0.45; cursor:not-allowed; }
   .zone-info{ flex:1; min-width:200px; }
@@ -207,7 +226,7 @@
   .zone-name-row h4{ margin:0; font-size:1rem; }
   .tier-badge{
     font-size:0.68rem; padding:0.1rem 0.45rem; border-radius:10px;
-    background:var(--bg-0); border:1px solid var(--gold-dim); color:var(--gold);
+    background:var(--bg-0); border:1px solid var(--steel-dim); color:var(--steel);
     text-transform:uppercase; letter-spacing:0.04em;
   }
   .zone-req{ font-size:0.78rem; color:var(--text-muted); margin-top:0.15rem; }
@@ -252,12 +271,12 @@
   .modal-actions{ text-align:center; margin-top:1.2rem; }
   .modal-warning{ color:#e08080; font-size:0.85rem; margin:0.8rem 0; }
   .wb-rest-note{ text-align:center; color:var(--green); font-size:0.9rem; margin-top:0.6rem; font-style:italic; }
-  .wb-content-note{ text-align:center; color:var(--gold-bright); font-size:0.9rem; margin-top:0.6rem; }
+  .wb-content-note{ text-align:center; color:var(--parchment); font-size:0.9rem; margin-top:0.6rem; }
   #cr-outcome{ text-align:center; font-family:Georgia,'Times New Roman',serif; font-size:1.2rem; margin-bottom:0.4rem; }
   #codex-modal .modal-box{ max-width:560px; max-height:70vh; overflow-y:auto; }
   #codex-modal .codex-section{ margin-bottom:0.85rem; font-size:0.9rem; color:var(--parchment-dim); }
   #codex-modal .codex-section:last-child{ margin-bottom:0; }
-  #codex-modal .codex-section b{ color:var(--gold-bright); }
+  #codex-modal .codex-section b{ color:var(--parchment); }
 
   /* ================= TABS ================= */
   .tab-row{ display:flex; gap:0.5rem; }
@@ -267,7 +286,7 @@
     cursor:pointer; font-family:Georgia,'Times New Roman',serif; font-size:0.95rem;
   }
   .tab-btn.active{ background:var(--bg-2); color:var(--gold-bright); border-color:var(--gold-dim); }
-  .tab-btn:hover:not(.active){ color:var(--gold); }
+  .tab-btn:hover:not(.active){ color:var(--steel); }
   .tab-panel{ }
 
   /* ================= INJURY / REST / BUFFS ================= */
@@ -281,23 +300,47 @@
 
   .buff-row{ display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.5rem; }
   .buff-chip{
-    font-size:0.75rem; background:var(--bg-1); border:1px solid var(--panel-border);
-    border-radius:10px; padding:0.2rem 0.6rem; color:var(--gold);
+    font-size:0.75rem; background:var(--bg-1); border:1px solid var(--steel-dim);
+    border-radius:10px; padding:0.2rem 0.6rem; color:var(--steel);
   }
 
   /* ================= EQUIPMENT / GEAR ================= */
-  .equipment-list{ display:flex; flex-direction:column; gap:0.4rem; }
-  .equip-slot-row{
-    display:flex; justify-content:space-between; align-items:center; gap:0.6rem; flex-wrap:wrap;
-    background:var(--bg-1); border:1px solid var(--panel-border); border-radius:6px;
-    padding:0.4rem 0.65rem; font-size:0.85rem;
+  /* Header line above the armory grid — total equipped power, gold accent. */
+  .equipment-power-total{
+    display:flex; align-items:center; gap:0.35rem; margin-bottom:0.7rem;
+    font-family:Georgia,'Times New Roman',serif; font-size:0.95rem; color:var(--parchment-dim);
   }
-  .equip-slot-label{ color:var(--text-muted); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em; min-width:60px; }
-  .equip-slot-empty{ color:var(--text-muted); font-style:italic; flex:1; }
-  .equip-slot-item{ flex:1; }
-  .equip-slot-power{ font-size:0.78rem; color:var(--parchment-dim); }
+  .equipment-power-total .icon{ color:var(--gold); }
+  .equipment-power-total b{ color:var(--gold-bright); }
+
+  /* Armory view: 3x2 tile grid on wide layouts, 2 columns on mobile
+     (see @media max-width:640px below). */
+  .equipment-grid{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:0.6rem; }
+  .equip-tile{
+    position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; gap:0.3rem; min-height:118px;
+    background:var(--bg-1); border:1px solid var(--panel-border); border-radius:8px;
+    padding:0.7rem 0.4rem 0.55rem;
+  }
+  .equip-tile-icon{ color:var(--steel); }
+  .equip-tile.empty .equip-tile-icon{ color:var(--text-muted); opacity:0.4; }
+  .equip-tile-slot-label{ font-size:0.68rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); }
+  .equip-tile-name{ font-family:Georgia,'Times New Roman',serif; font-size:0.88rem; line-height:1.25; overflow-wrap:anywhere; }
+  .equip-tile-name .equip-tile-upgrade{ color:var(--gold); font-weight:700; font-family:'Segoe UI',sans-serif; }
+  .equip-tile-power{ display:flex; align-items:center; gap:0.25rem; font-size:0.78rem; color:var(--parchment-dim); }
+  .equip-tile-power .icon{ color:var(--gold); }
+  .equip-tile-bonus{ font-size:0.72rem; color:var(--steel); }
+  .equip-tile-empty-hint{ font-size:0.78rem; font-style:italic; color:var(--text-muted); }
+  .equip-tile-unequip{
+    position:absolute; top:0.3rem; right:0.3rem; width:24px; height:24px; padding:0;
+    display:flex; align-items:center; justify-content:center; border-radius:50%;
+    background:var(--bg-0); border:1px solid var(--panel-border); color:var(--parchment-dim);
+    font-size:0.9rem; line-height:1; cursor:pointer;
+  }
+  .equip-tile-unequip:hover{ border-color:var(--red); color:var(--red); }
 
   .inv-meta{ color:var(--text-muted); font-size:0.75rem; margin-left:0.5rem; }
+  .inv-name-line{ display:flex; align-items:center; flex-wrap:wrap; gap:0.4rem; }
   .gear-delta{ font-weight:700; font-size:0.75rem; margin-left:0.4rem; }
   .inv-row-main{ display:flex; flex-direction:column; }
   .inv-actions{ display:flex; gap:0.4rem; align-items:center; }
@@ -322,17 +365,27 @@
     display:flex; flex-direction:column; gap:0.25rem;
     background:var(--bg-1); border:1px solid var(--panel-border); border-radius:6px; padding:0.6rem 0.8rem; font-size:0.85rem;
   }
-  .tavern-name{ color:var(--gold-bright); font-family:Georgia,'Times New Roman',serif; }
+  .tavern-name{ color:var(--parchment); font-family:Georgia,'Times New Roman',serif; }
 
   /* ================= ADVENTURE SUB-TABS ================= */
   .adv-subtab-row{ display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.9rem; border-bottom:1px solid var(--panel-border); padding-bottom:0.6rem; }
   .subtab-btn{
+    position:relative;
     background:var(--bg-1); border:1px solid var(--panel-border); color:var(--parchment-dim);
     padding:0.35rem 0.9rem; border-radius:14px; cursor:pointer;
     font-family:Georgia,'Times New Roman',serif; font-size:0.85rem;
   }
   .subtab-btn.active{ background:linear-gradient(180deg, #2a2314, var(--bg-1)); color:var(--gold-bright); border-color:var(--gold-dim); }
-  .subtab-btn:hover:not(.active){ color:var(--gold); border-color:var(--gold-dim); }
+  .subtab-btn:hover:not(.active){ color:var(--steel); border-color:var(--steel-dim); }
+  .subtab-btn.has-activity::after{
+    content:""; position:absolute; top:2px; right:5px; width:7px; height:7px; border-radius:50%;
+    background:var(--gold); box-shadow:0 0 5px rgba(212,175,55,0.8);
+    animation:beacon-pulse 1.7s ease-in-out infinite;
+  }
+  @keyframes beacon-pulse{
+    0%, 100%{ opacity:1; transform:scale(1); }
+    50%{ opacity:0.45; transform:scale(1.35); }
+  }
 
   /* ================= TIMED CONTENT / QUESTS / ARENA ================= */
   .content-flavor{ font-style:italic; color:var(--parchment-dim); font-size:0.8rem; margin-top:0.15rem; }
@@ -360,7 +413,7 @@
   .arena-status-grid .k{ color:var(--parchment-dim); }
   .arena-status-grid .v{ color:var(--gold-bright); text-align:right; }
   .arena-monster{
-    text-align:center; font-family:Georgia,'Times New Roman',serif; font-size:1.1rem; color:var(--gold-bright);
+    text-align:center; font-family:Georgia,'Times New Roman',serif; font-size:1.1rem; color:var(--parchment);
     background:var(--bg-1); border:1px solid var(--panel-border); border-radius:8px; padding:0.7rem; margin:0.7rem 0;
   }
   .arena-monster .sub{ font-size:0.8rem; color:var(--parchment-dim); font-family:'Segoe UI',sans-serif; margin-top:0.25rem; }
@@ -380,7 +433,7 @@
     font-size:0.85rem; color:var(--parchment-dim); margin-bottom:0.8rem;
     padding-bottom:0.7rem; border-bottom:1px solid var(--panel-border);
   }
-  .legend-boons-line b{ color:var(--gold); }
+  .legend-boons-line b{ color:var(--parchment); }
   .legend-boons-line .b{ color:var(--gold-bright); }
   .legend-empty{ color:var(--text-muted); font-size:0.9rem; }
   .legend-empty-hint{ color:var(--text-muted); font-size:0.82rem; font-style:italic; margin-top:0.4rem; }
@@ -406,6 +459,65 @@
   .evo-card .perks{ font-size:0.8rem; color:var(--green); margin-top:0.4rem; }
 
   footer.version-tag{ text-align:center; color:var(--text-muted); font-size:0.72rem; margin-top:1rem; }
+
+  /* ================= MOBILE (<=640px) ================= */
+  @media (max-width:640px){
+    #app{ padding:0.75rem; }
+    .panel{ padding:0.9rem; }
+
+    /* Grid/flex items default to min-width:auto, which sizes the track to
+       fit unshrinkable content (e.g. zone-card/shop-item rows) instead of
+       the viewport. Overriding to 0 lets flex-wrap/text-wrap inside do
+       their job at narrow widths. */
+    .main-grid > *, .town-grid > *, .zone-card, .shop-item, .blacksmith-item,
+    .medic-row, .tavern-item, .equip-tile, .inv-item, .zone-info{ min-width:0; }
+
+    /* -- armory grid: 2 columns, larger unequip tap target -- */
+    .equipment-grid{ grid-template-columns:repeat(2, minmax(0,1fr)); }
+    .equip-tile-unequip{ width:40px; height:40px; font-size:1.1rem; }
+
+    /* -- top nav: sticky icon-over-label grid, 4 equal columns -- */
+    .tab-row{
+      display:grid; grid-template-columns:repeat(4, 1fr); gap:0.3rem;
+      position:sticky; top:0; z-index:30;
+      background:var(--bg-0); padding:0.5rem 0.3rem 0.4rem;
+      border-bottom:1px solid var(--panel-border); margin:0 -0.75rem 1rem; padding-left:0.75rem; padding-right:0.75rem;
+    }
+    .tab-btn{
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.25rem;
+      min-height:48px; padding:0.4rem 0.2rem;
+      font-size:0.7rem; text-transform:uppercase; letter-spacing:0.03em;
+      border-radius:8px; border-bottom:1px solid var(--panel-border);
+    }
+    .tab-btn .icon{ margin-right:0; }
+
+    /* -- adventure subtabs: horizontal scroll instead of wrap -- */
+    .adv-subtab-row{
+      flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;
+      scrollbar-width:none; -ms-overflow-style:none;
+      padding-bottom:0.6rem;
+    }
+    .adv-subtab-row::-webkit-scrollbar{ display:none; }
+    .subtab-btn{
+      flex:0 0 auto; white-space:nowrap;
+      min-height:40px; padding:0.5rem 1.1rem; font-size:0.85rem;
+    }
+
+    /* -- hero stat row: wrap with tighter row-gap -- */
+    .stat-row{ gap:0.4rem 1.2rem; }
+
+    /* -- rest actions: full tap-size buttons -- */
+    .rest-actions{ gap:0.5rem; }
+    .rest-actions .btn{ flex:1 1 auto; min-height:44px; }
+
+    /* -- modals: fit the viewport, scroll if tall -- */
+    .modal-box{ width:94vw; max-height:85vh; overflow-y:auto; }
+
+    /* Interactive text stays >=0.8rem at every other size in this file
+       (.btn 1rem, .btn.small 0.85rem, .subtab-btn 0.85rem above). The
+       0.7rem tab-row label is the one deliberate exception: it's paired
+       with an icon above it inside a 48px tap target, not read alone. */
+  }
 </style>
 </head>
 <body>
@@ -456,8 +568,8 @@
         </div>
         <div class="stat-row">
           <span class="stat">Level <b id="hero-level"></b></span>
-          <span class="stat">Gold <b id="hero-gold"></b></span>
-          <span class="stat">Power <b id="hero-power"></b></span>
+          <span class="stat" data-icon="gold" data-icon-size="14">Gold <b id="hero-gold"></b></span>
+          <span class="stat" data-icon="power" data-icon-size="14">Power <b id="hero-power"></b></span>
         </div>
         <div class="xp-bar-wrap">
           <div class="xp-bar-label">
@@ -469,8 +581,8 @@
         <div class="injury-row">
           <span class="injury-status" id="injury-status"></span>
           <div class="rest-actions" id="rest-actions">
-            <button class="btn small secondary" id="rest-short-btn">Short Rest (4h)</button>
-            <button class="btn small secondary" id="rest-long-btn">Long Rest (6h)</button>
+            <button class="btn small secondary" id="rest-short-btn" data-icon="rest" data-icon-size="15">Short Rest (4h)</button>
+            <button class="btn small secondary" id="rest-long-btn" data-icon="rest" data-icon-size="15">Long Rest (6h)</button>
           </div>
           <div class="rest-countdown hidden" id="rest-countdown"></div>
         </div>
@@ -478,8 +590,8 @@
       </div>
 
       <div class="settings-corner">
-        <button class="gear-btn" id="codex-btn" title="Realm Codex">?</button>
-        <button class="gear-btn" id="gear-btn" title="Settings">&#9881;</button>
+        <button class="gear-btn" id="codex-btn" title="Realm Codex" data-icon="codex" data-icon-size="20"></button>
+        <button class="gear-btn" id="gear-btn" title="Settings" data-icon="settings" data-icon-size="20"></button>
         <div id="settings-menu" class="settings-menu hidden">
           <button class="btn small secondary" id="export-save-btn" style="width:100%;">Export save</button>
           <button class="btn small secondary" id="import-save-btn" style="width:100%;">Import save</button>
@@ -490,10 +602,10 @@
     </div>
 
     <div class="tab-row">
-      <button class="tab-btn active" id="tab-btn-adventure" data-tab="adventure">Adventure</button>
-      <button class="tab-btn" id="tab-btn-inventory" data-tab="inventory">Inventory</button>
-      <button class="tab-btn" id="tab-btn-character" data-tab="character">Character</button>
-      <button class="tab-btn" id="tab-btn-town" data-tab="town">Town</button>
+      <button class="tab-btn active" id="tab-btn-adventure" data-tab="adventure" data-icon="adventure" data-icon-size="18">Adventure</button>
+      <button class="tab-btn" id="tab-btn-inventory" data-tab="inventory" data-icon="inventory" data-icon-size="18">Inventory</button>
+      <button class="tab-btn" id="tab-btn-character" data-tab="character" data-icon="character" data-icon-size="18">Character</button>
+      <button class="tab-btn" id="tab-btn-town" data-tab="town" data-icon="town" data-icon-size="18">Town</button>
     </div>
 
     <div id="evolution-banner" class="evolution-banner hidden">
@@ -513,14 +625,14 @@
             <button class="btn secondary small" id="stop-training-btn">Stop questing</button>
           </div>
           <div class="adv-subtab-row">
-            <button class="subtab-btn active" data-subtab="training">Quests</button>
-            <button class="subtab-btn" data-subtab="dungeons">Dungeons</button>
-            <button class="subtab-btn" data-subtab="raids">Raids</button>
-            <button class="subtab-btn" data-subtab="quests">Campaign</button>
-            <button class="subtab-btn" data-subtab="arena">Arena</button>
+            <button class="subtab-btn active" data-subtab="training" data-icon="quests" data-icon-size="15">Quests</button>
+            <button class="subtab-btn" data-subtab="dungeons" data-icon="dungeons" data-icon-size="15">Dungeons</button>
+            <button class="subtab-btn" data-subtab="raids" data-icon="raids" data-icon-size="15">Raids</button>
+            <button class="subtab-btn" data-subtab="quests" data-icon="campaign" data-icon-size="15">Campaign</button>
+            <button class="subtab-btn" data-subtab="arena" data-icon="arena" data-icon-size="15">Arena</button>
           </div>
           <div id="adv-training" class="adv-subpanel">
-            <h3>Questing Zones</h3>
+            <h3 data-icon="quests" data-icon-size="18">Questing Zones</h3>
             <p class="section-flair">Coin and calluses, earned one patient hour at a time.</p>
             <div id="training-progress-panel" class="training-progress hidden">
               <div class="xp-bar-label">
@@ -532,22 +644,22 @@
             <div id="zone-list" class="zone-list"></div>
           </div>
           <div id="adv-dungeons" class="adv-subpanel hidden">
-            <h3>Dungeons</h3>
+            <h3 data-icon="dungeons" data-icon-size="18">Dungeons</h3>
             <p class="section-flair">Old stone keeps its secrets, and its dead, close.</p>
             <div id="dungeon-list" class="zone-list"></div>
           </div>
           <div id="adv-raids" class="adv-subpanel hidden">
-            <h3>Raids</h3>
+            <h3 data-icon="raids" data-icon-size="18">Raids</h3>
             <p class="section-flair">Strength in numbers, or so the survivors claim.</p>
             <div id="raid-list" class="zone-list"></div>
           </div>
           <div id="adv-quests" class="adv-subpanel hidden">
-            <h3>Campaign</h3>
+            <h3 data-icon="campaign" data-icon-size="18">Campaign</h3>
             <p class="section-flair">A story the realm itself is waiting to finish.</p>
             <div id="quest-list" class="zone-list"></div>
           </div>
           <div id="adv-arena" class="adv-subpanel hidden">
-            <h3>The Arena</h3>
+            <h3 data-icon="arena" data-icon-size="18">The Arena</h3>
             <p class="section-flair">The gate locks behind you; only victory or ruin opens it again.</p>
             <div id="arena-body"></div>
           </div>
@@ -555,7 +667,7 @@
 
         <div class="side-col">
           <div class="panel">
-            <h3>Chronicle</h3>
+            <h3 data-icon="chronicle" data-icon-size="18">Chronicle</h3>
             <div id="log-list" class="log-list"></div>
           </div>
         </div>
@@ -566,12 +678,13 @@
       <p class="section-flair">What you carry into the dark decides what walks back out.</p>
       <div class="town-grid">
         <div class="panel">
-          <h3>Equipped Gear</h3>
-          <div id="equipment-list" class="equipment-list"></div>
+          <h3 data-icon="armor" data-icon-size="18">Equipped Gear</h3>
+          <div id="equipment-power-total" class="equipment-power-total"></div>
+          <div id="equipment-list" class="equipment-grid"></div>
         </div>
 
         <div class="panel">
-          <h3>Inventory</h3>
+          <h3 data-icon="inventory" data-icon-size="18">Inventory</h3>
           <div id="inventory-list" class="inventory-list"></div>
           <div class="inv-note">Equip gear to raise your power, or sell it to the shop for gold.</div>
         </div>
@@ -582,25 +695,25 @@
       <p class="section-flair">The realm remembers every hero, even the ones it forgets.</p>
       <div class="town-grid">
         <div class="panel">
-          <h3>Renown</h3>
+          <h3 data-icon="renown" data-icon-size="18">Renown</h3>
           <p class="section-flair">A name is worth little until strangers start repeating it.</p>
           <div id="renown-body"></div>
         </div>
 
         <div class="panel">
-          <h3>Character</h3>
+          <h3 data-icon="character" data-icon-size="18">Character</h3>
           <p class="section-flair">Blood, training, and steel — the sum of what stands before the dark.</p>
           <div id="character-info-body"></div>
         </div>
 
         <div class="panel" style="grid-column:1 / -1;">
-          <h3>Lifetime Statistics</h3>
+          <h3 data-icon="chronicle" data-icon-size="18">Lifetime Statistics</h3>
           <p class="section-flair">Every ledger tells a story, if you know how to read the ink.</p>
           <div id="stats-body" class="modal-stat-grid" style="margin:0;"></div>
         </div>
 
         <div class="panel" style="grid-column:1 / -1;">
-          <h3>Hall of Legends</h3>
+          <h3 data-icon="legends" data-icon-size="18">Hall of Legends</h3>
           <p class="section-flair">Every hero falls silent eventually; here, at least, the silence is honored.</p>
           <div id="legends-body"></div>
         </div>
@@ -611,26 +724,26 @@
       <p class="section-flair">Within these walls, even a hero can catch their breath.</p>
       <div class="town-grid">
         <div class="panel" id="shop-panel">
-          <h3>Shop</h3>
+          <h3 data-icon="shop" data-icon-size="18">Shop</h3>
           <p class="section-flair">The merchant's shelves change with the caravans and the rumors.</p>
           <div class="shop-restock" id="shop-restock-label"></div>
           <div id="shop-list" class="shop-list"></div>
         </div>
 
         <div class="panel" id="blacksmith-panel">
-          <h3>Blacksmith</h3>
+          <h3 data-icon="blacksmith" data-icon-size="18">Blacksmith</h3>
           <p class="section-flair">The forge asks a price, and pays it back in edge and weight.</p>
           <div id="blacksmith-list" class="blacksmith-list"></div>
         </div>
 
         <div class="panel" id="medic-panel">
-          <h3>Medic</h3>
+          <h3 data-icon="medic" data-icon-size="18">Medic</h3>
           <p class="section-flair">Needle, poultice, and a steady hand against the wounds you carry home.</p>
           <div id="medic-body"></div>
         </div>
 
         <div class="panel" id="tavern-panel">
-          <h3>Tavern</h3>
+          <h3 data-icon="tavern" data-icon-size="18">Tavern</h3>
           <p class="section-flair">Ale loosens tongues, and sometimes sharpens a hero's nerve.</p>
           <div id="tavern-list" class="tavern-list"></div>
         </div>
@@ -830,6 +943,25 @@
 const SAVE_KEY = "realmwalker_save";
 const SAVE_KEY_CORRUPT = "realmwalker_save_corrupt";
 const SAVE_VERSION = 6;
+
+// UI-only preferences (last tab/subtab viewed) — deliberately a separate
+// localStorage key from the game save so it never touches SAVE_VERSION
+// or the save/load/import/export paths.
+const UI_PREFS_KEY = "realmwalker_ui";
+function loadUiPrefs(){
+  try{
+    const raw = localStorage.getItem(UI_PREFS_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch(e){ return {}; }
+}
+function saveUiPrefs(){
+  try{ localStorage.setItem(UI_PREFS_KEY, JSON.stringify(uiPrefs)); } catch(e){ /* best effort */ }
+}
+let uiPrefs = loadUiPrefs();
+
+// Which adventure subtab hosts each activity type, for the beacon dot and
+// the "one-tap continuity" auto-select when re-entering the Adventure tab.
+const ACTIVITY_SUBTAB_MAP = { training:"training", dungeon:"dungeons", raid:"raids", quest:"quests", arena:"arena" };
 
 /* ================================================================
    POWER MODEL  (v5 content-era rebalance)
@@ -2546,10 +2678,89 @@ function fmtCountdown(ms){
   return h + ":" + String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
 }
 
+/* ================================================================
+   ICON SYSTEM
+   ----------------------------------------------------------------
+   Hand-authored dark-fantasy SVG glyphs on a 24x24 viewBox. Every
+   path uses currentColor (via the shared stroke/fill on the <svg>
+   wrapper) so icons inherit whatever text color surrounds them.
+   Access ONLY through icon(name, size); never inline one-off SVG.
+   Static markup opts in with data-icon="name" (+ optional
+   data-icon-size); applyStaticIcons() injects them once at boot.
+================================================================ */
+const ICON_ART = {
+  // --- Navigation ---
+  adventure: '<circle cx="12" cy="12" r="9"/><path d="M12 5.5 L13.8 12 L12 18.5 L10.2 12 Z"/><path d="M5.5 12 L12 10.2 L18.5 12 L12 13.8 Z"/>',
+  inventory: '<rect x="5.5" y="9" width="13" height="11.5" rx="2.5"/><path d="M8 9 V7.5 a4 4 0 0 1 8 0 V9"/><path d="M5.5 13 h13"/><path d="M10.5 13 v2.2 h3 V13"/>',
+  character: '<path d="M6 9 a6 6 0 0 1 12 0 v3 a6 6 0 0 1 -6 6 a6 6 0 0 1 -6 -6 Z"/><path d="M6.5 10.5 h11"/><path d="M12 5 V18"/><path d="M9 13.5 h1.4 M13.6 13.5 h1.4"/>',
+  town: '<path d="M3 21 V10 h2 v-2 h2 v2 h2 v-3 h4 v3 h2 v-2 h2 v2 h2 V21 Z"/><path d="M10 21 v-4 a2 2 0 0 1 4 0 v4"/><path d="M3 21 h18"/>',
+  // --- Adventure subtabs ---
+  quests: '<path d="M12 21 V5"/><path d="M12 6.5 H6.5 L4.5 8.5 L6.5 10.5 H12 Z"/><path d="M12 12 H17.5 L19.5 14 L17.5 16 H12 Z"/><path d="M9.5 21 h5"/>',
+  dungeons: '<path d="M5 21 V10 a7 7 0 0 1 14 0 V21"/><path d="M9 6 V21 M12 5 V21 M15 6 V21"/><path d="M6.5 9 h11 M6 13 h12 M6 17 h12"/>',
+  raids: '<path d="M6 3.5 V21"/><path d="M6 5 H19 l-3 3.5 3 3.5 H6"/><path d="M11 7 l2 1.5 -2 1.5"/><circle cx="6" cy="3" r="1"/>',
+  campaign: '<path d="M12 6.5 C9.5 5 6.5 5 4 6 V18.5 C6.5 17.5 9.5 17.5 12 19 C14.5 17.5 17.5 17.5 20 18.5 V6 C17.5 5 14.5 5 12 6.5 Z"/><path d="M12 6.5 V19"/><path d="M6.5 9 h3 M6.5 11.5 h3 M14.5 9 h3 M14.5 11.5 h3"/>',
+  arena: '<path d="M3 21 V13 a9 9 0 0 1 18 0 V21 Z"/><path d="M3.5 16 h17"/><path d="M7 21 v-2 a1.5 1.5 0 0 1 3 0 v2 M10.5 21 v-2 a1.5 1.5 0 0 1 3 0 v2 M14 21 v-2 a1.5 1.5 0 0 1 3 0 v2"/>',
+  // --- Gear slots (registry only; gear-panel agent consumes these) ---
+  weapon: '<path d="M12 2.5 L13.4 5 V13 H10.6 V5 Z"/><path d="M8 14 H16"/><path d="M12 14 V19.4"/><circle cx="12" cy="20.7" r="1.3"/>',
+  helm: '<path d="M4.5 16 a7.5 7.5 0 0 1 15 0"/><path d="M4.5 16 h15"/><path d="M12 8.5 V19.5"/>',
+  armor: '<path d="M7 5 L12 7 L17 5 v3 a10 10 0 0 1 -1.2 6.5 L12 20 L8.2 14.5 A10 10 0 0 1 7 8 Z"/><path d="M12 7 V20"/><path d="M8.5 11 a4 4 0 0 0 7 0"/>',
+  gloves: '<path d="M8 21 v-6 a1.2 1.2 0 0 1 2.4 0 M10.4 15 V5.5 a1.3 1.3 0 0 1 2.6 0 V13 M13 13 V7 a1.3 1.3 0 0 1 2.6 0 v6.5 a4 4 0 0 1 -0.8 3.5 l-1 1 M8 15 a2.5 2.5 0 0 0 -2 2.6 V21 Z"/><path d="M8 21 h6.8"/>',
+  boots: '<path d="M9 3 h3 v10 h3 a3 3 0 0 1 3 3 v3 a1 1 0 0 1 -1 1 H9 a3 3 0 0 1 -3 -3 V6 a3 3 0 0 1 3 -3 Z"/><path d="M6.3 14 h5.7"/>',
+  relic: '<path d="M5.5 5 A9 6.5 0 0 0 18.5 5"/><circle cx="12" cy="8" r="1"/><path d="M12 9 V10.5"/><path d="M12 10.5 L15 14 L12 19 L9 14 Z"/>',
+  // --- Resources / status ---
+  gold: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="5.5"/><path d="M12 9.2 l1.5 2.8 -1.5 2.8 -1.5 -2.8 Z"/>',
+  power: '<path d="M5.5 21 v-4.5 a5 5 0 0 1 5 -5 h0.3 a1.5 1.5 0 0 0 1.5 -1.5 V6.5 a2 2 0 0 1 4 0 v2.2 a8.5 8.5 0 0 1 -2.7 6.2"/><path d="M5.5 16.5 h4.4"/>',
+  renown: '<path d="M12 20.5 C7 19 5 14 6 8"/><path d="M12 20.5 C17 19 19 14 18 8"/><path d="M6.3 10.4 q-2.3 -0.9 -3.3 0.4 M6.1 13.2 q-2.4 -0.3 -3.2 1.1 M7 16 q-2.2 0.2 -2.9 1.7"/><path d="M17.7 10.4 q2.3 -0.9 3.3 0.4 M17.9 13.2 q2.4 -0.3 3.2 1.1 M17 16 q2.2 0.2 2.9 1.7"/><path d="M12 5.4 l0.7 1.6 1.7 0.2 -1.3 1.2 0.4 1.7 -1.5 -0.9 -1.5 0.9 0.4 -1.7 -1.3 -1.2 1.7 -0.2 Z"/>',
+  injury: '<path d="M12 20 C6.5 15.5 4 12 4 8.8 A3.6 3.6 0 0 1 12 6.2 A3.6 3.6 0 0 1 20 8.8 C20 12 17.5 15.5 12 20 Z"/><rect x="6.2" y="11" width="11.6" height="4" rx="2" transform="rotate(45 12 13)"/><path d="M10.2 11.4 l1.4 1.4 M11.6 10 l1.4 1.4 M12.4 14 l1.4 1.4"/>',
+  rest: '<path d="M20 14.5 A8.2 8.2 0 1 1 9.5 3.8 A6.4 6.4 0 0 0 20 14.5 Z"/><path d="M17.5 5 l0.5 1.4 1.4 0.5 -1.4 0.5 -0.5 1.4 -0.5 -1.4 -1.4 -0.5 1.4 -0.5 Z"/>',
+  buff: '<path d="M9.5 3 h5"/><path d="M11 3 v4.5 L7.3 15 a2.2 2.2 0 0 0 2 3.2 h5.4 a2.2 2.2 0 0 0 2 -3.2 L13 7.5 V3"/><path d="M8.4 13 h7.2"/><circle cx="11" cy="15.2" r="0.7"/><circle cx="13.4" cy="16.4" r="0.6"/>',
+  // --- Town services ---
+  shop: '<path d="M12 5.5 V19"/><path d="M9 19 h6"/><circle cx="12" cy="5" r="1.1"/><path d="M6 8 H18"/><path d="M6 8 L3.7 12.5 a2.6 2.6 0 0 0 4.6 0 Z"/><path d="M18 8 L15.7 12.5 a2.6 2.6 0 0 0 4.6 0 Z"/>',
+  blacksmith: '<path d="M4 11 h13 a3.5 3.5 0 0 1 -3.5 3 h-1.5 v1 h5 v2.5 H6.5 v-2.5 h3 v-1 H7.5 A3.5 3.5 0 0 1 4 11 Z"/><path d="M14.5 3.5 l4 4 -1.6 1.6 -4 -4 Z"/><path d="M13.3 5.9 l-2.6 2.6"/>',
+  medic: '<path d="M4.5 12.5 h15 v0.5 a7.5 7 0 0 1 -15 0 Z"/><path d="M8 19 h8"/><path d="M12 12.5 L17 6.5"/><path d="M15.8 5.3 a1.8 1.8 0 0 1 2.6 2.4 l-1.2 1.4"/>',
+  tavern: '<path d="M6.5 7 h8 v13 h-8 Z"/><path d="M14.5 9.5 h2.2 a2 2 0 0 1 2 2 v3 a2 2 0 0 1 -2 2 h-2.2"/><path d="M6.5 7 c0 -2 2.2 -3 3.7 -1.6 C11.5 3.8 14.5 4.8 14.5 7"/><path d="M6.5 10 h8"/>',
+  // --- Misc ---
+  settings: '<path d="M21 12 L17.82 14.41 L18.36 18.36 L14.41 17.82 L12 21 L9.59 17.82 L5.64 18.36 L6.18 14.41 L3 12 L6.18 9.59 L5.64 5.64 L9.59 6.18 L12 3 L14.41 6.18 L18.36 5.64 L17.82 9.59 Z"/><circle cx="12" cy="12" r="3.2"/>',
+  codex: '<path d="M12 6 C9.5 4.5 6.5 4.5 4 5.5 V18 C6.5 17 9.5 17 12 18.5 C14.5 17 17.5 17 20 18 V5.5 C17.5 4.5 14.5 4.5 12 6 Z"/><path d="M12 6 V18.5"/><path d="M15.8 4.8 V10 l1.7 -1.3 1.7 1.3 V4.4"/>',
+  legends: '<path d="M8 21 V9 a4 4 0 0 1 8 0 V21 Z"/><path d="M6.5 21 h11"/><path d="M9 11.8 q-1 1.6 0 3.2 M15 11.8 q1 1.6 0 3.2"/><path d="M12 8 v4"/>',
+  chronicle: '<path d="M4 20 C7 13 12 7 19 4 C18 9 15 15 8 18 Z"/><path d="M4 20 l3.5 -3.5"/><path d="M9.5 14.5 h3.5"/>'
+};
+
+// Wrap an ICON_ART entry in a themed <svg>. Unknown name -> "".
+function icon(name, size){
+  const art = ICON_ART[name];
+  if (!art) return "";
+  const s = size || 16;
+  return '<svg class="icon" viewBox="0 0 24 24" width="' + s + '" height="' + s +
+    '" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    art + '</svg>';
+}
+
+// Inject icons into static markup that opted in with data-icon. Prepends by
+// default; gear-btns hold only the icon. Runs once at boot (DOM already parsed).
+function applyStaticIcons(){
+  document.querySelectorAll("[data-icon]").forEach(el => {
+    if (el.dataset.iconDone) return;
+    const svg = icon(el.dataset.icon, parseInt(el.dataset.iconSize, 10) || 16);
+    if (!svg) return;
+    el.insertAdjacentHTML("afterbegin", svg);
+    el.dataset.iconDone = "1";
+  });
+}
+
 function relicBonusLabel(bonus){
   const pct = Math.round(Math.abs(bonus.value - 1) * 100);
   const sign = bonus.value >= 1 ? "+" : "-";
   return sign + pct + "% " + (RELIC_LABELS[bonus.key] || bonus.key);
+}
+
+// Small rarity pill for a gear tier — reuses the shared .tier-badge chip
+// (zone/quest rows leave it plain-steel) and tints border+text per
+// ITEM_TIERS color inline, so rarity reads as text even without the
+// tier-colored item name (color-blind friendly).
+function tierBadge(tierId){
+  const tier = ITEM_TIERS.find(t => t.id === tierId) || ITEM_TIERS[0];
+  return "<span class=\"tier-badge\" style=\"color:" + tier.color + "; border-color:" + tier.color + ";\">" + escapeHtml(tier.name) + "</span>";
 }
 
 // Compact slot:itemId:upgradeLevel fingerprint of the whole equipped set —
@@ -2709,7 +2920,8 @@ function renderInjuryStatus(){
   if (hero.injuries <= 0){ label = "Unhurt"; cls = "injury-ok"; }
   else if (hero.injuries === 1){ label = "Injured"; cls = "injury-warn"; }
   else { label = "Badly hurt — must rest"; cls = "injury-bad"; }
-  statusEl.textContent = label;
+  // Wounded states lead with the bandaged-heart glyph; Unhurt stays text-only.
+  statusEl.innerHTML = (hero.injuries > 0 ? icon("injury", 15) : "") + escapeHtml(label);
   statusEl.className = "injury-status " + cls;
 
   const resting = state.activity.type === "rest";
@@ -2740,35 +2952,46 @@ function renderBuffRow(){
   if (buffs.length === 0){ el.innerHTML = ""; return; }
   el.innerHTML = buffs.map(b => {
     const remaining = Math.max(0, b.expiresAt - Date.now());
-    return "<span class=\"buff-chip\">" + escapeHtml(b.name) + " — " + fmtCountdown(remaining) + "</span>";
+    return "<span class=\"buff-chip\">" + icon("buff", 13) + escapeHtml(b.name) + " — " + fmtCountdown(remaining) + "</span>";
   }).join("");
 }
 
 function renderEquipment(){
   const list = document.getElementById("equipment-list");
   list.innerHTML = "";
+  let totalPower = 0;
   SLOTS.forEach(slot => {
     const item = state.hero.equipment[slot];
-    const row = document.createElement("div");
-    row.className = "equip-slot-row";
+    const tile = document.createElement("div");
     if (item){
+      totalPower += displayItemPower(item);
       const tier = ITEM_TIERS.find(t => t.id === item.tierId) || ITEM_TIERS[0];
-      const bonusText = item.bonus ? (" · " + relicBonusLabel(item.bonus)) : "";
-      row.innerHTML =
-        "<span class=\"equip-slot-label\">" + capitalize(slot) + "</span>" +
-        "<span class=\"equip-slot-item\" style=\"color:" + tier.color + "\">" + escapeHtml(item.name) + (item.upgradeLevel ? " +" + item.upgradeLevel : "") + "</span>" +
-        "<span class=\"equip-slot-power\">Pwr " + displayItemPower(item) + bonusText + "</span>" +
-        "<button class=\"btn small secondary\" data-unequip=\"" + slot + "\">Unequip</button>";
+      const bonusLine = item.bonus ? ("<div class=\"equip-tile-bonus\">" + escapeHtml(relicBonusLabel(item.bonus)) + "</div>") : "";
+      tile.className = "equip-tile filled";
+      tile.style.borderColor = tier.color;
+      tile.innerHTML =
+        "<button class=\"equip-tile-unequip\" data-unequip=\"" + slot + "\" title=\"Unequip " + capitalize(slot) + "\" aria-label=\"Unequip " + capitalize(slot) + "\">&times;</button>" +
+        "<div class=\"equip-tile-icon\">" + icon(slot, 22) + "</div>" +
+        "<div class=\"equip-tile-name\" style=\"color:" + tier.color + "\">" + escapeHtml(item.name) +
+          (item.upgradeLevel ? " <span class=\"equip-tile-upgrade\">+" + item.upgradeLevel + "</span>" : "") + "</div>" +
+        tierBadge(item.tierId) +
+        "<div class=\"equip-tile-power\">" + icon("power", 12) + "Pwr " + displayItemPower(item) + "</div>" +
+        bonusLine;
     } else {
-      row.innerHTML =
-        "<span class=\"equip-slot-label\">" + capitalize(slot) + "</span>" +
-        "<span class=\"equip-slot-empty\">Empty</span>";
+      tile.className = "equip-tile empty";
+      tile.innerHTML =
+        "<div class=\"equip-tile-icon\">" + icon(slot, 22) + "</div>" +
+        "<div class=\"equip-tile-slot-label\">" + capitalize(slot) + "</div>" +
+        "<div class=\"equip-tile-empty-hint\">Empty</div>";
     }
-    list.appendChild(row);
+    list.appendChild(tile);
   });
   list.querySelectorAll("[data-unequip]").forEach(btn => {
     btn.addEventListener("click", () => unequipItem(btn.dataset.unequip));
   });
+
+  document.getElementById("equipment-power-total").innerHTML =
+    icon("power", 15) + "Total Power: <b>" + fmtNumber(totalPower) + "</b>";
 }
 
 function renderShopPanel(){
@@ -2794,7 +3017,8 @@ function renderShopPanel(){
     const row = document.createElement("div");
     row.className = "shop-item";
     row.innerHTML =
-      "<span><span style=\"color:" + tier.color + "\">" + escapeHtml(itemDisplayName(item)) + "</span>" +
+      "<span><span class=\"inv-name-line\"><span class=\"slot-icon\">" + icon(item.slot, 16) + "</span>" +
+      "<span style=\"color:" + tier.color + "\">" + escapeHtml(itemDisplayName(item)) + "</span>" + tierBadge(item.tierId) + "</span>" +
       "<span class=\"inv-meta\">" + capitalize(item.slot) + " · Pwr " + item.power + gearDeltaBadge(item) + bonusText + "</span></span>" +
       "<button class=\"btn small\" " + (afford ? "" : "disabled") + " data-buy=\"" + item.id + "\">Buy (" + fmtNumber(price) + "g)</button>";
     list.appendChild(row);
@@ -2823,7 +3047,8 @@ function renderBlacksmithPanel(){
     const row = document.createElement("div");
     row.className = "blacksmith-item";
     row.innerHTML =
-      "<span><span style=\"color:" + tier.color + "\">" + escapeHtml(item.name) + (item.upgradeLevel ? " +" + item.upgradeLevel : "") + "</span>" +
+      "<span><span class=\"inv-name-line\"><span class=\"slot-icon\">" + icon(item.slot, 16) + "</span>" +
+      "<span style=\"color:" + tier.color + "\">" + escapeHtml(item.name) + (item.upgradeLevel ? " +" + item.upgradeLevel : "") + "</span>" + tierBadge(item.tierId) + "</span>" +
       "<span class=\"inv-meta\">" + (equipped ? "Equipped · " : "") + "Pwr " + displayItemPower(item) + "</span></span>" +
       (atCap ?
         "<span class=\"inv-meta\">Max upgrade</span>" :
@@ -3474,16 +3699,34 @@ function wireCodexModal(){
   });
 }
 
+const ADV_SUBTABS = ["training", "dungeons", "raids", "quests", "arena"];
+
+// Shared by manual subtab clicks, the "one-tap continuity" auto-select on
+// Adventure tab entry, and boot-time restore — keeps all three in sync
+// with the same persisted UI pref instead of duplicating the toggle logic.
+function selectSubtab(sub){
+  if (ADV_SUBTABS.indexOf(sub) === -1) return;
+  document.querySelectorAll(".subtab-btn").forEach(b => b.classList.toggle("active", b.dataset.subtab === sub));
+  ADV_SUBTABS.forEach(s => {
+    document.getElementById("adv-" + s).classList.toggle("hidden", s !== sub);
+  });
+  uiPrefs.subtab = sub;
+  saveUiPrefs();
+}
+
 function wireAdventureSubtabs(){
   document.querySelectorAll(".subtab-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".subtab-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      const sub = btn.dataset.subtab;
-      ["training", "dungeons", "raids", "quests", "arena"].forEach(s => {
-        document.getElementById("adv-" + s).classList.toggle("hidden", s !== sub);
-      });
-    });
+    btn.addEventListener("click", () => selectSubtab(btn.dataset.subtab));
+  });
+}
+
+// Gold pulse dot on whichever subtab pill hosts the hero's current
+// activity (none while idle/resting). Called from render() so it stays
+// in sync without fighting the player's manual subtab browsing.
+function updateSubtabBeacons(){
+  const activeSub = state && state.activity ? ACTIVITY_SUBTAB_MAP[state.activity.type] : null;
+  document.querySelectorAll(".subtab-btn").forEach(btn => {
+    btn.classList.toggle("has-activity", !!activeSub && btn.dataset.subtab === activeSub);
   });
 }
 
@@ -3509,7 +3752,8 @@ function renderInventory(){
     row.className = "inv-item";
     row.innerHTML =
       "<span class=\"inv-row-main\">" +
-        "<span style=\"color:" + tier.color + "\">" + escapeHtml(itemDisplayName(item)) + (item.upgradeLevel ? " +" + item.upgradeLevel : "") + "</span>" +
+        "<span class=\"inv-name-line\"><span class=\"slot-icon\">" + icon(item.slot, 16) + "</span>" +
+        "<span style=\"color:" + tier.color + "\">" + escapeHtml(itemDisplayName(item)) + (item.upgradeLevel ? " +" + item.upgradeLevel : "") + "</span>" + tierBadge(item.tierId) + "</span>" +
         "<span class=\"inv-meta\">" + capitalize(item.slot) + " · Pwr " + displayItemPower(item) + gearDeltaBadge(item) + bonusText + "</span>" +
       "</span>" +
       "<span class=\"inv-actions\">" +
@@ -3553,6 +3797,7 @@ function renderLog(){
 
 function render(){
   if (!state) return;
+  updateSubtabBeacons();
   renderHeroPanel();
   renderTrainingProgress();
   renderZones();
@@ -4390,6 +4635,17 @@ function wireTabs(){
       TOP_TABS.forEach(t => {
         document.getElementById(t + "-tab").classList.toggle("hidden", t !== tab);
       });
+      uiPrefs.tab = tab;
+      saveUiPrefs();
+
+      // One-tap continuity: entering Adventure while mid-activity jumps
+      // straight to the subtab hosting it. Only fires on this explicit
+      // top-tab click, not on every render, so it never fights a manual
+      // subtab choice made while browsing.
+      if (tab === "adventure" && state && state.activity){
+        const activitySub = ACTIVITY_SUBTAB_MAP[state.activity.type];
+        if (activitySub) selectSubtab(activitySub);
+      }
     });
   });
 }
@@ -4529,7 +4785,22 @@ function wirePersistenceHooks(){
    BOOT
 ================================================================ */
 
+// Restore the last-viewed top tab and adventure subtab as literal saved
+// state (not the activity-based auto-select from wireTabs' click handler —
+// that's for live tab switches; a cold reload should reopen exactly where
+// the player left off, mid-activity or not).
+function applyUiPrefsOnBoot(){
+  const tab = TOP_TABS.indexOf(uiPrefs.tab) !== -1 ? uiPrefs.tab : "adventure";
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+  TOP_TABS.forEach(t => document.getElementById(t + "-tab").classList.toggle("hidden", t !== tab));
+
+  const sub = ADV_SUBTABS.indexOf(uiPrefs.subtab) !== -1 ? uiPrefs.subtab : "training";
+  document.querySelectorAll(".subtab-btn").forEach(b => b.classList.toggle("active", b.dataset.subtab === sub));
+  ADV_SUBTABS.forEach(s => document.getElementById("adv-" + s).classList.toggle("hidden", s !== sub));
+}
+
 function boot(){
+  applyStaticIcons();
   wireCreationScreen();
   wireGameScreen();
   wireResetModal();
@@ -4579,6 +4850,7 @@ function boot(){
   const offlineSummary = applyOfflineProgress();
 
   showGameScreen();
+  applyUiPrefsOnBoot();
   render();
   startLoops();
   saveGame();
