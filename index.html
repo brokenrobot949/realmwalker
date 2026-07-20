@@ -727,15 +727,15 @@
       <p class="section-flair">The realm remembers every hero, even the ones it forgets.</p>
       <div class="town-grid">
         <div class="panel">
-          <h3 data-icon="renown" data-icon-size="18">Renown</h3>
-          <p class="section-flair">A name is worth little until strangers start repeating it.</p>
-          <div id="renown-body"></div>
-        </div>
-
-        <div class="panel">
           <h3 data-icon="character" data-icon-size="18">Character</h3>
           <p class="section-flair">Blood, training, and steel — the sum of what stands before the dark.</p>
           <div id="character-info-body"></div>
+        </div>
+
+        <div class="panel">
+          <h3 data-icon="renown" data-icon-size="18">Renown</h3>
+          <p class="section-flair">A name is worth little until strangers start repeating it.</p>
+          <div id="renown-body"></div>
         </div>
 
         <div class="panel" style="grid-column:1 / -1;">
@@ -1179,7 +1179,7 @@ const ZONES = [
     tasks:["Standing the long watch over the seam beneath the Peaks","Turning back pilgrims still chasing the Hollow Choir's promises","Binding a crack in the stone before something notices it's open","Putting down whatever crawled through before the seal caught it","Listening to the Threshold breathe, and reporting that it still does"] }
 ];
 
-const DROP_INTERVAL_MS = 60 * 1000; // one drop roll per minute of training
+const DROP_INTERVAL_MS = 120 * 1000; // one drop roll per 2 minutes of training
 const MAX_OFFLINE_DROPS = 20;
 const MAX_LOG_ENTRIES = 50;
 const TRAINING_CAP_MS = 8 * 60 * 60 * 1000; // a training session auto-ends after 8 hours
@@ -1203,11 +1203,11 @@ const SLOTS = ["weapon", "helm", "armor", "gloves", "boots", "relic"];
 
 // Item power range by tier, before zone-tier scaling.
 const POWER_RANGES = {
-  common:    [2, 4],
-  uncommon:  [5, 9],
-  rare:      [12, 18],
-  epic:      [25, 35],
-  legendary: [50, 70]
+  common:    [3, 5],
+  uncommon:  [6, 10],
+  rare:      [11, 17],
+  epic:      [18, 28],
+  legendary: [32, 48]
 };
 
 // Relic bonus keys feed the matching central modifier function.
@@ -2024,13 +2024,21 @@ function addInjury(hero, sourceLabel){
    ITEM ROLLING
 ================================================================ */
 
-function rollItemTier(zoneTier){
-  // shift weights toward higher tiers slightly as zone tier rises
-  const shift = (zoneTier - 1) * 1.6;
-  const weights = ITEM_TIERS.map((t, i) => {
-    if (i === 0) return Math.max(5, t.weight - shift * 2.2);
-    return t.weight + shift * (i / ITEM_TIERS.length);
-  });
+function rollItemTier(effTier){
+  // Rarities are world-progression gates. legendary is impossible below
+  // effTier 4; epic below effTier 2. As effTier (zone tier + dropTierBonus)
+  // rises, share shifts smoothly toward rare/epic/legendary while common
+  // stays the filler (never below ~30% share). Each rarity's share is
+  // monotonic in effTier. Weights are indexed to ITEM_TIERS' order
+  // (common, uncommon, rare, epic, legendary); return shape is unchanged.
+  const t = Math.max(1, effTier);
+  const weights = [
+    Math.max(32, 100 - 9 * (t - 1)),               // common
+    Math.max(0, 46 - 4 * (t - 1)),                 // uncommon
+    6 + 3 * (t - 1),                               // rare
+    t <= 1 ? 0 : 0.42 * Math.pow(t - 1, 1.5),      // epic
+    t <= 3 ? 0 : 0.65 * Math.pow(t - 3, 1.15)      // legendary
+  ];
   const total = weights.reduce((a,b)=>a+b, 0);
   let roll = Math.random() * total;
   for (let i = 0; i < ITEM_TIERS.length; i++){
@@ -2064,7 +2072,7 @@ function itemDisplayName(item){
 function computeItemPower(tierId, zoneTier){
   const range = POWER_RANGES[tierId] || POWER_RANGES.common;
   const base = range[0] + Math.random() * (range[1] - range[0]);
-  const scaled = base * (1 + 0.15 * (zoneTier - 1));
+  const scaled = base * (1 + 0.25 * (zoneTier - 1));
   return Math.max(1, Math.round(scaled));
 }
 
