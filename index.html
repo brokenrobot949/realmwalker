@@ -34,6 +34,9 @@
     --tier-rare:#4a90d9;
     --tier-epic:#a34fd9;
     --tier-legendary:#e0a52c;
+    /* Mythic sits above legendary's gold-orange: a hotter, forge-bright
+       red-orange, clear of --red (#a83232, dark) and --injury (#d1477a). */
+    --tier-mythic:#ff5c3a;
 
     --arcane:#a06be0;
   }
@@ -308,6 +311,22 @@
   .modal-items{ font-size:0.85rem; color:var(--parchment-dim); margin-top:0.5rem; max-height:120px; overflow-y:auto; }
   .modal-actions{ text-align:center; margin-top:1.2rem; }
   .modal-warning{ color:#e08080; font-size:0.85rem; margin:0.8rem 0; }
+  /* A mythic find is the rarest event in the game — it gets its own panel. */
+  .modal-mythic{
+    margin-top:0.75rem; padding:0.6rem 0.7rem; text-align:center;
+    border:1px solid var(--tier-mythic); border-radius:4px;
+    background:rgba(255,92,58,0.09); color:var(--tier-mythic);
+    font-family:Georgia,'Times New Roman',serif; font-size:0.95rem; line-height:1.45;
+  }
+  .modal-mythic .mythic-kicker{
+    display:block; font-family:'Segoe UI',Tahoma,sans-serif; font-size:0.7rem;
+    letter-spacing:0.18em; text-transform:uppercase; color:var(--parchment-dim);
+    margin-bottom:0.25rem;
+  }
+  .modal-mythic .mythic-note{
+    display:block; font-family:'Segoe UI',Tahoma,sans-serif; font-size:0.78rem;
+    color:var(--parchment-dim); margin-top:0.3rem;
+  }
   .wb-rest-note{ text-align:center; color:var(--green); font-size:0.9rem; margin-top:0.6rem; font-style:italic; }
   .wb-content-note{ text-align:center; color:var(--parchment); font-size:0.9rem; margin-top:0.6rem; }
   #cr-outcome{ text-align:center; font-family:Georgia,'Times New Roman',serif; font-size:1.2rem; margin-bottom:0.4rem; }
@@ -930,6 +949,7 @@
         <div class="k">Items recovered</div><div class="v" id="cr-item-count"></div>
       </div>
       <div id="cr-items" class="modal-items"></div>
+      <div id="cr-mythic" class="modal-mythic hidden"></div>
       <div id="cr-injury" class="modal-warning hidden" style="text-align:center;"></div>
       <div class="modal-actions"><button class="btn" id="cr-close-btn">Continue</button></div>
     </div>
@@ -1112,6 +1132,7 @@
       <div class="codex-section"><b>Skills.</b> At levels 10, 25, 30, 45, 50, and 55 you choose a new skill from your current class's repertoire — six in all. Each is triggered from the Skills tab for a temporary effect, or an instant one like mending an injury, then goes on cooldown; the stronger the skill, the longer the wait before it's ready again.</div>
       <div class="codex-section"><b>Questing Zones.</b> Pick a zone under Adventure to quest passively for XP, gold, and item drops; a questing session caps at 8 hours, but you may stop questing at any time with no penalty — XP and drops are banked continuously as you go.</div>
       <div class="codex-section"><b>Dungeons, Raids, Campaign.</b> Timed ventures on the Adventure tab that resolve after a set duration, win or lose; the Campaign advances chapter by chapter. Renown comes from these and the Arena — never from questing.</div>
+      <div class="codex-section"><b>The Forgotten Beyond.</b> A level-60 expedition past the seam in the world, where time does not keep step with the realm. Its length is not fixed and is not yours to choose: the span is rolled when you set out, anywhere from thirty minutes to six hours, and nothing shortens it &mdash; not haste, not a swiftness buff, not power far beyond what the place demands. XP, gold, and renown all scale with the span you drew, so a long crossing is a rich one. It yields no ordinary gear whatsoever. What it may yield is a <b>Mythic</b> weapon, a rarity above Legendary that exists nowhere else in the realm &mdash; not in any zone, dungeon, raid, chapter, or shop. The longer the rolled span, the better the odds, from 5% at the half-hour floor to a hard ceiling of 75% at six hours. An expedition that fails returns with nothing mythic, however long it was gone.</div>
       <div class="codex-section"><b>The Arena.</b> Fights resolve every 10 seconds against escalating monsters, and there is no retreat — you fight until a wound or a beating carries you out. Wins bank XP, gold, and renown, and the longer you last, the bigger the survival bonus on your spoils (up to +50%).</div>
       <div class="codex-section"><b>Injuries &amp; Rest.</b> Injuries lock you out of adventuring at 2; rest to heal — a Short Rest (4 hours) heals one injury, a Long Rest (6 hours) heals both.</div>
       <div class="codex-section"><b>Outgrowing an expedition.</b> Once your power overwhelms a dungeon, raid, or chapter, the extra strength stops buying better odds — the danger is already as good as beaten — and starts buying speed and safety instead. A venture you have thoroughly outgrown is marched through faster and is far less likely to leave a mark on you, up to three-quarters less likely. The duration shown on each card already accounts for it. But an old road pays an old road's toll: as a place stops being able to threaten you, its spoils dwindle toward what such a place was ever worth. This turns on the danger, not on the date — an expedition that still tests you yields its full measure however far your name has travelled since, while one you can walk through in your sleep gives up only what a sleepwalk deserves. Plunder worth having is found ahead of you, never behind.</div>
@@ -1199,7 +1220,7 @@
 
 const SAVE_KEY = "realmwalker_save";
 const SAVE_KEY_CORRUPT = "realmwalker_save_corrupt";
-const SAVE_VERSION = 11;
+const SAVE_VERSION = 12;
 
 // UI-only preferences (last tab/subtab viewed) — deliberately a separate
 // localStorage key from the game save so it never touches SAVE_VERSION
@@ -1594,7 +1615,13 @@ const ITEM_TIERS = [
   { id:"uncommon",  name:"Uncommon",  color:"var(--tier-uncommon)",  weight:20 },
   { id:"rare",      name:"Rare",      color:"var(--tier-rare)",      weight:7 },
   { id:"epic",      name:"Epic",      color:"var(--tier-epic)",      weight:2.5 },
-  { id:"legendary", name:"Legendary", color:"var(--tier-legendary)", weight:0.5 }
+  { id:"legendary", name:"Legendary", color:"var(--tier-legendary)", weight:0.5 },
+  // Mythic is NOT a drop rarity — weight 0 everywhere. It exists only as the
+  // Forgotten Beyond's chase weapon (see MYTHIC_* and applyTimedContentProgress).
+  // Its position LAST matters: ITEM_TIERS order is the tier rank used by the
+  // inventory sort, and it is the positional index rollItemTier's weights
+  // array is written against.
+  { id:"mythic",    name:"Mythic",    color:"var(--tier-mythic)",    weight:0 }
 ];
 
 /* ---- v2: gear, equipment, town hub data ---- */
@@ -1607,15 +1634,19 @@ const POWER_RANGES = {
   uncommon:  [6, 10],
   rare:      [11, 17],
   epic:      [18, 28],
-  legendary: [32, 48]
+  legendary: [32, 48],
+  mythic:    [52, 72]
 };
 
 // Relic bonus keys feed the matching central modifier function.
 const RELIC_BOOST_KEYS = ["xpMult", "goldMult", "dropMult"];       // values >1 are good
 const RELIC_REDUCE_KEYS = ["injuryChanceMult", "restTimeMult"];    // values <1 are good
 const RELIC_BONUS_KEYS = RELIC_BOOST_KEYS.concat(RELIC_REDUCE_KEYS);
-const RELIC_BOOST_BY_TIER  = { common:1.02, uncommon:1.04, rare:1.06, epic:1.09, legendary:1.12 };
-const RELIC_REDUCE_BY_TIER = { common:0.98, uncommon:0.96, rare:0.93, epic:0.90, legendary:0.88 };
+// mythic is carried here defensively only — no mythic RELIC exists (the
+// Forgotten Beyond mints weapons exclusively) — so that a hand-edited save
+// or a future mythic relic can never fall through to the common default.
+const RELIC_BOOST_BY_TIER  = { common:1.02, uncommon:1.04, rare:1.06, epic:1.09, legendary:1.12, mythic:1.15 };
+const RELIC_REDUCE_BY_TIER = { common:0.98, uncommon:0.96, rare:0.93, epic:0.90, legendary:0.88, mythic:0.85 };
 const RELIC_LABELS = {
   xpMult: "XP", goldMult: "Gold", dropMult: "Drop Chance",
   injuryChanceMult: "Injury Chance", restTimeMult: "Rest Time"
@@ -1624,8 +1655,8 @@ const RELIC_LABELS = {
 // Weapons carry a weaker version of a relic's bonus — the relic slot stays
 // the premier bonus slot. Same five keys as RELIC_BONUS_KEYS, so no new
 // modifier plumbing is needed anywhere a bonus is consumed.
-const WEAPON_AFFIX_BOOST_BY_TIER  = { common:1.01, uncommon:1.02, rare:1.04, epic:1.05, legendary:1.07 };
-const WEAPON_AFFIX_REDUCE_BY_TIER = { common:0.99, uncommon:0.98, rare:0.96, epic:0.94, legendary:0.93 };
+const WEAPON_AFFIX_BOOST_BY_TIER  = { common:1.01, uncommon:1.02, rare:1.04, epic:1.05, legendary:1.07, mythic:1.09 };
+const WEAPON_AFFIX_REDUCE_BY_TIER = { common:0.99, uncommon:0.98, rare:0.96, epic:0.94, legendary:0.93, mythic:0.91 };
 
 // Correct fixed bonus magnitude for `key` at `tierId`, given which slot is
 // asking — relics read the stronger RELIC_* tables, weapons the weaker
@@ -1644,12 +1675,12 @@ function rollBonusForSlot(slot, tierId){
   return { key: key, value: bonusValueForSlot(slot, tierId, key) };
 }
 
-const SELL_VALUE_BY_TIER = { common:1, uncommon:3, rare:10, epic:30, legendary:100 };
+const SELL_VALUE_BY_TIER = { common:1, uncommon:3, rare:10, epic:30, legendary:100, mythic:300 };
 const SHOP_PRICE_MULT = 5;
 
 // Salvage: an alternative to selling that yields dust (Enchanter currency,
 // added in a later pass) instead of gold. Independent of SELL_VALUE_BY_TIER.
-const SALVAGE_DUST_BY_TIER = { common:2, uncommon:5, rare:14, epic:40, legendary:100 };
+const SALVAGE_DUST_BY_TIER = { common:2, uncommon:5, rare:14, epic:40, legendary:100, mythic:250 };
 const SALVAGE_UPGRADE_BONUS = 0.25; // each blacksmith upgrade level returns +25% of the base yield
 
 // Enchanter: spends dust on weapon/relic bonuses ONLY. Deliberately never
@@ -1658,7 +1689,7 @@ const SALVAGE_UPGRADE_BONUS = 0.25; // each blacksmith upgrade level returns +25
 // gear-power model that assumes only the Blacksmith raises power. Costs
 // scale off the ITEM's own tier (not the hero's zone tier or gold-price
 // multiplier — dust prices are flat, like the Cleric Temple's tithe).
-const ENCHANT_BASE_COST = { common:25, uncommon:50, rare:110, epic:240, legendary:500 };
+const ENCHANT_BASE_COST = { common:25, uncommon:50, rare:110, epic:240, legendary:500, mythic:900 };
 const ENCHANT_REROLL_MULT = 0.6;   // random new stat
 const ENCHANT_CHOOSE_MULT = 1.5;   // pick the exact stat
 
@@ -1739,7 +1770,7 @@ const SHOP_RESTOCK_INTERVAL_MS = 6 * 60 * 60 * 1000;
 const BLACKSMITH_MAX_UPGRADE = 5;
 const BLACKSMITH_BASE_COST = 10;
 const BLACKSMITH_COST_GROWTH = 3;
-const BLACKSMITH_TIER_COST_MULT = { common:1, uncommon:2, rare:4, epic:8, legendary:16 };
+const BLACKSMITH_TIER_COST_MULT = { common:1, uncommon:2, rare:4, epic:8, legendary:16, mythic:28 };
 const BLACKSMITH_UPGRADE_POWER_STEP = 0.1; // +10% of base power per upgrade level (nerfed from 0.2 in v5 — cap is now x1.5, not x2)
 
 // Cleric Temple
@@ -1895,7 +1926,22 @@ const DUNGEONS = [
   { id: "emberfall_catacombs", name: "Emberfall Catacombs", flavor: "Beneath the ruins, tunnels the old empire dug for reasons no one wrote down.", durationMin: 40, difficulty: 237, levelReq: 32, xp: 40000, gold: 2000, renown: 8, dropRolls: 3, dropTierBonus: 1 },
   { id: "cinder_maw", name: "The Cinder Maw", flavor: "A fissure of permanent fire at Emberfall's heart, said to breathe like something alive.", durationMin: 45, difficulty: 330, levelReq: 40, xp: 45000, gold: 2250, renown: 10, dropRolls: 4, dropTierBonus: 2 },
   { id: "frostbound_vault", name: "Frostbound Vault", flavor: "A treasury sealed in ice long before anyone alive was born, still guarding what it was told to guard.", durationMin: 55, difficulty: 480, levelReq: 55, xp: 137500, gold: 6875, renown: 13, dropRolls: 4, dropTierBonus: 2 },
-  { id: "shattered_throne", name: "The Shattered Throne", flavor: "The Peaks' broken summit hides a throne room that was never meant to be found again.", durationMin: 60, difficulty: 600, levelReq: 60, xp: 150000, gold: 7500, renown: 16, dropRolls: 4, dropTierBonus: 2 }
+  { id: "shattered_throne", name: "The Shattered Throne", flavor: "The Peaks' broken summit hides a throne room that was never meant to be found again.", durationMin: 60, difficulty: 600, levelReq: 60, xp: 150000, gold: 7500, renown: 16, dropRolls: 4, dropTierBonus: 2 },
+  // The Forgotten Beyond — the endgame's one gamble. It drops no ordinary
+  // gear at all (dropRolls 0): its whole payout is xp/gold/renown scaled by
+  // the span it ROLLS at the moment you set out (randomDurationMin/Max, in
+  // minutes), plus a chance at a Mythic weapon that exists nowhere else in
+  // the realm. difficulty 480 is deliberately the softer end for level 60 —
+  // the expedition is likely to succeed, so the real wager is the length of
+  // the span you draw, not whether you come back.
+  //
+  // xp/gold/renown are absent by design: nothing may read a fixed value off
+  // this def. See mythicContentRewards / MYTHIC_XP_PER_HOUR.
+  { id: "forgotten_beyond", name: "The Forgotten Beyond",
+    flavor: "Past the seam the ground keeps going and the hours do not. Expeditions sent out at dawn come back at dawn, or four days on, every one of them swearing they were gone an afternoon.",
+    difficulty: 480, levelReq: 60, dropRolls: 0, dropTierBonus: 0,
+    randomDurationMin: 30, randomDurationMax: 360,   // minutes; rolled at start
+    mythicSource: true }
 ];
 
 const RAIDS = [
@@ -2484,7 +2530,9 @@ const ACHIEVEMENTS = [
   { id: "rests_100", stat: "restsCompleted", threshold: 100, title: "the Well-Rested",
     desc: "Complete 100 rests.", bonus: { key: "restTimeMult", value: 0.97 }, bonusText: "-3% rest time" },
   { id: "xp_10m", stat: "xpEarned", threshold: 10000000, title: "the Seasoned",
-    desc: "Earn 10,000,000 XP over your lifetime.", bonus: { key: "xpMult", value: 1.02 }, bonusText: "+2% XP from all sources" }
+    desc: "Earn 10,000,000 XP over your lifetime.", bonus: { key: "xpMult", value: 1.02 }, bonusText: "+2% XP from all sources" },
+  { id: "mythic_1", stat: "mythicsFound", threshold: 1, title: "the Hour-Lost",
+    desc: "Return from the Forgotten Beyond bearing a Mythic weapon.", bonus: { key: "dropMult", value: 1.04 }, bonusText: "+4% item drop chance" }
 ];
 
 const ARENA_MONSTERS = {
@@ -2499,6 +2547,15 @@ const CONTENT_INJURY_CHANCE_FAILURE = 0.60;   // × getInjuryChanceMultiplier
 const CONTENT_FAILURE_REWARD_FRACTION = 0.30; // failure pays 30% xp/gold, no renown, no drops
 const QUEST_DROP_ROLLS = 2;                   // quest missions carry no dropRolls in data
 const QUEST_DROP_TIER_BONUS = 1;
+
+// The Forgotten Beyond (any def with mythicSource) — every number below is
+// per ROLLED HOUR of the span the expedition drew at start, derived at
+// resolve time from endsAt - startedAt. Nothing here is persisted.
+const MYTHIC_XP_PER_HOUR = 86000;
+const MYTHIC_GOLD_DIVISOR = 20;      // the realm's universal gold = xp / 20
+const MYTHIC_RENOWN_PER_HOUR = 4;
+const MYTHIC_CHANCE_MIN = 0.05;      // at the 30-minute floor
+const MYTHIC_CHANCE_MAX = 0.75;      // at the 6-hour ceiling — a hard cap
 
 // Arena tuning.
 const ARENA_MONSTER_POWER_BASE = 0.6;    // monster power = hero power × (base + step × fightNumber)
@@ -2848,7 +2905,8 @@ function createEmptyStats(){
     arenaFightsWon: 0, arenaRuns: 0,
     dungeonsCompleted: 0, dungeonsFailed: 0,
     raidsCompleted: 0, raidsFailed: 0,
-    questChaptersCompleted: 0, restsCompleted: 0
+    questChaptersCompleted: 0, restsCompleted: 0,
+    mythicsFound: 0
   };
 }
 
@@ -3377,7 +3435,70 @@ function contentDropTier(hero, def){
 // drift. Composes with getTimerMultiplier (Dragoon 0.80, swiftness buff).
 function timedContentDurationMs(hero, def){
   if (!def) return 0;
+  // A rolled-duration expedition has no fixed span to quote — it has a
+  // range. Callers start one through rollTimedContentDurationMs and display
+  // one through rolledDurationRangeLabel. Returning the floor of the range
+  // rather than 0 keeps any future caller somewhere sane instead of banking
+  // an instantly-resolving run.
+  if (hasRolledDuration(def)) return Math.round(def.randomDurationMin * 60000);
   return Math.round((def.durationMin || 0) * 60000 * getTimerMultiplier(hero) * contentSpeedMultiplier(hero, def));
+}
+
+/* ---- rolled-duration content: The Forgotten Beyond ---- */
+
+// True for content whose span is drawn at start instead of fixed in data.
+function hasRolledDuration(def){
+  return !!(def && def.randomDurationMin > 0 && def.randomDurationMax > def.randomDurationMin);
+}
+
+// The span startTimedContent actually banks.
+//
+// ⚠ A rolled span is DELIBERATELY exempt from BOTH duration multipliers —
+// getTimerMultiplier (the swiftness buff, the Dragoon's timerMult) and
+// contentSpeedMultiplier (surplus power). This is not an oversight. The
+// Forgotten Beyond's xp, gold, renown AND its mythic chance all scale UP
+// with the rolled span, so shortening the run would REDUCE the payout:
+// haste buffs and overwhelming power would become a straight downside, and
+// the strongest heroes would get the worst expeditions. The rolled span is
+// the span. Everything else in the game still routes through
+// timedContentDurationMs and keeps both multipliers.
+function rollTimedContentDurationMs(hero, def){
+  if (!hasRolledDuration(def)) return timedContentDurationMs(hero, def);
+  const lo = def.randomDurationMin, hi = def.randomDurationMax;
+  return Math.round((lo + Math.random() * (hi - lo)) * 60000);
+}
+
+// Rolled hours for a span. endsAt - startedAt already persists the rolled
+// span on the activity, so no new activity field is needed anywhere — every
+// derived number (rewards, mythic odds, the card's live readout) comes from
+// this one quantity.
+function rolledHours(ms){
+  return Math.max(0, ms || 0) / 3600000;
+}
+
+// Payout for a mythicSource expedition at a given rolled span, before the
+// hero's own reward/xp/gold multipliers and before any failure fraction.
+function mythicContentRewards(def, ms){
+  const h = rolledHours(ms);
+  const xp = Math.round(h * MYTHIC_XP_PER_HOUR);
+  return {
+    xp: xp,
+    gold: Math.round(xp / MYTHIC_GOLD_DIVISOR),
+    renown: Math.round(h * MYTHIC_RENOWN_PER_HOUR)
+  };
+}
+
+// Chance of a mythic weapon, linear in the rolled span between the range's
+// own floor and ceiling, clamped hard to [MYTHIC_CHANCE_MIN, MYTHIC_CHANCE_MAX].
+// Rolled on SUCCESS ONLY (see applyTimedContentProgress) — a failed
+// expedition can never yield one, at any span.
+function mythicChance(def, ms){
+  if (!hasRolledDuration(def)) return 0;
+  const loH = def.randomDurationMin / 60;
+  const hiH = def.randomDurationMax / 60;
+  const t = (rolledHours(ms) - loH) / (hiH - loH);
+  const raw = MYTHIC_CHANCE_MIN + (MYTHIC_CHANCE_MAX - MYTHIC_CHANCE_MIN) * t;
+  return Math.min(MYTHIC_CHANCE_MAX, Math.max(MYTHIC_CHANCE_MIN, raw));
 }
 
 /* ================================================================
@@ -3488,15 +3609,25 @@ function rollItemTier(effTier){
   // effTier 4; epic below effTier 2. As effTier (zone tier + dropTierBonus)
   // rises, share shifts smoothly toward rare/epic/legendary while common
   // stays the filler (never below ~30% share). Each rarity's share is
-  // monotonic in effTier. Weights are indexed to ITEM_TIERS' order
-  // (common, uncommon, rare, epic, legendary); return shape is unchanged.
+  // monotonic in effTier. Weights are indexed POSITIONALLY to ITEM_TIERS'
+  // order (common, uncommon, rare, epic, legendary, mythic) and the loop
+  // below runs to ITEM_TIERS.length — so this array MUST have exactly one
+  // entry per ITEM_TIERS entry. A short array makes the loop read
+  // `roll < undefined` (false) then `roll -= undefined` (NaN), which
+  // silently breaks every item roll in the game. Return shape is unchanged.
   const t = Math.max(1, effTier);
   const weights = [
     Math.max(32, 100 - 9 * (t - 1)),               // common
     Math.max(0, 46 - 4 * (t - 1)),                 // uncommon
     6 + 3 * (t - 1),                               // rare
     t <= 1 ? 0 : 0.42 * Math.pow(t - 1, 1.5),      // epic
-    t <= 3 ? 0 : 0.65 * Math.pow(t - 3, 1.15)      // legendary
+    t <= 3 ? 0 : 0.65 * Math.pow(t - 3, 1.15),     // legendary
+    // mythic — ALWAYS 0, at every effTier, forever. Mythic is not a drop
+    // rarity: it is the Forgotten Beyond's exclusive chase weapon and is
+    // minted directly there, never rolled. Present solely to keep this
+    // array the same length as ITEM_TIERS (see above). Adding weight here
+    // would leak mythics into zone drops, dungeon loot, and shop stock.
+    0                                              // mythic
   ];
   const total = weights.reduce((a,b)=>a+b, 0);
   let roll = Math.random() * total;
@@ -3597,6 +3728,28 @@ function rollGearItem(tier, zoneTier, hero){
 function rollItem(zone, hero){
   const tier = rollItemTier(zone.tier);
   return rollGearItem(tier, zone.tier, hero);
+}
+
+// The ONLY place a mythic item is ever created. Deliberately NOT
+// rollGearItem: the slot is forced to weapon (mythic armour and mythic
+// relics do not exist) and the tier is taken by id rather than rolled,
+// because rollItemTier weights mythic at 0 forever — mythic is not a drop
+// rarity. Name comes from the hero's class weapon family through the same
+// rollGearName/CLASS_GEAR_STYLE path every other weapon uses; bonus is null
+// like any other found weapon (the Enchanter binds weapon affixes).
+function mintMythicWeapon(hero, zoneTier){
+  const tier = ITEM_TIERS.find(t => t.id === "mythic") || ITEM_TIERS[ITEM_TIERS.length - 1];
+  return {
+    id: "item_" + Date.now() + "_" + Math.floor(Math.random()*100000),
+    name: rollGearName("weapon", hero),
+    slot: "weapon",
+    tierId: tier.id,
+    tierName: tier.name,
+    power: computeItemPower(tier.id, zoneTier),
+    upgradeLevel: 0,
+    bonus: null,
+    foundAt: Date.now()
+  };
 }
 
 function itemSellValue(item){
@@ -3782,10 +3935,19 @@ function applyTimedContentProgress(summary){
   // × the regular xp/gold multipliers. Failure pays a fraction of that,
   // with no renown and no drops.
   const rewardMult = getRewardMultiplier(hero);
-  let xpGain = def.xp * rewardMult * getXpMultiplier(hero);
-  let goldGain = def.gold * rewardMult * getGoldMultiplier(hero);
-  let renownGain = def.renown;
+  // A mythicSource expedition (the Forgotten Beyond) has no fixed xp/gold/
+  // renown in data — it pays off the span it actually rolled, which
+  // endsAt - startedAt already persists. `activity` is the pre-reset object
+  // captured above, so both timestamps are still readable here.
+  const rolledMs = Math.max(0, (activity.endsAt || 0) - (activity.startedAt || 0));
+  const basePay = def.mythicSource
+    ? mythicContentRewards(def, rolledMs)
+    : { xp: def.xp, gold: def.gold, renown: def.renown };
+  let xpGain = basePay.xp * rewardMult * getXpMultiplier(hero);
+  let goldGain = basePay.gold * rewardMult * getGoldMultiplier(hero);
+  let renownGain = basePay.renown;
   const items = [];
+  let mythicItem = null;
   let injured = false;
 
   if (success){
@@ -3801,6 +3963,18 @@ function applyTimedContentProgress(summary){
       state.inventory.push(item);
       items.push(item);
       addLog("Recovered " + itemDisplayName(item) + " from " + def.name + ".", "drop");
+    }
+    // The Forgotten Beyond's entire yield, and the only source of mythic
+    // gear in the realm. Success only — the roll is inside this branch, so
+    // a failed expedition can never produce one at any span. dropRolls is 0
+    // on that def, so this is also the only gear it ever hands over.
+    if (def.mythicSource && Math.random() < mythicChance(def, rolledMs)){
+      mythicItem = mintMythicWeapon(hero, contentDropTier(hero, def));
+      state.inventory.push(mythicItem);
+      items.push(mythicItem);
+      if (state.stats) state.stats.mythicsFound = (state.stats.mythicsFound || 0) + 1;
+      addLog(hero.name + " returns from " + def.name + " carrying " + itemDisplayName(mythicItem) +
+        " — a MYTHIC weapon, and there is nowhere else in the realm one can be had.", "levelup");
     }
     if (state.stats) state.stats.itemsFound += items.length;
     injured = Math.random() < CONTENT_INJURY_CHANCE_SUCCESS * getInjuryChanceMultiplier(hero) * safetyMult;
@@ -3851,6 +4025,7 @@ function applyTimedContentProgress(summary){
     type: type, name: def.name, success: success,
     xp: xpGain, gold: goldGain, renown: renownGain,
     items: items, injured: injured, outro: outro,
+    mythic: mythicItem,
     questTitle: type === "quest" ? def.title : null
   };
 }
@@ -4024,6 +4199,7 @@ function migrateSave(data){
   if (d.version === 8) d = migrateV8toV9(d);
   if (d.version === 9) d = migrateV9toV10(d);
   if (d.version === 10) d = migrateV10toV11(d);
+  if (d.version === 11) d = migrateV11toV12(d);
   return d;
 }
 
@@ -4213,6 +4389,27 @@ function migrateV10toV11(data){
   return data;
 }
 
+// v12 adds the Forgotten Beyond and the mythic item tier, tracked by the new
+// mythicsFound counter. That counter must exist in BOTH places achievement
+// progress is summed from — state.stats (this life) and legacy.totals
+// (every past life) — because getAchievementProgress adds them, and a
+// missing key on either side reads undefined. Seeding legacy.totals is not
+// optional even though the counter is brand new: normalizeLegacy would coerce
+// it on the next boot, but the mythic achievement is checked on the very
+// first render after load, before any rebirth ever touches totals.
+//
+// No backfill is possible or needed: no mythic could have been found before
+// this version existed, so 0 is the true lifetime figure for every save.
+function migrateV11toV12(data){
+  if (!data.stats || typeof data.stats !== "object") data.stats = createEmptyStats();
+  if (typeof data.stats.mythicsFound !== "number") data.stats.mythicsFound = 0;
+  if (!data.legacy || typeof data.legacy !== "object") data.legacy = createEmptyLegacy();
+  if (!data.legacy.totals || typeof data.legacy.totals !== "object") data.legacy.totals = createEmptyStats();
+  if (typeof data.legacy.totals.mythicsFound !== "number") data.legacy.totals.mythicsFound = 0;
+  data.version = 12;
+  return data;
+}
+
 function migrateItemToGear(item, hero){
   if (item.slot) return item; // already gear-shaped, leave as-is
   const slot = SLOTS[Math.floor(Math.random() * SLOTS.length)];
@@ -4283,6 +4480,24 @@ function humanizeDuration(ms){
   if (minutes > 0 || hours > 0 || days > 0) parts.push(minutes + "m");
   if (parts.length === 0) parts.push(seconds + "s");
   return parts.join(" ");
+}
+
+// Compact whole-minute span for a range badge: "30m", "6h", "1h 30m".
+// Deliberately NOT humanizeDuration, which would render 360 minutes as
+// "6h 0m" — a range badge reads better tight ("30m – 6h").
+function compactMinutes(min){
+  const total = Math.max(0, Math.round(min || 0));
+  const h = Math.floor(total / 60);
+  const m = total % 60;
+  if (h > 0 && m > 0) return h + "h " + m + "m";
+  if (h > 0) return h + "h";
+  return m + "m";
+}
+
+// "30m – 6h" for a rolled-duration def, shown until the span is drawn.
+function rolledDurationRangeLabel(def){
+  if (!hasRolledDuration(def)) return humanizeDuration(0);
+  return compactMinutes(def.randomDurationMin) + " – " + compactMinutes(def.randomDurationMax);
 }
 
 function applyOfflineProgress(){
@@ -5181,19 +5396,45 @@ function renderTimedContentList(type, defs, listElId){
     // even if power/buffs change mid-run.
     const dur = active ? Math.max(0, act.endsAt - act.startedAt) : timedContentDurationMs(hero, def);
 
+    // A rolled-duration expedition knows nothing about itself until you
+    // commit to it: the span is drawn at the moment you set out, and every
+    // payout plus the mythic chance is derived from that span. So the card
+    // quotes RANGES before starting and the ACTUAL rolled figures once
+    // underway — that reveal is the whole point of the content.
+    const rolled = hasRolledDuration(def);
+    const durLabel = (rolled && !active) ? rolledDurationRangeLabel(def) : humanizeDuration(dur);
+    let statsHtml;
+    if (rolled){
+      const lo = mythicContentRewards(def, def.randomDurationMin * 60000);
+      const hi = mythicContentRewards(def, def.randomDurationMax * 60000);
+      const now0 = active ? mythicContentRewards(def, dur) : null;
+      const range = (a, b) => fmtNumber(a) + " – " + fmtNumber(b);
+      statsHtml =
+        "<span><b>" + (now0 ? fmtNumber(now0.xp) : range(lo.xp, hi.xp)) + "</b> xp</span>" +
+        "<span><b>" + (now0 ? fmtNumber(now0.gold) : range(lo.gold, hi.gold)) + "</b> gold</span>" +
+        "<span><b>" + (now0 ? now0.renown : range(lo.renown, hi.renown)) + "</b> renown</span>" +
+        "<span style=\"color:var(--tier-mythic)\"><b>" +
+          (active ? Math.round(mythicChance(def, dur) * 100) + "%"
+                  : Math.round(MYTHIC_CHANCE_MIN * 100) + "% – " + Math.round(MYTHIC_CHANCE_MAX * 100) + "%") +
+          "</b> mythic</span>";
+    } else {
+      statsHtml =
+        "<span><b>" + fmtNumber(def.xp) + "</b> xp</span>" +
+        "<span><b>" + fmtNumber(def.gold) + "</b> gold</span>" +
+        "<span><b>" + def.renown + "</b> renown</span>" +
+        "<span><b>" + def.dropRolls + "</b> drops</span>";
+    }
+
     const card = document.createElement("div");
     card.className = "zone-card" + (locked ? " locked" : "") + (active ? " active" : "");
     card.innerHTML =
       "<div class=\"zone-info\">" +
         "<div class=\"zone-name-row\"><h4 class=\"content-title\">" + escapeHtml(def.name) + "</h4>" +
-          "<span class=\"tier-badge\">" + humanizeDuration(dur) + "</span></div>" +
+          "<span class=\"tier-badge\">" + escapeHtml(durLabel) + "</span></div>" +
         "<div class=\"content-flavor\">" + escapeHtml(def.flavor || "") + "</div>" +
         "<div class=\"zone-req\">" + (hero.level < def.levelReq ? "Requires level " + def.levelReq : "Level " + def.levelReq + "+") + "</div>" +
         "<div class=\"zone-stats\">" +
-          "<span><b>" + fmtNumber(def.xp) + "</b> xp</span>" +
-          "<span><b>" + fmtNumber(def.gold) + "</b> gold</span>" +
-          "<span><b>" + def.renown + "</b> renown</span>" +
-          "<span><b>" + def.dropRolls + "</b> drops</span>" +
+          statsHtml +
           "<span class=\"content-band\" style=\"color:" + band.color + "\">" + band.label + " (" + chancePct + "%)</span>" +
         "</div>" +
       "</div>" +
@@ -5696,7 +5937,8 @@ function renderStatsPanel(){
     ["Raids completed", fmtNumber(s.raidsCompleted)],
     ["Raids failed", fmtNumber(s.raidsFailed)],
     ["Campaign chapters completed", fmtNumber(s.questChaptersCompleted)],
-    ["Rests completed", fmtNumber(s.restsCompleted)]
+    ["Rests completed", fmtNumber(s.restsCompleted)],
+    ["Mythic weapons found", fmtNumber(s.mythicsFound || 0)]
   ];
   document.getElementById("stats-body").innerHTML =
     rows.map(r => "<div class=\"k\">" + r[0] + "</div><div class=\"v\">" + r[1] + "</div>").join("");
@@ -6152,6 +6394,21 @@ function showContentResultModal(result){
     return "<div style=\"color:" + tier.color + "\">" + escapeHtml(itemDisplayName(item)) + "</div>";
   }).join("");
 
+  // A mythic find gets its own panel above the injury line — it is the
+  // rarest thing that can happen to a hero, and the reason the Forgotten
+  // Beyond is run at all.
+  const mythicEl = document.getElementById("cr-mythic");
+  if (result.mythic){
+    mythicEl.innerHTML =
+      "<span class=\"mythic-kicker\">Mythic</span>" +
+      escapeHtml(itemDisplayName(result.mythic)) +
+      " <span style=\"color:var(--parchment-dim)\">(Power " + displayItemPower(result.mythic) + ")</span>" +
+      "<span class=\"mythic-note\">There is nowhere else in the realm one can be had.</span>";
+    mythicEl.classList.remove("hidden");
+  } else {
+    mythicEl.classList.add("hidden");
+  }
+
   const injuryEl = document.getElementById("cr-injury");
   if (result.injured){
     injuryEl.textContent = state.hero.injuries >= MAX_INJURIES
@@ -6465,7 +6722,10 @@ function startTimedContent(type, contentId){
   // Duration through the shared helper: central timer multiplier
   // (Dragoon 0.8, swiftness) x the surplus-power speed bonus. Fixed at
   // start — the same call backs the duration badge on every card.
-  const dur = timedContentDurationMs(state.hero, def);
+  // ...except a rolled-duration expedition (the Forgotten Beyond), which
+  // draws its own span and takes NEITHER multiplier — see
+  // rollTimedContentDurationMs for why shortening it would be a penalty.
+  const dur = rollTimedContentDurationMs(state.hero, def);
   state.activity = { type: type, contentId: contentId, startedAt: now, endsAt: now + dur };
 
   const typeLabel = type === "dungeon" ? "the dungeon" : type === "raid" ? "the raid" : "the campaign";
@@ -7637,7 +7897,12 @@ function showWelcomeBackModal(summary){
       " +" + fmtNumber(cr.xp) + " xp, +" + fmtNumber(cr.gold) + " gold" +
       (cr.renown > 0 ? ", +" + cr.renown + " renown" : "") +
       (cr.items.length > 0 ? ", " + cr.items.length + " item" + (cr.items.length === 1 ? "" : "s") : "") +
-      (cr.injured ? "<span style=\"color:var(--injury)\">. You were injured.</span>" : ".");
+      (cr.injured ? "<span style=\"color:var(--injury)\">. You were injured.</span>" : ".") +
+      // An expedition that came back with a mythic while the tab was closed
+      // gets the same prominence the live result modal gives it.
+      (cr.mythic ? "<div class=\"modal-mythic\"><span class=\"mythic-kicker\">Mythic</span>" +
+        escapeHtml(itemDisplayName(cr.mythic)) +
+        " <span style=\"color:var(--parchment-dim)\">(Power " + displayItemPower(cr.mythic) + ")</span></div>" : "");
     contentNoteEl.classList.remove("hidden");
   } else {
     contentNoteEl.classList.add("hidden");
