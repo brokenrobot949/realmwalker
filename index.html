@@ -755,6 +755,7 @@
             <button class="subtab-btn" data-subtab="raids" data-icon="raids" data-icon-size="15">Raids</button>
             <button class="subtab-btn" data-subtab="quests" data-icon="campaign" data-icon-size="15">Campaign</button>
             <button class="subtab-btn" data-subtab="arena" data-icon="arena" data-icon-size="15">Arena</button>
+            <button class="subtab-btn" data-subtab="worldboss" data-icon="worldboss" data-icon-size="15">World Bosses</button>
           </div>
           <div id="adv-training" class="adv-subpanel">
             <h3 data-icon="quests" data-icon-size="18">Questing Zones</h3>
@@ -789,6 +790,11 @@
             <h3 data-icon="arena" data-icon-size="18">The Arena</h3>
             <p class="section-flair">The gate locks behind you; only victory or ruin opens it again.</p>
             <div id="arena-body"></div>
+          </div>
+          <div id="adv-worldboss" class="adv-subpanel hidden">
+            <h3 data-icon="worldboss" data-icon-size="18">World Bosses</h3>
+            <p class="section-flair">The realm keeps a list of what it could not kill. You are welcome to work down it.</p>
+            <div id="worldboss-list" class="zone-list"></div>
           </div>
         </div>
 
@@ -868,6 +874,12 @@
             <h3 data-icon="legends" data-icon-size="18">Hall of Legends</h3>
             <p class="section-flair">Every hero falls silent eventually; here, at least, the silence is honored.</p>
             <div id="legends-body"></div>
+          </div>
+
+          <div class="panel" style="grid-column:1 / -1;">
+            <h3 data-icon="worldboss" data-icon-size="18">The Roll of First Blood</h3>
+            <p class="section-flair">Ten names the realm could not finish. The Hall remembers who reached each one first.</p>
+            <div id="worldboss-hall-body"></div>
           </div>
         </div>
       </div>
@@ -1134,6 +1146,7 @@
       <div class="codex-section"><b>Dungeons, Raids, Campaign.</b> Timed ventures on the Adventure tab that resolve after a set duration, win or lose; the Campaign advances chapter by chapter. Renown comes from these and the Arena — never from questing.</div>
       <div class="codex-section"><b>The Forgotten Beyond.</b> A level-60 expedition past the seam in the world, where time does not keep step with the realm. Its length is not fixed and is not yours to choose: the span is rolled when you set out, anywhere from thirty minutes to six hours, and nothing shortens it &mdash; not haste, not a swiftness buff, not power far beyond what the place demands. XP, gold, and renown all scale with the span you drew, so a long crossing is a rich one. It yields no ordinary gear whatsoever. What it may yield is a <b>Mythic</b> weapon, a rarity above Legendary that exists nowhere else in the realm &mdash; not in any zone, dungeon, raid, chapter, or shop. The longer the rolled span, the better the odds, from 5% at the half-hour floor to a hard ceiling of 75% at six hours. An expedition that fails returns with nothing mythic, however long it was gone.</div>
       <div class="codex-section"><b>The Arena.</b> Fights resolve every 10 seconds against escalating monsters, and there is no retreat — you fight until a wound or a beating carries you out. Wins bank XP, gold, and renown, and the longer you last, the bigger the survival bonus on your spoils (up to +50%).</div>
+      <div class="codex-section"><b>World Bosses.</b> A ladder of ten things the realm never managed to kill, opened only once your hero has seen the Campaign through to its last chapter. You climb it one rung at a time: only the next unbeaten name is ever shown to you, and the one after it stays nameless until the one before it falls. They yield <b>no gear and no gold whatsoever</b> &mdash; only XP and renown far beyond anything else in the realm. They are also brutally dangerous whether you win or lose: a 35% chance of injury on a kill, and 85% on a defeat. Do not expect to reach the top of the ladder. The point is how far you get, and the Hall remembers by name whoever first felled each one, across every life you live.</div>
       <div class="codex-section"><b>Injuries &amp; Rest.</b> Injuries lock you out of adventuring at 2; rest to heal — a Short Rest (4 hours) heals one injury, a Long Rest (6 hours) heals both.</div>
       <div class="codex-section"><b>Outgrowing an expedition.</b> Once your power overwhelms a dungeon, raid, or chapter, the extra strength stops buying better odds — the danger is already as good as beaten — and starts buying speed and safety instead. A venture you have thoroughly outgrown is marched through faster and is far less likely to leave a mark on you, up to three-quarters less likely. The duration shown on each card already accounts for it. But an old road pays an old road's toll: as a place stops being able to threaten you, its spoils dwindle toward what such a place was ever worth. This turns on the danger, not on the date — an expedition that still tests you yields its full measure however far your name has travelled since, while one you can walk through in your sleep gives up only what a sleepwalk deserves. Plunder worth having is found ahead of you, never behind.</div>
       <div class="codex-section"><b>The odds of a wound.</b> A dungeon, raid, or campaign chapter carries a 10% chance of injury on success, and a steep 60% chance on failure. The Arena is gentler at first but grows crueler with every win — its injury chance climbs 3% per fight survived, and never strikes during an early run's safe fights. All these odds bend to your hero's own fortune: gear, race, class, renown, and legacy boons can all shift the chance of harm, for better or worse.</div>
@@ -1220,7 +1233,7 @@
 
 const SAVE_KEY = "realmwalker_save";
 const SAVE_KEY_CORRUPT = "realmwalker_save_corrupt";
-const SAVE_VERSION = 12;
+const SAVE_VERSION = 13;
 
 // UI-only preferences (last tab/subtab viewed) — deliberately a separate
 // localStorage key from the game save so it never touches SAVE_VERSION
@@ -1239,7 +1252,7 @@ let uiPrefs = loadUiPrefs();
 
 // Which adventure subtab hosts each activity type, for the beacon dot and
 // the "one-tap continuity" auto-select when re-entering the Adventure tab.
-const ACTIVITY_SUBTAB_MAP = { training:"training", dungeon:"dungeons", raid:"raids", quest:"quests", arena:"arena" };
+const ACTIVITY_SUBTAB_MAP = { training:"training", dungeon:"dungeons", raid:"raids", quest:"quests", arena:"arena", worldboss:"worldboss" };
 
 /* ================================================================
    POWER MODEL  (v5 content-era rebalance; re-anchored for the
@@ -1354,24 +1367,45 @@ const ACTIVITY_SUBTAB_MAP = { training:"training", dungeon:"dungeons", raid:"rai
    no gear. One injury is worth ~3h of forgone questing: two runs earn two
    injuries, which one 6h long rest clears. So the Arena's effective rate
    is (banked xp x survival bonus) / (run seconds + 3h x restTimeMult).
-   ARENA_XP_ZONE_FRACTION is tuned so that lands at ~1.50x the hero's zone
-   xp/hour — measured at levels 12/25/40/55, where it comes out 1.49-1.50x
+   ARENA_XP_ZONE_FRACTION lands that at ~1.21x the hero's zone xp/hour
    (rewards scale off the zone, so the ratio is level-invariant by
-   construction). For scale, a level-appropriate dungeon on that same
-   rest-inclusive metric runs ~0.68-0.74x questing, but also pays 3-4 drop
-   rolls and 4-8 renown, which the Arena never does.
+   construction — it measures 1.21-1.22x at every level). For scale, a
+   level-appropriate dungeon on that same rest-inclusive metric runs
+   ~0.68-0.74x questing, but also pays 3-4 drop rolls and 5-16 renown.
+   Measured over 80,000 simulated runs per level, plain hero:
 
      Level | Zone xp/hr | xp/run  | eff xp/hr | vs questing | dungeon
      ------+------------+---------+-----------+-------------+---------
-       12  |   14,000   |  62,905 |   20,901  |    1.49x    |  0.72x
-       25  |   21,000   |  94,921 |   31,537  |    1.50x    |  0.68x
-       40  |   30,000   | 135,546 |   45,035  |    1.50x    |  0.71x
-       55  |   75,000   | 338,800 |  112,566  |    1.50x    |  0.74x
+       25  |   21,000   |  84,241 |   27,988  |    1.21x    |  0.68x
+       40  |   30,000   | 121,137 |   40,246  |    1.22x    |  0.71x
+       60  |   75,000   | 301,922 |  100,311  |    1.22x    |  0.74x
 
-   Gold rides the same fraction against goldPerHour, so a run pays ~4.5
-   zone-hours of gold — well under the 8 zone-hours a Cleric Temple heal
-   costs (TEMPLE_TITHE_MULTIPLIER x 4h), which keeps "farm the Arena, tithe
-   the wound away" a strictly losing loop rather than an exploit.
+   GOLD DOES NOT RIDE THE XP FRACTION. It has its own, ~33x smaller
+   ARENA_GOLD_ZONE_FRACTION, and the reason is a hard balance constraint
+   rather than flavour. Arena rewards are multiplied by getRewardMultiplier
+   (up to ~1.94 from a Raider/Paladin perk x stacked `spoils` buffs x
+   achievements) and again by the survival bonus, but medicHealCost is
+   priced on getGoldMultiplier x getRestTimeMultiplier ONLY — it takes no
+   rewardMult, and every restTimeMult reducer in the game (evolution perk,
+   stacked `restful` buffs, relic + weapon affixes, renown milestone,
+   repeatable Restless Vigor boons, achievement — jointly down to ~0.19)
+   CUTS it. So the two sides drift apart in opposite directions as an
+   account matures. When both rode 0.50 the loop opened wide:
+
+     Build (level 60)             gold/run : heal   at 0.50   at 0.015
+     -----------------------------+------------------+---------+--------
+     plain hero                   |  17,126 : 30,000 |  0.57x  |  0.017x
+     Raider + spoils + achv       |  28,085 : 20,682 |  1.36x  |  0.041x
+     optimised Paladin (legal)    |  33,045 :  7,222 |  4.58x  |  0.136x
+     every source stacked (illegal)| 48,074 :  6,471 |  7.43x  |  0.223x
+
+   At 4.58x the injury ending every run cost nothing at all, and the Arena
+   became an unlimited xp faucet (a 40-second run banking >1,000,000 xp).
+   At 0.015 even the deliberately-illegal superposition of every bonus in
+   the game reaches only 0.22x, so "farm the Arena, tithe the wound away"
+   is closed by construction, not by the margin between two independently
+   drifting numbers. The Arena's payout is xp and renown; its gold is a
+   token (~0.14 zone-hours per run) and must stay one.
 
    Era-1 leveling pace (pure zone training, no xp mults; discrete
    sums of xpNeeded(L) = round(100 * L^1.9) over each level band):
@@ -1949,6 +1983,64 @@ const RAIDS = [
   { id: "the_sunken_court", name: "The Sunken Court", flavor: "A drowned noble house beneath the Marsh, holding court for guests who never leave.", durationMin: 150, difficulty: 280, levelReq: 28, xp: 187500, gold: 9375, renown: 35, dropRolls: 5, dropTierBonus: 2 },
   { id: "the_ember_conclave", name: "The Ember Conclave", flavor: "A gathering of the Hollow Choir's faithful, deep in Emberfall's burning heart.", durationMin: 200, difficulty: 430, levelReq: 45, xp: 400000, gold: 20000, renown: 46, dropRolls: 5, dropTierBonus: 3 },
   { id: "the_shattered_vigil", name: "The Shattered Vigil", flavor: "What's left of an army that marched into the Peaks and forgot to march back out.", durationMin: 240, difficulty: 700, levelReq: 60, xp: 750000, gold: 37500, renown: 58, dropRolls: 6, dropTierBonus: 3 }
+];
+
+/* ================================================================
+   WORLD BOSSES — the endgame ladder
+   ----------------------------------------------------------------
+   Ten named things the realm never managed to kill, climbed strictly
+   one rung at a time. Boss 1 opens only once the Campaign is finished
+   (state.questProgress >= CAMPAIGN_SPINE.length); every rung after
+   that opens only by felling the one before it.
+   state.worldBossProgress counts the rungs THIS hero has taken, and
+   resets on rebirth exactly like questProgress. The account-wide
+   record of who first felled each name lives in legacy.worldBossFirsts
+   and survives every rebirth.
+
+   ⚠ NOT a checklist — a "how far can you climb" prestige chase. The
+   difficulty curve starts 30% above the hardest raid (The Shattered
+   Vigil, 700) and rises 20% per rung, so a level-60 hero in typical
+   gear (~500 power) meets rung 1 at ratio 0.55 — about a 26% chance —
+   and the upper rungs are effectively unreachable BY DESIGN. Do not
+   "fix" this by flattening the curve; the Hall of Legends record of
+   how far anyone ever got is the actual prize.
+
+   ⚠ Deliberately NO gold field, NO dropRolls, NO dropTierBonus. A
+   world boss yields XP and (very high) renown and nothing else — see
+   applyTimedContentProgress, which skips the whole drop block for
+   this type rather than relying on dropRolls being absent.
+================================================================ */
+const WORLD_BOSSES = [
+  { id: "sangrell", name: "Sangrell, the Bloodletter",
+    flavor: "He does not kill for hunger or for orders — he opens people the way a surgeon does, carefully, and stands back to watch what runs out. The villages he has visited are all still standing. That is the part nobody can explain.",
+    difficulty: 910, durationMin: 150, xp: 400000, renown: 40 },
+  { id: "golgoras", name: "Golgoras, Lord of the Gallows",
+    flavor: "Every rope the realm has ever tied answers to him now, and he has been counting them for a very long time. He does not hunt anyone; he simply waits at the end of a sentence somebody else already passed.",
+    difficulty: 1092, durationMin: 167, xp: 520000, renown: 52 },
+  { id: "nauris", name: "Nauris, Whom the Marsh Kept",
+    flavor: "The Sunken Marsh drowned her an age ago and then, for reasons of its own, declined to finish the job. She has been rising back through the silt ever since, wearing the water like a coat and bringing the colder parts of the marsh up with her.",
+    difficulty: 1310, durationMin: 185, xp: 676000, renown: 68 },
+  { id: "umbris", name: "Umbris, Living Shadow",
+    flavor: "It has no body to cut and no face to read — only the shape a thing leaves behind when the light gives up on it. Put out the light and you kill nothing; you merely stop being able to see where it is standing.",
+    difficulty: 1573, durationMin: 205, xp: 879000, renown: 88 },
+  { id: "threnn", name: "Threnn, First Voice of the Hollow Choir",
+    flavor: "Before the Choir sang to congregations that had stopped answering, it sang with one voice, and that voice has never gone hoarse and never gone quiet. Everything the cult has done since is only a chorus following where he already led.",
+    difficulty: 1887, durationMin: 228, xp: 1143000, renown: 114 },
+  { id: "cindrach", name: "Cindrach, the Ash-Crowned",
+    flavor: "Emberfall did not merely burn; something in it learned to keep burning, and what walks out of the inner ruins now is ash held together by nothing but intent. Whatever it touches goes grey first, and only much later goes cold.",
+    difficulty: 2265, durationMin: 253, xp: 1486000, renown: 149 },
+  { id: "vespera", name: "Vespera, Queen of the Eternal Night",
+    flavor: "She holds no court and rules no land — she rules an hour, the one just after dusk, which never quite ends anywhere she has been. Armies that march on her at dawn arrive in the dark, whatever the sky was doing when they set out.",
+    difficulty: 2718, durationMin: 281, xp: 1931000, renown: 193 },
+  { id: "ballaster", name: "Ballaster, the Watchman Who Answered",
+    flavor: "He stood the long watch at the seam for forty years and rang his bell each night to say the world was still whole. On the last night something on the far side rang back, and he opened the door to be polite.",
+    difficulty: 3261, durationMin: 312, xp: 2511000, renown: 251 },
+  { id: "kaeloth", name: "Kaeloth, Shadow of the Unmade King",
+    flavor: "Sealed beneath the Peaks, unsealed, sealed again — the realm has spent its entire recorded history losing ground to him one careful inch at a time. He is not the thing the Threshold was built to hold. He is the part of it that got through.",
+    difficulty: 3913, durationMin: 346, xp: 3264000, renown: 327 },
+  { id: "vaurn", name: "Vaurn, What Breathes Back",
+    flavor: "The Threshold breathes, and something breathes back. This is that something, and it has been on the far side of the seam long enough to learn the rhythm of ours. It was never sealed in — it has simply never had a reason to come through, and a hero climbing toward it is a reason.",
+    difficulty: 4696, durationMin: 384, xp: 4243000, renown: 425 }
 ];
 
 /* ================================================================
@@ -2532,7 +2624,9 @@ const ACHIEVEMENTS = [
   { id: "xp_10m", stat: "xpEarned", threshold: 10000000, title: "the Seasoned",
     desc: "Earn 10,000,000 XP over your lifetime.", bonus: { key: "xpMult", value: 1.02 }, bonusText: "+2% XP from all sources" },
   { id: "mythic_1", stat: "mythicsFound", threshold: 1, title: "the Hour-Lost",
-    desc: "Return from the Forgotten Beyond bearing a Mythic weapon.", bonus: { key: "dropMult", value: 1.04 }, bonusText: "+4% item drop chance" }
+    desc: "Return from the Forgotten Beyond bearing a Mythic weapon.", bonus: { key: "dropMult", value: 1.04 }, bonusText: "+4% item drop chance" },
+  { id: "worldboss_1", stat: "worldBossesFelled", threshold: 1, title: "the Name-Taker",
+    desc: "Fell a World Boss.", bonus: { key: "injuryChanceMult", value: 0.97 }, bonusText: "-3% injury chance" }
 ];
 
 const ARENA_MONSTERS = {
@@ -2548,6 +2642,15 @@ const CONTENT_FAILURE_REWARD_FRACTION = 0.30; // failure pays 30% xp/gold, no re
 const QUEST_DROP_ROLLS = 2;                   // quest missions carry no dropRolls in data
 const QUEST_DROP_TIER_BONUS = 1;
 
+// World bosses replace the two constants above for their type only, and
+// nothing else about the resolve changes: both are still multiplied by
+// getInjuryChanceMultiplier(hero) AND by the surplus safety multiplier,
+// exactly as ordinary content is. A world boss is dangerous whether it
+// falls or not — that is the price of the renown, which is the only thing
+// it pays.
+const WORLDBOSS_INJURY_CHANCE_SUCCESS = 0.35;  // vs 0.10 for ordinary content
+const WORLDBOSS_INJURY_CHANCE_FAILURE = 0.85;  // vs 0.60
+
 // The Forgotten Beyond (any def with mythicSource) — every number below is
 // per ROLLED HOUR of the span the expedition drew at start, derived at
 // resolve time from endsAt - startedAt. Nothing here is persisted.
@@ -2560,22 +2663,44 @@ const MYTHIC_CHANCE_MAX = 0.75;      // at the 6-hour ceiling — a hard cap
 // Arena tuning.
 const ARENA_MONSTER_POWER_BASE = 0.6;    // monster power = hero power × (base + step × fightNumber)
 const ARENA_MONSTER_POWER_STEP = 0.12;
-// xp per win = zone xp/hour × this × fightNumber; gold uses the SAME fraction
-// against the zone's goldPerHour, so the two always move together. Sized by
-// simulation (see the Arena note in the POWER MODEL block): a run averages
-// 2.83 wins / 3.52 fights / ~35s and banks ~4.52 zone-hours of xp after the
-// survival bonus. Every run ends in exactly one guaranteed injury, worth ~3h
-// of forgone questing (two runs → two injuries → one 6h long rest), so the
-// run's EFFECTIVE rate is 4.52 zone-hours / 3.01h ≈ 1.50× the hero's questing
-// rate — deliberately above idling, and the price of that is the wound.
-const ARENA_XP_ZONE_FRACTION = 0.50;
+// xp per win = zone xp/hour × this × fightNumber. Sized by simulation (see the
+// Arena note in the POWER MODEL block): a run averages 2.85 wins / 3.56 fights
+// / ~35.6s and banks ~3.62 zone-hours of xp after the survival bonus. Every run
+// ends in exactly one guaranteed injury, worth ~3h of forgone questing (two runs
+// → two injuries → one 6h long rest), so the run's EFFECTIVE rate is 3.62
+// zone-hours / 3.01h ≈ 1.21× the hero's questing rate — deliberately above
+// idling, and the price of that is the wound.
+const ARENA_XP_ZONE_FRACTION = 0.40;
+// gold per win = zone gold/hour × THIS × fightNumber — deliberately a separate,
+// far smaller constant, NOT ARENA_XP_ZONE_FRACTION.
+//
+// ⚠ DO NOT raise this or re-merge it with the xp fraction. Arena rewards are
+// multiplied by getRewardMultiplier (evolution perk × stacked `spoils` buffs ×
+// achievements — up to ~1.94) and by the survival bonus, while medicHealCost is
+// priced on getGoldMultiplier × getRestTimeMultiplier only. Every restTimeMult
+// reducer (Cleric/Paladin perk, stacked `restful` buffs, relic/weapon affix,
+// renown milestone, Restless Vigor boons, achievement — down to ~0.19) therefore
+// CUTS the tithe while reward-stacking RAISES arena income. At the old shared
+// 0.50 an optimised Paladin banked 4.58× a temple heal per 40-second run, so the
+// injury that is supposed to end every run cost nothing and the Arena became an
+// unlimited xp faucet. At 0.015 that same build banks 0.137× a heal, and the
+// deliberately-illegal maximum-stacking superposition still only reaches 0.223×
+// — the "farm the Arena, tithe the wound away" loop is closed by construction
+// rather than by the margin between two independently-drifting numbers.
+const ARENA_GOLD_ZONE_FRACTION = 0.015;
 const ARENA_INJURY_CHANCE_BASE = 0.04;   // injury roll after a win: (base + step × fightNumber) × injury mult
 const ARENA_INJURY_CHANCE_STEP = 0.03;
 // +1 banked renown per this many fights won. At 3 nearly half of all runs paid
-// ZERO renown despite always costing an injury; at 2 that share falls to ~17%
-// and a run averages ~1.18 renown — still far below a level-appropriate
-// dungeon's 4-8 per completion, so the Arena stays a minor renown source.
-const ARENA_RENOWN_FIGHT_INTERVAL = 2;
+// ZERO renown despite always costing an injury; at 2 that share fell to ~17% and
+// a run averaged ~1.18 renown. At 1 — renown on EVERY win — a run averages 3.87
+// after the survival bonus (resolveArenaRunEnd applies it to renown too), and
+// only the ~5% of runs that lose fight 1 outright pay nothing (fight 1 is pinned
+// at the 95% successChance clamp). Renown is now the axis the Arena is paid on,
+// since ARENA_GOLD_ZONE_FRACTION deliberately took gold off the table; even so
+// 1.29 renown per EFFECTIVE hour (the 3h injury dominates the 36s run) still sits
+// far under a level-appropriate dungeon's 7.6-12.5 on the same rest-inclusive
+// metric, so the Arena remains a secondary renown source, not the best one.
+const ARENA_RENOWN_FIGHT_INTERVAL = 1;
 const ARENA_EPITHET_INTERVAL = 5;        // every Nth fight's monster carries an epithet
 const ARENA_COMBAT_LOG_LINES = 6;
 const ARENA_FIGHT_MS = 10 * 1000;        // each Arena fight auto-resolves 10s after it begins
@@ -2584,7 +2709,7 @@ const ARENA_FIGHT_MS = 10 * 1000;        // each Arena fight auto-resolves 10s a
 // run cannot exceed 32 fights at all, and the loop exits at the first
 // injury/defeat anyway because the run ends and activity returns to idle.
 const ARENA_MAX_FIGHTS_PER_CATCHUP = 5000;
-const ARENA_SURVIVAL_BONUS_MAX = 0.5;    // run-end survival multiplier ramps from +0% up to this (+50%) on banked xp/gold
+const ARENA_SURVIVAL_BONUS_MAX = 0.5;    // run-end survival multiplier ramps from +0% up to this (+50%) on banked xp/gold/renown
 // ...reaching the cap after surviving this many fights. At 10 the ramp was
 // dead copy: runs average 2.83 wins, so it paid only +14% on average and 0.01%
 // of runs ever saw the cap. At 5 the ladder is felt inside a realistic run
@@ -2819,7 +2944,11 @@ function createDefaultState(name, raceId, classId){
   // Avoid repeating the arc the retiring hero just finished, if one is on
   // record (src.lastArcId, transient — see normalizeLegacy/performRebirth).
   if (src.lastArcId) hero.campaignArc = pickCampaignArc(src.lastArcId);
-  const legacy = { rebirths: src.rebirths, boons: src.boons, legends: src.legends, totals: src.totals, achievements: src.achievements };
+  // ⚠ Enumerated field-by-field, same trap as normalizeLegacy and
+  // buildSavePayload: a legacy field missing here is silently dropped the
+  // moment a new hero is created after a rebirth. worldBossFirsts is
+  // account-wide and must survive that transition.
+  const legacy = { rebirths: src.rebirths, boons: src.boons, legends: src.legends, totals: src.totals, achievements: src.achievements, worldBossFirsts: src.worldBossFirsts };
   pendingRebirthLegacy = null;
 
   return {
@@ -2830,6 +2959,10 @@ function createDefaultState(name, raceId, classId){
     shop: { stock: [], nextRestockAt: 0 },
     pendingEncounters: [],
     questProgress: 0, // number of completed story chapters (0-10)
+    // World bosses felled by THIS hero (0-10). Per-hero, exactly like
+    // questProgress — a fresh hero starts the ladder from the bottom. Only
+    // legacy.worldBossFirsts is account-wide.
+    worldBossProgress: 0,
     stats: createEmptyStats(),
     legacy: legacy,   // { rebirths, boons:[boonId], legends:[legendRecord] } — Rebirth (prestige)
     lastTick: Date.now()
@@ -2838,7 +2971,10 @@ function createDefaultState(name, raceId, classId){
 
 // Fresh, empty prestige legacy — a hero who has never reborn.
 function createEmptyLegacy(){
-  return { rebirths: 0, boons: [], legends: [], totals: createEmptyStats(), achievements: [] };
+  // worldBossFirsts: { [bossId]: { heroName, at } } — who first felled each
+  // World Boss, account-wide and never overwritten by a later kill of the
+  // same boss. See applyTimedContentProgress.
+  return { rebirths: 0, boons: [], legends: [], totals: createEmptyStats(), achievements: [], worldBossFirsts: {} };
 }
 
 // Coerce any stored/partial legacy blob into a well-formed one. Preserves
@@ -2865,6 +3001,16 @@ function normalizeLegacy(legacy){
       });
     }
     if (Array.isArray(legacy.achievements)) l.achievements = legacy.achievements.slice();
+    // Copied entry-by-entry with a shape guard, so a hand-edited or partial
+    // blob can never put a malformed record into the Hall's roll.
+    if (legacy.worldBossFirsts && typeof legacy.worldBossFirsts === "object"){
+      Object.keys(legacy.worldBossFirsts).forEach(k => {
+        const rec = legacy.worldBossFirsts[k];
+        if (rec && typeof rec === "object" && typeof rec.heroName === "string"){
+          l.worldBossFirsts[k] = { heroName: rec.heroName, at: (typeof rec.at === "number") ? rec.at : 0 };
+        }
+      });
+    }
   }
   return l;
 }
@@ -2906,7 +3052,7 @@ function createEmptyStats(){
     dungeonsCompleted: 0, dungeonsFailed: 0,
     raidsCompleted: 0, raidsFailed: 0,
     questChaptersCompleted: 0, restsCompleted: 0,
-    mythicsFound: 0
+    mythicsFound: 0, worldBossesFelled: 0
   };
 }
 
@@ -3823,7 +3969,7 @@ function applyProgress(elapsedMs, opts){
     applyTrainingProgressWithCap(elapsedMs, maxDrops, summary);
   } else if (activity.type === "rest"){
     applyRestProgress(summary);
-  } else if (activity.type === "dungeon" || activity.type === "raid" || activity.type === "quest"){
+  } else if (activity.type === "dungeon" || activity.type === "raid" || activity.type === "quest" || activity.type === "worldboss"){
     applyTimedContentProgress(summary);
   } else if (activity.type === "arena"){
     // Fights resolve automatically as elapsed time crosses each
@@ -3892,6 +4038,11 @@ function applyRestProgress(summary){
 function getTimedContentDef(type, contentId){
   if (type === "dungeon") return DUNGEONS.find(d => d.id === contentId) || null;
   if (type === "raid") return RAIDS.find(r => r.id === contentId) || null;
+  // A world boss def is already flat and deliberately carries no gold,
+  // dropRolls, dropTierBonus or levelReq — the ladder is gated on campaign
+  // completion and the previous rung, not on level. Returned as-authored so
+  // nothing downstream can read a reward off it that doesn't exist.
+  if (type === "worldboss") return WORLD_BOSSES.find(b => b.id === contentId) || null;
   if (type === "quest"){
     const ch = campaignChapters().find(q => q.id === contentId);
     if (!ch) return null;
@@ -3905,9 +4056,19 @@ function getTimedContentDef(type, contentId){
   return null;
 }
 
+// Display name for a timed-content type. One place, so the chronicle line,
+// the result modal, the welcome-back note and the hero panel can never
+// disagree about what a run was.
+function contentTypeLabel(type){
+  if (type === "dungeon") return "Dungeon";
+  if (type === "raid") return "Raid";
+  if (type === "worldboss") return "World Boss";
+  return "Campaign";
+}
+
 function isBusyWithContent(){
   const t = state.activity.type;
-  return t === "dungeon" || t === "raid" || t === "quest" || t === "arena";
+  return t === "dungeon" || t === "raid" || t === "quest" || t === "arena" || t === "worldboss";
 }
 
 // Like rest, timed content doesn't scale with elapsedMs — it resolves
@@ -3940,9 +4101,12 @@ function applyTimedContentProgress(summary){
   // endsAt - startedAt already persists. `activity` is the pre-reset object
   // captured above, so both timestamps are still readable here.
   const rolledMs = Math.max(0, (activity.endsAt || 0) - (activity.startedAt || 0));
+  // A world boss pays XP and renown ONLY — its def carries no gold field at
+  // all, so the 0 here is the authoritative value, not a fallback.
+  const isWorldBoss = type === "worldboss";
   const basePay = def.mythicSource
     ? mythicContentRewards(def, rolledMs)
-    : { xp: def.xp, gold: def.gold, renown: def.renown };
+    : { xp: def.xp, gold: isWorldBoss ? 0 : def.gold, renown: def.renown };
   let xpGain = basePay.xp * rewardMult * getXpMultiplier(hero);
   let goldGain = basePay.gold * rewardMult * getGoldMultiplier(hero);
   let renownGain = basePay.renown;
@@ -3950,7 +4114,13 @@ function applyTimedContentProgress(summary){
   let mythicItem = null;
   let injured = false;
 
-  if (success){
+  if (success && isWorldBoss){
+    // A world boss yields NO gear of any kind — not a roll, not a tier, not
+    // a mythic. The drop block below is skipped outright rather than left to
+    // depend on dropRolls being absent from the def, so no future edit to
+    // the ladder data can accidentally start handing out loot.
+    injured = Math.random() < WORLDBOSS_INJURY_CHANCE_SUCCESS * getInjuryChanceMultiplier(hero) * safetyMult;
+  } else if (success){
     // dropRolls guaranteed drops, tier weights shifted up by dropTierBonus,
     // then slid toward the content's own tier in proportion to surplus (see
     // contentDropTier): an expedition you have genuinely outgrown can only
@@ -3982,12 +4152,13 @@ function applyTimedContentProgress(summary){
     xpGain *= CONTENT_FAILURE_REWARD_FRACTION;
     goldGain *= CONTENT_FAILURE_REWARD_FRACTION;
     renownGain = 0;
-    injured = Math.random() < CONTENT_INJURY_CHANCE_FAILURE * getInjuryChanceMultiplier(hero) * safetyMult;
+    injured = Math.random() < (isWorldBoss ? WORLDBOSS_INJURY_CHANCE_FAILURE : CONTENT_INJURY_CHANCE_FAILURE) * getInjuryChanceMultiplier(hero) * safetyMult;
   }
 
   if (state.stats){
     if (type === "dungeon") state.stats[success ? "dungeonsCompleted" : "dungeonsFailed"] += 1;
     else if (type === "raid") state.stats[success ? "raidsCompleted" : "raidsFailed"] += 1;
+    else if (isWorldBoss && success) state.stats.worldBossesFelled = (state.stats.worldBossesFelled || 0) + 1;
   }
 
   summary.xpGained += xpGain;
@@ -3997,11 +4168,28 @@ function applyTimedContentProgress(summary){
   awardRenown(hero, renownGain);
   summary.itemsFound = summary.itemsFound.concat(items);
 
-  const typeLabel = type === "dungeon" ? "Dungeon" : type === "raid" ? "Raid" : "Campaign";
+  const typeLabel = contentTypeLabel(type);
   addLog(typeLabel + " — " + def.name + ": " + (success ? "Success!" : "Failure.") +
-    " +" + fmtNumber(xpGain) + " xp, +" + fmtNumber(goldGain) + " gold" +
+    " +" + fmtNumber(xpGain) + " xp" + (isWorldBoss ? "" : ", +" + fmtNumber(goldGain) + " gold") +
     (renownGain > 0 ? ", +" + renownGain + " renown" : "") + ".",
     success ? "zone" : "system");
+
+  if (isWorldBoss && success){
+    // Advance the ladder only if this boss is still the frontier (mirrors
+    // the campaign spine's guard below) — re-felling an already-beaten rung
+    // must never push the hero past the next unbeaten one.
+    const idx = WORLD_BOSSES.findIndex(b => b.id === def.id);
+    if (idx === (state.worldBossProgress || 0)) state.worldBossProgress = idx + 1;
+    // Account-wide first-blood record. Written ONCE per boss, ever: a later
+    // kill by this or any future hero leaves the original name standing.
+    if (state.legacy){
+      if (!state.legacy.worldBossFirsts || typeof state.legacy.worldBossFirsts !== "object") state.legacy.worldBossFirsts = {};
+      if (!state.legacy.worldBossFirsts[def.id]){
+        state.legacy.worldBossFirsts[def.id] = { heroName: hero.name, at: Date.now() };
+        addLog("The realm will remember it was " + hero.name + " who first felled " + def.name + ".", "levelup");
+      }
+    }
+  }
 
   let outro = null;
   if (type === "quest"){
@@ -4104,6 +4292,7 @@ function buildSavePayload(){
     shop: state.shop,
     pendingEncounters: state.pendingEncounters || [],
     questProgress: state.questProgress || 0,
+    worldBossProgress: state.worldBossProgress || 0,
     stats: state.stats || createEmptyStats(),
     // Rebirth (prestige) + achievements. Only these canonical fields persist
     // on a normal save — the transient pendingInheritance lives solely on a
@@ -4116,7 +4305,8 @@ function buildSavePayload(){
       boons: (state.legacy && Array.isArray(state.legacy.boons)) ? state.legacy.boons : [],
       legends: (state.legacy && Array.isArray(state.legacy.legends)) ? state.legacy.legends : [],
       totals: (state.legacy && state.legacy.totals) ? state.legacy.totals : createEmptyStats(),
-      achievements: (state.legacy && Array.isArray(state.legacy.achievements)) ? state.legacy.achievements : []
+      achievements: (state.legacy && Array.isArray(state.legacy.achievements)) ? state.legacy.achievements : [],
+      worldBossFirsts: (state.legacy && state.legacy.worldBossFirsts && typeof state.legacy.worldBossFirsts === "object") ? state.legacy.worldBossFirsts : {}
     },
     lastTick: Date.now()
   };
@@ -4200,6 +4390,7 @@ function migrateSave(data){
   if (d.version === 9) d = migrateV9toV10(d);
   if (d.version === 10) d = migrateV10toV11(d);
   if (d.version === 11) d = migrateV11toV12(d);
+  if (d.version === 12) d = migrateV12toV13(d);
   return d;
 }
 
@@ -4410,6 +4601,30 @@ function migrateV11toV12(data){
   return data;
 }
 
+// v13 adds the World Boss ladder. Three new fields, seeded in every place
+// they are read from:
+//   • data.worldBossProgress — per-hero rung count, resets on rebirth like
+//     questProgress. An existing hero has climbed nothing, so 0.
+//   • data.legacy.worldBossFirsts — account-wide roll of first-killers.
+//     normalizeLegacy would coerce a missing one on the next boot, but the
+//     Hall panel reads it on the very first render after load.
+//   • worldBossesFelled on BOTH data.stats and data.legacy.totals — same
+//     reason as migrateV11toV12's mythicsFound: getAchievementProgress sums
+//     the two, and a missing key on either side reads undefined.
+// No backfill is possible or needed — no world boss could have been felled
+// before this version existed, so 0 is the true figure for every save.
+function migrateV12toV13(data){
+  if (typeof data.worldBossProgress !== "number") data.worldBossProgress = 0;
+  if (!data.stats || typeof data.stats !== "object") data.stats = createEmptyStats();
+  if (typeof data.stats.worldBossesFelled !== "number") data.stats.worldBossesFelled = 0;
+  if (!data.legacy || typeof data.legacy !== "object") data.legacy = createEmptyLegacy();
+  if (!data.legacy.totals || typeof data.legacy.totals !== "object") data.legacy.totals = createEmptyStats();
+  if (typeof data.legacy.totals.worldBossesFelled !== "number") data.legacy.totals.worldBossesFelled = 0;
+  if (!data.legacy.worldBossFirsts || typeof data.legacy.worldBossFirsts !== "object") data.legacy.worldBossFirsts = {};
+  data.version = 13;
+  return data;
+}
+
 function migrateItemToGear(item, hero){
   if (item.slot) return item; // already gear-shaped, leave as-is
   const slot = SLOTS[Math.floor(Math.random() * SLOTS.length)];
@@ -4514,7 +4729,7 @@ function applyOfflineProgress(){
   // the hero sits idle for the remainder of the gap.
   const rawBoundaries = (state.hero.buffs || []).map(b => b.expiresAt);
   const a = state.activity;
-  if ((a.type === "rest" || a.type === "dungeon" || a.type === "raid" || a.type === "quest") && a.endsAt){
+  if ((a.type === "rest" || a.type === "dungeon" || a.type === "raid" || a.type === "quest" || a.type === "worldboss") && a.endsAt){
     rawBoundaries.push(a.endsAt);
   } else if (a.type === "training"){
     rawBoundaries.push(a.startedAt + TRAINING_CAP_MS);
@@ -4604,6 +4819,12 @@ const ICON_ART = {
   raids: '<path d="M6 3.5 V21"/><path d="M6 5 H19 l-3 3.5 3 3.5 H6"/><path d="M11 7 l2 1.5 -2 1.5"/><circle cx="6" cy="3" r="1"/>',
   campaign: '<path d="M12 6.5 C9.5 5 6.5 5 4 6 V18.5 C6.5 17.5 9.5 17.5 12 19 C14.5 17.5 17.5 17.5 20 18.5 V6 C17.5 5 14.5 5 12 6.5 Z"/><path d="M12 6.5 V19"/><path d="M6.5 9 h3 M6.5 11.5 h3 M14.5 9 h3 M14.5 11.5 h3"/>',
   arena: '<path d="M3 21 V13 a9 9 0 0 1 18 0 V21 Z"/><path d="M3.5 16 h17"/><path d="M7 21 v-2 a1.5 1.5 0 0 1 3 0 v2 M10.5 21 v-2 a1.5 1.5 0 0 1 3 0 v2 M14 21 v-2 a1.5 1.5 0 0 1 3 0 v2"/>',
+  // A horned skull — nothing else in the set is a face, so it can't be
+  // confused with the portcullis (dungeons), the banner (raids) or the
+  // colosseum (arena). Bbox ~14.8 x 16.6 centred near 12,11.5, in line with
+  // its neighbours; the sockets are circles rather than dashes so they stay
+  // legible at the 15px subtab size.
+  worldboss: '<path d="M8.2 8.4 C5.6 7.4 4.2 5.4 4.6 3.2 C7 3.8 8.8 5.4 9.4 7.6"/><path d="M15.8 8.4 C18.4 7.4 19.8 5.4 19.4 3.2 C17 3.8 15.2 5.4 14.6 7.6"/><path d="M7 13.6 a5 5 0 0 1 10 0 v1.7 a2.5 2.5 0 0 1 -1.3 2.2 L12 19.6 L8.3 17.5 A2.5 2.5 0 0 1 7 15.3 Z"/><circle cx="10" cy="13.4" r="1"/><circle cx="14" cy="13.4" r="1"/><path d="M12 15.4 v1.7"/>',
   // --- Gear slots (registry only; gear-panel agent consumes these) ---
   weapon: '<path d="M12 2.5 L13.4 5 V13 H10.6 V5 Z"/><path d="M8 14 H16"/><path d="M12 14 V19.4"/><circle cx="12" cy="20.7" r="1.3"/>',
   helm: '<path d="M4.5 16 a7.5 7.5 0 0 1 15 0"/><path d="M4.5 16 h15"/><path d="M12 8.5 V19.5"/>',
@@ -4983,12 +5204,13 @@ function renderHeroPanel(){
     const remaining = Math.max(0, act.endsAt - Date.now());
     activityEl.textContent = (act.restKind === "short" ? "Resting (short)" : "Resting (long)");
     trackerEl.innerHTML = "<span class=\"activity-name\">Resting</span> — " + humanizeDuration(remaining) + " remaining";
-  } else if (act.type === "dungeon" || act.type === "raid" || act.type === "quest"){
+  } else if (act.type === "dungeon" || act.type === "raid" || act.type === "quest" || act.type === "worldboss"){
     const def = getTimedContentDef(act.type, act.contentId);
-    const label = act.type === "dungeon" ? "Dungeon" : act.type === "raid" ? "Raid" : "Campaign";
+    const label = contentTypeLabel(act.type);
     const remaining = Math.max(0, act.endsAt - Date.now());
     activityEl.textContent = label + ": " + (def ? def.name : "Unknown") + " — " + fmtCountdown(remaining) + " left";
-    const verb = act.type === "dungeon" ? "Delving" : act.type === "raid" ? "Raiding" : "On campaign:";
+    const verb = act.type === "dungeon" ? "Delving" : act.type === "raid" ? "Raiding" :
+      act.type === "worldboss" ? "Hunting" : "On campaign:";
     trackerEl.innerHTML = verb + " <span class=\"activity-name\">" + escapeHtml(def ? def.name : "Unknown") + "</span> — " + humanizeDuration(remaining) + " remaining";
   } else if (act.type === "arena"){
     activityEl.textContent = "In the Arena — fight " + act.fightNumber;
@@ -5576,6 +5798,100 @@ function renderQuests(){
   });
 }
 
+/* ---- the World Boss ladder ---- */
+
+// Only ever renders TWO kinds of rung: the ones this hero has already
+// felled, and the single next unbeaten one. Everything past that is not
+// rendered at all — the names further up the ladder are the reveal, and
+// leaking them (even as a greyed-out row) would give the climb away.
+function renderWorldBosses(){
+  const hero = state.hero;
+  const power = computePower(hero);
+  const act = state.activity;
+  const progress = state.worldBossProgress || 0;
+  const unlocked = worldBossLadderUnlocked();
+  const activeId = (act.type === "worldboss") ? act.contentId : null;
+  const remaining = activeId ? Math.max(0, act.endsAt - Date.now()) : 0;
+  const sig = unlocked + "|" + progress + "|" + (state.questProgress || 0) + "|" + power + "|" +
+    act.type + "|" + activeId + "|" + Math.floor(remaining / 1000) + "|" +
+    (hero.injuries >= MAX_INJURIES) + "|" + getTimerMultiplier(hero);
+  if (contentRenderSigs["worldboss-list"] === sig) return;
+  contentRenderSigs["worldboss-list"] = sig;
+
+  const list = document.getElementById("worldboss-list");
+  list.innerHTML = "";
+
+  if (!unlocked){
+    // Deliberately a locked CARD rather than an empty section: the player
+    // should know the ladder exists and exactly what opens it.
+    const done = Math.min(state.questProgress || 0, CAMPAIGN_SPINE.length);
+    const card = document.createElement("div");
+    card.className = "quest-current locked";
+    card.innerHTML =
+      "<h4 class=\"content-title\">The list stays closed</h4>" +
+      "<div class=\"quest-intro\">There are things abroad in the realm that outlived every army sent against them, and the Wardenry does not hand their names to just anyone. Finish your story first — see the Campaign through to its last chapter — and the list will be opened to you.</div>" +
+      "<div class=\"zone-req\">Campaign chapters completed: " + done + " / " + CAMPAIGN_SPINE.length + "</div>";
+    list.appendChild(card);
+    return;
+  }
+
+  WORLD_BOSSES.forEach((def, i) => {
+    if (i > progress) return; // never render an unreached rung — the name is the spoiler
+    if (i < progress){
+      const row = document.createElement("div");
+      row.className = "quest-chapter-done";
+      row.innerHTML = "<span class=\"check\">&#10003;</span> " + escapeHtml(def.name) + " — felled";
+      list.appendChild(row);
+      return;
+    }
+
+    const active = def.id === activeId;
+    const reason = timedContentBlockReason("worldboss", def);
+    const locked = !!reason && !active;
+    const ratio = power / def.difficulty;
+    const band = contentBandInfo(ratio);
+    const chancePct = Math.round(successChance(ratio) * 100);
+    const dur = active ? Math.max(0, act.endsAt - act.startedAt) : timedContentDurationMs(hero, def);
+
+    const card = document.createElement("div");
+    card.className = "zone-card" + (locked ? " locked" : "") + (active ? " active" : "");
+    card.innerHTML =
+      "<div class=\"zone-info\">" +
+        "<div class=\"zone-name-row\"><h4 class=\"content-title\">" + escapeHtml(def.name) + "</h4>" +
+          "<span class=\"tier-badge\">" + escapeHtml(humanizeDuration(dur)) + "</span></div>" +
+        "<div class=\"content-flavor\">" + escapeHtml(def.flavor || "") + "</div>" +
+        "<div class=\"zone-req\">The " + ordinal(i + 1) + " name on the list</div>" +
+        "<div class=\"zone-stats\">" +
+          "<span><b>" + fmtNumber(def.xp) + "</b> xp</span>" +
+          "<span style=\"color:var(--gold-bright)\"><b>" + def.renown + "</b> renown</span>" +
+          "<span class=\"content-band\" style=\"color:" + band.color + "\">" + band.label + " (" + chancePct + "%)</span>" +
+        "</div>" +
+        "<div class=\"content-flavor\" style=\"color:var(--red)\">No gear. No gold. " +
+          Math.round(WORLDBOSS_INJURY_CHANCE_SUCCESS * 100) + "% chance of a wound even if it falls, " +
+          Math.round(WORLDBOSS_INJURY_CHANCE_FAILURE * 100) + "% if it does not.</div>" +
+      "</div>" +
+      "<div class=\"zone-action\">" +
+        (active ? "<span class=\"content-countdown\">" + fmtCountdown(remaining) + "</span>" :
+          reason ? "<span style=\"color:var(--text-muted); font-size:0.78rem;\" title=\"" + escapeHtml(reason) + "\">" + escapeHtml(reason) + "</span>" :
+          "<button class=\"btn small\" data-worldboss-start=\"" + def.id + "\">Set out</button>") +
+      "</div>";
+    list.appendChild(card);
+  });
+
+  if (progress >= WORLD_BOSSES.length){
+    const row = document.createElement("div");
+    row.className = "quest-current";
+    row.innerHTML = "<h4>The list is finished.</h4><div class=\"quest-intro\">" +
+      escapeHtml("Every name the realm could not kill has been crossed out by one hand. There is nothing left on the far side of the seam that has not already met you. Whatever comes next, the Hall will have to invent a word for it.") +
+      "</div>";
+    list.appendChild(row);
+  }
+
+  list.querySelectorAll("[data-worldboss-start]").forEach(btn => {
+    btn.addEventListener("click", () => startTimedContent("worldboss", btn.dataset.worldbossStart));
+  });
+}
+
 function renderArena(){
   const hero = state.hero;
   const act = state.activity;
@@ -5938,7 +6254,8 @@ function renderStatsPanel(){
     ["Raids failed", fmtNumber(s.raidsFailed)],
     ["Campaign chapters completed", fmtNumber(s.questChaptersCompleted)],
     ["Rests completed", fmtNumber(s.restsCompleted)],
-    ["Mythic weapons found", fmtNumber(s.mythicsFound || 0)]
+    ["Mythic weapons found", fmtNumber(s.mythicsFound || 0)],
+    ["World Bosses felled", fmtNumber(s.worldBossesFelled || 0)]
   ];
   document.getElementById("stats-body").innerHTML =
     rows.map(r => "<div class=\"k\">" + r[0] + "</div><div class=\"v\">" + r[1] + "</div>").join("");
@@ -5979,6 +6296,45 @@ function renderLegendsPanel(){
   }
 
   document.getElementById("legends-body").innerHTML = html;
+}
+
+// Character > Stats — the account-wide World Boss record. Unlike the ladder
+// panel on the Adventure tab, this is a HISTORY: it shows only names that
+// have actually been felled by somebody, so it still never reveals a rung
+// nobody has reached. Derived entirely from legacy.worldBossFirsts (which
+// survives every rebirth); state.worldBossProgress is this hero's own
+// progress and is deliberately not consulted here.
+function renderWorldBossHallPanel(){
+  const firsts = normalizeLegacy(state.legacy).worldBossFirsts;
+  const felled = WORLD_BOSSES.map((def, i) => ({ def: def, idx: i, rec: firsts[def.id] })).filter(e => e.rec);
+  const sig = felled.map(e => e.def.id + ":" + e.rec.heroName + ":" + e.rec.at).join("|");
+  if (contentRenderSigs["worldboss-hall-body"] === sig) return;
+  contentRenderSigs["worldboss-hall-body"] = sig;
+
+  const el = document.getElementById("worldboss-hall-body");
+  if (felled.length === 0){
+    el.innerHTML = "<div class=\"legend-empty\">Not one of them has fallen. The list is exactly as long as it was.</div>" +
+      "<div class=\"legend-empty-hint\">Complete the Campaign to be shown the first name.</div>";
+    return;
+  }
+
+  // Highest RUNG reached account-wide, not simply the newest kill.
+  const highest = felled[felled.length - 1];
+  let html =
+    "<div class=\"legend-boons-line\"><b>Highest felled:</b> <span class=\"b\">" + escapeHtml(highest.def.name) + "</span>" +
+    " — the " + ordinal(highest.idx + 1) + " of " + WORLD_BOSSES.length + " names, first by " +
+    escapeHtml(highest.rec.heroName) + ".</div>";
+
+  html += "<div class=\"legend-list\">" + felled.map(e => {
+    const dateStr = e.rec.at ? new Date(e.rec.at).toLocaleDateString() : "";
+    return "<div class=\"legend-card\"><div class=\"legend-card-body\">" +
+      "<div class=\"legend-name\">" + escapeHtml(e.def.name) + "</div>" +
+      "<div class=\"legend-line\">The " + ordinal(e.idx + 1) + " name — first felled by " + escapeHtml(e.rec.heroName) + "</div>" +
+      (dateStr ? "<div class=\"legend-date\">" + escapeHtml(dateStr) + "</div>" : "") +
+      "</div></div>";
+  }).join("") + "</div>";
+
+  el.innerHTML = html;
 }
 
 // One retired hero's card. Reads only the legend record — race/class/
@@ -6366,7 +6722,7 @@ function wireEncounterModal(){
 /* ---- content result modal (dungeon / raid / quest resolution) ---- */
 
 function showContentResultModal(result){
-  const typeLabel = result.type === "dungeon" ? "Dungeon" : result.type === "raid" ? "Raid" : "Campaign";
+  const typeLabel = contentTypeLabel(result.type);
   document.getElementById("cr-title").textContent = typeLabel + ": " + result.name;
   const outcomeEl = document.getElementById("cr-outcome");
   outcomeEl.textContent = result.success ? "Success!" : "Failure";
@@ -6460,8 +6816,13 @@ function showArenaResultModal(result){
   document.getElementById("ar-gold").textContent = fmtNumber(result.gold);
   document.getElementById("ar-renown").textContent = result.renown > 0 ? "+" + result.renown : "0";
   const bf = result.bonusFraction || 0;
+  // The bonus line itemises every currency it actually moved. Renown is rounded
+  // (see resolveArenaRunEnd), so bonusRenown can be 0 even with bf > 0 — list it
+  // only when the rounding actually paid out, rather than showing "+0 renown".
+  const br = result.bonusRenown || 0;
   document.getElementById("ar-bonus").textContent = bf > 0
-    ? "×" + (1 + bf).toFixed(2) + " (+" + fmtNumber(result.bonusXp || 0) + " xp, +" + fmtNumber(result.bonusGold || 0) + " gold)"
+    ? "×" + (1 + bf).toFixed(2) + " (+" + fmtNumber(result.bonusXp || 0) + " xp, +" + fmtNumber(result.bonusGold || 0) + " gold" +
+      (br > 0 ? ", +" + br + " renown" : "") + ")"
     : "—";
   document.getElementById("arena-result-modal").classList.remove("hidden");
 }
@@ -6478,7 +6839,7 @@ function wireCodexModal(){
   });
 }
 
-const ADV_SUBTABS = ["training", "dungeons", "raids", "quests", "arena"];
+const ADV_SUBTABS = ["training", "dungeons", "raids", "quests", "arena", "worldboss"];
 
 // Shared by manual subtab clicks, the "one-tap continuity" auto-select on
 // Adventure tab entry, and boot-time restore — keeps all three in sync
@@ -6624,6 +6985,7 @@ function render(){
   renderTimedContentList("dungeon", DUNGEONS, "dungeon-list");
   renderTimedContentList("raid", RAIDS, "raid-list");
   renderQuests();
+  renderWorldBosses();
   renderArena();
   renderRenownPanel();
   renderTitlesPanel();
@@ -6632,6 +6994,7 @@ function render(){
   renderCharacterInfoPanel();
   renderStatsPanel();
   renderLegendsPanel();
+  renderWorldBossHallPanel();
   renderEvolutionBanner();
   renderInventory();
   renderEquipment();
@@ -6705,7 +7068,18 @@ function timedContentBlockReason(type, def){
     const idx = campaignChapters().findIndex(q => q.id === def.id);
     if (idx !== (state.questProgress || 0)) return "The story hasn't reached this chapter";
   }
+  if (type === "worldboss"){
+    if (!worldBossLadderUnlocked()) return "Complete the Campaign first";
+    const idx = WORLD_BOSSES.findIndex(b => b.id === def.id);
+    if (idx !== (state.worldBossProgress || 0)) return "Not the next name on the list";
+  }
   return null;
+}
+
+// The ladder opens only once THIS hero has seen the Campaign through to its
+// final chapter — the same gate rebirthAvailable() uses.
+function worldBossLadderUnlocked(){
+  return !!state && (state.questProgress || 0) >= CAMPAIGN_SPINE.length;
 }
 
 function startTimedContent(type, contentId){
@@ -6728,8 +7102,12 @@ function startTimedContent(type, contentId){
   const dur = rollTimedContentDurationMs(state.hero, def);
   state.activity = { type: type, contentId: contentId, startedAt: now, endsAt: now + dur };
 
-  const typeLabel = type === "dungeon" ? "the dungeon" : type === "raid" ? "the raid" : "the campaign";
-  addLog("Set out for " + typeLabel + " \"" + def.name + "\" (" + humanizeDuration(dur) + ").", "zone");
+  if (type === "worldboss"){
+    addLog("Set out to hunt " + def.name + " (" + humanizeDuration(dur) + ").", "zone");
+  } else {
+    const typeLabel = type === "dungeon" ? "the dungeon" : type === "raid" ? "the raid" : "the campaign";
+    addLog("Set out for " + typeLabel + " \"" + def.name + "\" (" + humanizeDuration(dur) + ").", "zone");
+  }
   saveGame();
   render();
 }
@@ -6822,12 +7200,16 @@ function resolveArenaFight(a){
     return { ended: true, reason: "defeat", fightNumber: a.fightNumber };
   }
 
-  // Win: bank rewards. Zone gold/hour is authored at half the zone's
-  // xp/hour, so using the same fraction gives "gold half that".
+  // Win: bank rewards. XP is the Arena's real payout and rides
+  // ARENA_XP_ZONE_FRACTION against the zone's xp/hour. Gold rides its OWN,
+  // far smaller ARENA_GOLD_ZONE_FRACTION against the zone's gold/hour — the two
+  // are deliberately decoupled so that reward-stacking (which lifts both terms
+  // below) can never lift arena gold to the point where it pays the Cleric
+  // Temple's heal tithe, which is priced without rewardMult. See the constants.
   const zone = arenaRewardZone(hero);
   const rewardMult = getRewardMultiplier(hero);
   const xpWin = zone.xpPerHour * ARENA_XP_ZONE_FRACTION * a.fightNumber * rewardMult * getXpMultiplier(hero);
-  const goldWin = zone.goldPerHour * ARENA_XP_ZONE_FRACTION * a.fightNumber * rewardMult * getGoldMultiplier(hero);
+  const goldWin = zone.goldPerHour * ARENA_GOLD_ZONE_FRACTION * a.fightNumber * rewardMult * getGoldMultiplier(hero);
   a.bankedXp += xpWin;
   a.bankedGold += goldWin;
   if (a.fightNumber % ARENA_RENOWN_FIGHT_INTERVAL === 0) a.bankedRenown += 1;
@@ -6872,22 +7254,29 @@ function resolveArenaRunEnd(reason, runData){
   const bankedRenown = runData.bankedRenown || 0;
   // Survival bonus: multiplier ramps from 1.0 up to 1 + ARENA_SURVIVAL_BONUS_MAX
   // across the first ARENA_SURVIVAL_BONUS_FIGHTS fights, then holds at the cap.
+  // Applies to all THREE banked currencies — renown included, since renown is
+  // what a deep run is actually paid in now that ARENA_GOLD_ZONE_FRACTION has
+  // taken gold off the table. Renown is integral everywhere else in the game
+  // (awardRenown, milestones, the renown panel), so it rounds rather than
+  // carrying a fraction: 5 wins → 5 banked × 1.50 → 8.
   const bonusFraction = Math.min(ARENA_SURVIVAL_BONUS_MAX, ARENA_SURVIVAL_BONUS_MAX * fightsWon / ARENA_SURVIVAL_BONUS_FIGHTS);
   const bonusXp = bankedXp * bonusFraction;
   const bonusGold = bankedGold * bonusFraction;
   const totalXp = bankedXp + bonusXp;
   const totalGold = bankedGold + bonusGold;
+  const totalRenown = Math.round(bankedRenown * (1 + bonusFraction));
+  const bonusRenown = totalRenown - bankedRenown;
   grantXp(hero, totalXp);
   awardGold(hero, totalGold);
-  awardRenown(hero, bankedRenown);
+  awardRenown(hero, totalRenown);
   const reasonText = reason === "injury" ? "carried out injured" : "beaten down";
   addLog("Arena run ends (" + reasonText + ") — " + fightsWon + " win" + (fightsWon === 1 ? "" : "s") +
     ", +" + fmtNumber(totalXp) + " xp, +" + fmtNumber(totalGold) + " gold" +
-    (bankedRenown > 0 ? ", +" + bankedRenown + " renown" : "") +
+    (totalRenown > 0 ? ", +" + totalRenown + " renown" : "") +
     (bonusFraction > 0 ? " (survival bonus ×" + (1 + bonusFraction).toFixed(2) + ")" : "") + ".",
     "system");
-  return { reason: reason, fightsWon: fightsWon, xp: totalXp, gold: totalGold, renown: bankedRenown,
-    bonusFraction: bonusFraction, bonusXp: bonusXp, bonusGold: bonusGold };
+  return { reason: reason, fightsWon: fightsWon, xp: totalXp, gold: totalGold, renown: totalRenown,
+    bonusFraction: bonusFraction, bonusXp: bonusXp, bonusGold: bonusGold, bonusRenown: bonusRenown };
 }
 
 // Dispatch target for activity.type === "arena". Resolves as many fights
@@ -7102,6 +7491,9 @@ function performRebirth(boonId){
     legends: prev.legends.concat([legend]),
     totals: foldedTotals,
     achievements: prev.achievements, // unlocked achievements are never lost
+    // The roll of first-killers is account-wide and outlives every hero on
+    // it — carried through untouched, exactly like achievements.
+    worldBossFirsts: prev.worldBossFirsts,
     pendingInheritance: rebirthInheritanceAmount(hero), // consumed by createDefaultState
     lastArcId: hero.campaignArc || null // consumed by createDefaultState to avoid a repeat arc
   };
@@ -7888,13 +8280,13 @@ function showWelcomeBackModal(summary){
   const contentNoteEl = document.getElementById("wb-content-note");
   const cr = summary.contentResolved;
   if (cr){
-    const typeLabel = cr.type === "dungeon" ? "dungeon" : cr.type === "raid" ? "raid" : "campaign";
+    const typeLabel = contentTypeLabel(cr.type).toLowerCase();
     const outcomeHtml = cr.success
       ? "<span style=\"color:var(--green)\">Success!</span>"
       : "<span style=\"color:var(--red)\">Failure.</span>";
     contentNoteEl.innerHTML =
       "Your " + typeLabel + ": " + escapeHtml(cr.name) + " — " + outcomeHtml +
-      " +" + fmtNumber(cr.xp) + " xp, +" + fmtNumber(cr.gold) + " gold" +
+      " +" + fmtNumber(cr.xp) + " xp" + (cr.type === "worldboss" ? "" : ", +" + fmtNumber(cr.gold) + " gold") +
       (cr.renown > 0 ? ", +" + cr.renown + " renown" : "") +
       (cr.items.length > 0 ? ", " + cr.items.length + " item" + (cr.items.length === 1 ? "" : "s") : "") +
       (cr.injured ? "<span style=\"color:var(--injury)\">. You were injured.</span>" : ".") +
@@ -7942,12 +8334,15 @@ function showWelcomeBackModal(summary){
   const ar = summary.arenaResolved;
   if (ar){
     const reasonText = ar.reason === "injury" ? "carried out injured" : "beaten down";
+    // ar.renown is already the survival-bonused, rounded total (resolveArenaRunEnd),
+    // same as ar.xp/ar.gold — the parenthetical just names the multiplier that
+    // produced all three.
     arenaNoteEl.textContent =
       "Your Arena run ended while you were away (" + reasonText + ") — " +
       ar.fightsWon + " win" + (ar.fightsWon === 1 ? "" : "s") + ", +" +
       fmtNumber(ar.xp) + " xp, +" + fmtNumber(ar.gold) + " gold" +
       (ar.renown > 0 ? ", +" + ar.renown + " renown" : "") +
-      ((ar.bonusFraction || 0) > 0 ? " (survival bonus ×" + (1 + ar.bonusFraction).toFixed(2) + ")" : "") + ".";
+      ((ar.bonusFraction || 0) > 0 ? " (survival bonus ×" + (1 + ar.bonusFraction).toFixed(2) + " on all three)" : "") + ".";
     arenaNoteEl.classList.remove("hidden");
   } else {
     arenaNoteEl.classList.add("hidden");
@@ -8035,6 +8430,7 @@ function boot(){
     shop: data.shop || { stock: [], nextRestockAt: 0 },
     pendingEncounters: Array.isArray(data.pendingEncounters) ? data.pendingEncounters : [],
     questProgress: (typeof data.questProgress === "number") ? data.questProgress : 0,
+    worldBossProgress: (typeof data.worldBossProgress === "number") ? data.worldBossProgress : 0,
     stats: data.stats || createEmptyStats(),
     legacy: normalizeLegacy(data.legacy),
     lastTick: data.lastTick || Date.now()
