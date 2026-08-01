@@ -166,6 +166,7 @@
   .pick-card .flavor{ font-style:italic; color:var(--parchment-dim); font-size:0.85rem; margin-bottom:0.5rem; }
   .pick-card .bonus{ font-size:0.83rem; color:var(--green); }
   .pick-card .bonus.inert{ color:var(--text-muted); }
+  .title-earned-line{ font-size:0.78rem; color:var(--text-muted); margin-bottom:0.35rem; }
   .pick-card .perks{ font-size:0.83rem; color:var(--green); }
   .pick-card .future{ margin-top:0.5rem; font-size:0.75rem; color:var(--text-muted); border-top:1px dashed var(--panel-border); padding-top:0.4rem; }
   .pick-card .weapon{ font-size:0.8rem; color:var(--parchment-dim); }
@@ -464,6 +465,18 @@
   .skill-card{
     background:var(--bg-1); border:1px solid var(--panel-border); border-radius:8px;
     padding:0.6rem 0.9rem; display:flex; flex-direction:column; gap:0.4rem;
+    transition:opacity 0.15s, border-color 0.15s, filter 0.15s;
+  }
+  /* Ready cards get a quiet affirmative accent so the eye lands on what's
+     usable; cooling (and the no-injuries-to-mend variant) desaturate and
+     dim so they visually recede without disappearing; active stays on its
+     existing gold treatment, distinct from both. */
+  .skill-card.ready{ border-color:var(--green); box-shadow:0 0 0 1px rgba(79,158,92,0.28); }
+  .skill-card.cooling, .skill-card.nomend{ opacity:0.6; filter:saturate(0.55); }
+  .skill-card.cooling .skill-card-head h4, .skill-card.nomend .skill-card-head h4{ color:var(--text-muted); }
+  .skill-card.active{
+    border-color:var(--gold); box-shadow:0 0 8px rgba(212,175,55,0.22);
+    background:linear-gradient(180deg, #2a2314, var(--bg-1));
   }
   .skill-card-head{ display:flex; justify-content:space-between; align-items:baseline; gap:0.6rem; flex-wrap:wrap; }
   .skill-card-head h4{ font-family:Georgia,'Times New Roman',serif; color:var(--gold-bright); font-size:1rem; margin:0; }
@@ -1270,7 +1283,27 @@ const ACTIVITY_SUBTAB_MAP = { training:"training", dungeon:"dungeons", raid:"rai
    powerMult = race power bonus (ignored here; assumed neutral race) *
                evolution perk powerMult (none pre-20, ~1.09 avg tier-2
                from level 20, ~1.15 avg tier-3 from level 40 — see
-               pendingEvolutionTier()). The three base classes (squire/
+               pendingEvolutionTier()).
+
+               ⚠ KNOWN ANCHOR GAP — reported here, deliberately NOT fixed.
+               The 1.09/1.15 figures above are the anchors this table was
+               BUILT on, but they are not the true averages across the
+               EVOLUTIONS roster: three of six tier-2 options (Ranger,
+               Thief, Acolyte) grant no powerMult at all, so the real
+               tier-2 mean is 1.045, and the real tier-3 mean is 1.13667.
+               Difficulty here is therefore effectively anchored on TAKING
+               a power evolution. Measured at Ch5 (level 30, difficulty
+               223) the tier-2 spread is 70.3% (Ranger/Thief/Acolyte) to
+               83.7% (Berserker); at Ch10 (level 60, difficulty 480) the
+               tier-3 spread is 58.4% (Cleric) to 75.1% (Archmage/
+               Sharpshooter). Closing that means re-anchoring the
+               difficulty tables against the true means, which is its own
+               piece of work — the v6 fork rebalance deliberately held
+               BOTH tier averages bit-identical (1.045 / 1.13667) rather
+               than touch it, and only narrowed the tier-3 spread from
+               19.8 points to 16.7 as a side effect.
+
+               The three base classes (squire/
                scout/apprentice) carry small perks of their own
                (injuryChanceMult/dropMult/xpMult) but deliberately NO
                powerMult, so "none pre-15" still holds exactly. Class
@@ -1421,6 +1454,16 @@ const ACTIVITY_SUBTAB_MAP = { training:"training", dungeon:"dungeons", raid:"rai
    Levels 1-12: ~16.0h. Total 1-25: ~35.1h. (Pre-smoothing this was
    ~30h to 12 and ~49h to 25 — the 1,500 -> 14,000 xp/hr cliff at
    Thornwood/Cragside is what The Warden's Ford exists to bridge.)
+
+   Every pace figure above, and every anchor in this block, lives at or
+   below level 60 and is UNAFFECTED by the tier ramps xpNeeded() applies
+   above 60 — both multipliers are exactly 1 through level 60, so the
+   band this model was tuned against is untouched. Past the level-60
+   content ceiling the curve steepens twice (see xpNeeded): per-level
+   cost is 1.075x base at 70, 1.15x at 80, 1.44x at 90, 1.76x at 100.
+   In Threshold Watch (75,000 xp/hr, neutral hero) the 10-level bands
+   from 60 now run 37.9h / 53.5h / 78.5h / 119.8h (was 36.6 / 48.2 /
+   61.2 / 75.6), i.e. 60->100 is ~290h rather than ~222h.
 
    ----------------------------------------------------------------
    SURPLUS POWER  (added after the tables above; changes NONE of them)
@@ -1827,14 +1870,22 @@ const EVOLUTIONS = {
     type: "martial", weapon: "Longsword & Kite Shield",
     flavor: "Discipline hardens into doctrine; the squire's oath becomes a wall nothing walks through twice.",
     skillNames: ["Shield Wall", "Oath Strike", "Bulwark Stance"],
-    perks: { powerMult: 1.09 }
+    // v6 fork rebalance: Knight and Berserker previously granted ONLY
+    // powerMult (1.09 vs 1.10), so Berserker strictly dominated on the
+    // identical axis — a pure trap. Knight now trades one point of power
+    // for the wall's own axis (fewer wounds); Berserker takes the point.
+    // The pair's power SUM is unchanged (1.08 + 1.11 = 1.09 + 1.10), so
+    // the tier-2 average powerMult the difficulty tables are anchored on
+    // does not move.
+    perks: { powerMult: 1.08, injuryChanceMult: 0.92 }
   },
   berserker: {
     id: "berserker", name: "Berserker", parentId: "squire", tier: 2, levelReq: 20,
     type: "martial", weapon: "Twin Battleaxes",
     flavor: "The squire's restraint burns away, leaving only the swing and the roar beneath it.",
     skillNames: ["Reckless Fury", "Bloodletting Swing", "Warpath Roar"],
-    perks: { powerMult: 1.10 }
+    // The tier-2 pure-power pick — nothing but the swing. See Knight above.
+    perks: { powerMult: 1.11 }
   },
   ranger: {
     id: "ranger", name: "Ranger", parentId: "scout", tier: 2, levelReq: 20,
@@ -1848,7 +1899,15 @@ const EVOLUTIONS = {
     type: "martial", weapon: "Twin Daggers",
     flavor: "Where the scout reads a room, the thief reads a mark, and neither ever sees them leave.",
     skillNames: ["Shadow Step", "Cutpurse Strike", "Vanishing Trick"],
-    perks: { goldMult: 1.10 }
+    // v6 fork rebalance: goldMult alone could not answer Ranger's xpMult
+    // 1.08. Gold is the realm's weakest currency — every gold sink is
+    // either flat-priced and saturated by base zone income (tavern, shop)
+    // or opportunity-cost priced so goldMult cancels out of it entirely
+    // (medicHealCost multiplies BY getGoldMultiplier, so a richer hero
+    // faces a proportionally larger tithe). rewardMult is the Thief's
+    // second axis and the one Assassin inherits: the take from every job.
+    // No powerMult, so the tier-2 power average is untouched.
+    perks: { goldMult: 1.10, rewardMult: 1.12 }
   },
   mage: {
     id: "mage", name: "Mage", parentId: "apprentice", tier: 2, levelReq: 20,
@@ -1899,42 +1958,68 @@ const EVOLUTIONS = {
     type: "martial", weapon: "Recurve Bow & Bonded Companion",
     flavor: "The ranger's solitary hunt becomes a pack hunt — a bonded creature at their side that finds what the eye alone would miss.",
     skillNames: ["Call of the Pack", "Savage Bond", "Feral Pursuit"],
-    perks: { powerMult: 1.10, dropMult: 1.10 }
+    // v6 fork rebalance: dropMult 1.10 was nowhere near payment for
+    // Sharpshooter's 15 extra points of power. dropMult only touches
+    // ZONE drops (dungeon dropRolls ignore it), and a drop is worth ~5
+    // gold or ~7 dust, so +10% drops measures at well under +1% of total
+    // value. The companion now hauls the kill home too (rewardMult) and
+    // the power gap narrows from 15 points to 9. Power moved here is
+    // taken from Sharpshooter, so the tier-3 average is unchanged.
+    perks: { powerMult: 1.13, dropMult: 1.15, rewardMult: 1.10 }
   },
   sharpshooter: {
     id: "sharpshooter", name: "Sharpshooter", parentId: "ranger", tier: 3, levelReq: 40,
     type: "martial", weapon: "Warbow",
     flavor: "The ranger narrows their whole world to a single point down-range. A sharpshooter's arrow arrives before the target finishes deciding it's afraid.",
     skillNames: ["Deadeye Volley", "Longshot", "Piercing Silence"],
-    perks: { powerMult: 1.25, injuryChanceMult: 0.95 }
+    // 1.25 -> 1.22; the three points fund Beastmaster (see above), so the
+    // tier-3 power SUM is unchanged. Still the branch's power pick.
+    perks: { powerMult: 1.22, injuryChanceMult: 0.95 }
   },
   assassin: {
     id: "assassin", name: "Assassin", parentId: "thief", tier: 3, levelReq: 40,
     type: "martial", weapon: "Twin Blackened Daggers",
     flavor: "The thief's opportunism sharpens into doctrine: the first strike is the only one that should matter. Assassins are paid in silence and in coin.",
     skillNames: ["First Blood", "Garrote", "Death's Whisper"],
-    perks: { powerMult: 1.15, rewardMult: 1.15, goldMult: 1.05 }
+    // 1.15 -> 1.13 power, 1.15 -> 1.14 rewards. Assassin measured 1.16x
+    // Shadowdancer under expedition-heavy play; two points of power go to
+    // Shadowdancer (tier-3 sum unchanged) and the reward edge is shaved.
+    perks: { powerMult: 1.13, rewardMult: 1.14, goldMult: 1.05 }
   },
   shadowdancer: {
     id: "shadowdancer", name: "Shadowdancer", parentId: "thief", tier: 3, levelReq: 40,
     type: "martial", weapon: "Shadow-woven Daggers",
     flavor: "The thief steps halfway into the dark between worlds, borrowing enough shadow-magic to stop existing exactly when a blade arrives.",
     skillNames: ["Umbral Step", "Veil of Night", "Twin Shadows"],
-    perks: { injuryChanceMult: 0.85, powerMult: 1.10, dropMult: 1.08 }
+    // The evasion pick, leaned into: 0.85 -> 0.78 injury chance (an injury
+    // is ~3h x restTimeMult of forgone questing, so this is the branch's
+    // real currency), +2 power from Assassin, drops 1.08 -> 1.12. Still
+    // clearly behind Cleric on total durability (0.80 injury x 0.75 rest).
+    perks: { injuryChanceMult: 0.78, powerMult: 1.12, dropMult: 1.12 }
   },
   archmage: {
     id: "archmage", name: "Archmage", parentId: "mage", tier: 3, levelReq: 40,
     type: "magical", weapon: "Arcane Staff",
     flavor: "The mage stops channeling power and starts commanding it outright — ley lines bend to their intent rather than their effort.",
     skillNames: ["Arcane Cataclysm", "Ley Line Surge", "Runeshatter"],
-    perks: { powerMult: 1.25, xpMult: 1.05 }
+    // 1.25 -> 1.22; the three points fund Warlock (see below), so the
+    // tier-3 power SUM is unchanged. Still the branch's power pick.
+    perks: { powerMult: 1.22, xpMult: 1.05 }
   },
   warlock: {
     id: "warlock", name: "Warlock", parentId: "mage", tier: 3, levelReq: 40,
     type: "magical", weapon: "Pact-bound Grimoire",
     flavor: "The mage's hunger for power finds a patron willing to sell it, at a price paid in favors, in years, in things warlocks have stopped naming aloud.",
     skillNames: ["Soulbind Pact", "Hex of Ruin", "Black Tithe"],
-    perks: { goldMult: 1.20, powerMult: 1.08, injuryChanceMult: 1.10 }
+    // v6 fork rebalance — this was the game's widest fork (Archmage
+    // measured 1.12x under a mixed play mix and 1.20x under expedition-
+    // heavy play). Archmage had MORE power and xp with no drawback while
+    // Warlock paid an injury penalty for goldMult, which is the realm's
+    // weakest currency (see Thief). The patron now actually delivers:
+    // rewardMult on top of the gold, and the power gap closes from 17
+    // points to 11. The injury penalty stays — it is the price, and it is
+    // what makes this a genuine trade rather than a smaller Archmage.
+    perks: { goldMult: 1.20, powerMult: 1.11, rewardMult: 1.15, injuryChanceMult: 1.10 }
   },
   cleric: {
     id: "cleric", name: "Cleric", parentId: "acolyte", tier: 3, levelReq: 40,
@@ -2079,6 +2164,14 @@ const ENCOUNTER_REWARD_HOURS = 0.5;     // risky-door reward ~= half an hour of 
 //   "dilemma" — the only kind with a risk path: safeLabel/riskLabel/
 //               riskFlavor drive the two-door modal. Only the risky door's
 //               own click (resolveEncounterRisk) may call addInjury.
+//
+// Optional `zoneId` scopes an entry to a single ZONES id — fireQuestEncounter
+// only draws it while questing in that zone. Entries WITHOUT zoneId are
+// generic and stay eligible everywhere, alongside whichever zone-specific
+// entries match the current zone (see fireQuestEncounter's pool build).
+// Old pending records may reference a zoneId-less (generic) encounterId —
+// openEncounterModal/resolveEncounterRisk/resolveEncounterContinue all look
+// entries up by id regardless of zoneId, so those still resolve untouched.
 const QUEST_ENCOUNTERS = [
   // ---- LORE (4) — pure flavor, no reward, no cost, no risk ----
   { id: "boundary_stone", kind: "lore", title: "The Boundary Stone",
@@ -2120,7 +2213,99 @@ const QUEST_ENCOUNTERS = [
   { id: "dice_stranger", kind: "dilemma", title: "A Stranger's Wager",
     prose: "A stranger crouches at the roadside with a set of bone dice and a grin that promises nothing good. \"Double or nothing,\" they offer, nodding at the coin in your purse. \"Or keep walking — no shame in a sure thing.\"",
     safeLabel: "Buy out of the bet", riskLabel: "Take the wager",
-    riskFlavor: "Their dice look honest. So did the last three sets that weren't." }
+    riskFlavor: "Their dice look honest. So did the last three sets that weren't." },
+
+  // ---- ZONE-SPECIFIC (24) — 3 per zone (~1 lore/1 boon/1 dilemma each),
+  // scoped via zoneId so they only ever fire in their own zone. They join
+  // the generic pool above rather than replacing it — see fireQuestEncounter.
+
+  // -- Millbrook Fields --
+  { id: "millbrook_treeline_watcher", kind: "lore", zoneId: "millbrook", title: "Something Counts the Rows",
+    prose: "The wheat behaves like wheat should, and the fence holds where you left it, and none of that stops the feeling that something at the tree line is counting the furrows as you cross them. Look up fast enough and there's nothing but leaves settling — a half-second too late, every time. The farmers here call it \"the neighbor\" and leave a share of the harvest at the fence post out of habit rather than fear." },
+  { id: "millbrook_lucky_gleaning", kind: "boon", zoneId: "millbrook", title: "A Lucky Gleaning",
+    prose: "The gleaners missed a whole row at the field's low corner, tucked behind a rise that hides it from the farmhouse — and wedged under the last uncut sheaf, a small strongbox someone buried in a hurry and never came back to dig up.",
+    reward: { type: "gold" } },
+  { id: "millbrook_fox_that_isnt", kind: "dilemma", zoneId: "millbrook", title: "The Fox That Isn't",
+    prose: "A fox sits at the fence line watching you with too much patience for a fox, head tilted at an angle real necks don't do. It hasn't moved to flee and it hasn't moved to bite — just watched, waiting to see which one you'll make it be.",
+    safeLabel: "Leave it your lunch", riskLabel: "Chase it off",
+    riskFlavor: "It runs fast for something that shouldn't be running at all." },
+
+  // -- Thornwood Edge --
+  { id: "thornwood_closing_path", kind: "lore", zoneId: "thornwood", title: "The Path That Wasn't There Going In",
+    prose: "Turn around on the Thornwood trail and the way back has rearranged itself — not lost, not blocked, just subtly, deliberately different, as though the wood prefers you keep walking forward. The old woodcutters have a rule for it: never look back twice. The second look is the one it answers." },
+  { id: "thornwood_pixie_leavings", kind: "boon", zoneId: "thornwood", title: "The Pixies Already Took Their Cut",
+    prose: "A cluster of coin-thieving pixies has clearly beaten you to a fallen traveler's purse, but pixies are tidy thieves — they've left the parts that don't shine for them scattered at the tree's roots, a fine pale grit that never quite settles.",
+    reward: { type: "dust" } },
+  { id: "thornwood_remembering_thicket", kind: "dilemma", zoneId: "thornwood", title: "A Thicket That Remembers Your Boots",
+    prose: "The thornvine ahead has grown into a shape uncomfortably close to a doorway, and it seems to recognize the tread of your boots from somewhere you don't recall walking. It hasn't closed the gap yet. It's deciding whether to.",
+    safeLabel: "Back away and go around", riskLabel: "Push through anyway",
+    riskFlavor: "Thorns don't usually flinch first. These might." },
+
+  // -- The Warden's Ford --
+  { id: "wardens_ford_wheel_tracks", kind: "lore", zoneId: "wardens_ford", title: "Where the Wheel Tracks End",
+    prose: "The cart tracks on the Ford road run straight and confident for a good half-mile, then simply stop — no skid, no turn, no sign the driver even slowed. Warden patrols have marked the spot with a stone for three years running and never once discussed why the stone is there." },
+  { id: "wardens_ford_patrol_ledger", kind: "boon", zoneId: "wardens_ford", title: "What the Warden's Log Knows",
+    prose: "A waterlogged patrol ledger turns up snagged in the reeds, its ink smeared but its habits legible — which bends in the current the outriders trust, which ones they don't, and why. It's worth more than the coin it would fetch as scrap paper.",
+    reward: { type: "xp" } },
+  { id: "wardens_ford_second_wake", kind: "dilemma", zoneId: "wardens_ford", title: "A Second Wake in the Water",
+    prose: "You're midway across the ford when you notice the current is carrying two wakes — yours, and another, matched stride for stride just beneath the surface, going nowhere in particular except wherever you go. The Wardens upstream have stopped waving travelers across after dark. Now you understand why.",
+    safeLabel: "Turn back and cross upstream", riskLabel: "Keep crossing",
+    riskFlavor: "Whatever's under there hasn't grabbed an ankle yet. That's not the same as being unable to." },
+
+  // -- Cragside Quarry --
+  { id: "cragside_wrong_echo", kind: "lore", zoneId: "cragside", title: "An Echo That Comes Back Wrong",
+    prose: "Shout down into the lower cut and the echo comes back a half-second late and half a tone lower, like something down there is repeating you rather than the rock simply throwing your voice back. The quarrymen have stopped shouting for fun. They still shout when they need to — just never twice." },
+  { id: "cragside_foremans_kit", kind: "boon", zoneId: "cragside", title: "The Foreman's Forgotten Kit",
+    prose: "A collapsed section of the upper gallery has opened onto an old foreman's office nobody's set foot in for a decade — coat still on the hook, personal gear still packed like he meant to be right back. He clearly never got the chance.",
+    reward: { type: "item" } },
+  { id: "cragside_lurker_toll", kind: "dilemma", zoneId: "cragside", title: "The Crag-Lurker's Toll",
+    prose: "A crag-lurker has wedged itself into the only clear path up the switchback, knuckles the size of ore carts, clearly unbothered by the queue of one it's created. It hasn't attacked. It also hasn't moved, and the quarry crew behind you is starting to ask why you've stopped.",
+    safeLabel: "Bribe it with rations", riskLabel: "Force the path",
+    riskFlavor: "It's slow to anger down here. That's not the same as slow." },
+
+  // -- The Sunken Marsh --
+  { id: "marsh_backward_footprints", kind: "lore", zoneId: "marsh", title: "Footprints Walking the Wrong Way",
+    prose: "A trail of footprints crosses the mudflat ahead of you, sunk deep and fresh — except they're facing the direction you're walking from, as if someone crossed this exact ground going the opposite way and left prints pointing at you instead of away. The mud doesn't usually get details like that wrong." },
+  { id: "marsh_bog_dust", kind: "boon", zoneId: "marsh", title: "What the Bog Gave Up",
+    prose: "The mud here has held onto things for centuries and occasionally, for no reason anyone's identified, decides to let one go. This time it's a stretch of pale, faintly warm grit worked up through the peat — the same stuff enchanters pay well for, if you don't mind the smell of it drying on your hands.",
+    reward: { type: "dust" } },
+  { id: "marsh_hags_invitation", kind: "dilemma", zoneId: "marsh", title: "The Bog Hag's Invitation",
+    prose: "A bog hag rises waist-deep from the reeds, uncomfortably polite, and offers you a seat at a table half-submerged that definitely wasn't there a moment ago. \"Sit and eat,\" she says, \"or pay the crossing toll like everyone sensible does.\" Her smile has entirely too many teeth doing entirely too little work.",
+    safeLabel: "Pay the crossing toll", riskLabel: "Sit at her table",
+    riskFlavor: "Marsh folk say you should never eat what a bog hag offers. Marsh folk also say a lot of things." },
+
+  // -- Emberfall Ruins --
+  { id: "emberfall_unfinished_hymn", kind: "lore", zoneId: "emberfall", title: "A Verse That Isn't Finished",
+    prose: "The Hollow Choir's old hymn still drifts through the ash on certain still evenings, always the same handful of bars, always cut off at the exact same word before it can resolve. Nobody's ever heard it finish. The scholars who've studied the Choir longest suggest that's rather the point." },
+  { id: "emberfall_fused_coin", kind: "boon", zoneId: "emberfall", title: "Coin the Fire Didn't Want",
+    prose: "The old ruin gave up most of its valuables to the fire generations back, but coin doesn't burn easy, and a scorched strongbox wedged under a collapsed archway still has most of its hoard fused into a single blackened lump. It chips apart easier than it looks like it should.",
+    reward: { type: "gold" } },
+  { id: "emberfall_ash_shape", kind: "dilemma", zoneId: "emberfall", title: "Cinders That Hold a Shape",
+    prose: "A drift of ash near the collapsed archive holds together in a shape that used to be a person, upright, motionless, waiting on something that hasn't happened yet. It scatters if you breathe on it wrong. It also, you're fairly sure, is watching you decide whether to.",
+    safeLabel: "Leave an offering and go around", riskLabel: "Walk straight through it",
+    riskFlavor: "Ash doesn't usually hit back. This ash has opinions." },
+
+  // -- The Shattered Peaks --
+  { id: "peaks_voice_knows_name", kind: "lore", zoneId: "peaks", title: "A Voice That Knows Your Name",
+    prose: "The wind through the Shattered Peaks carries voices the way it always does up here — fragments, arguments, half a laugh gone before you can place it. One of them, this time, said your name. Clearly. Correctly. Nobody up here should know it." },
+  { id: "peaks_climbers_notes", kind: "boon", zoneId: "peaks", title: "A Dead Climber's Route Notes",
+    prose: "A previous climber left a set of scratched route notes wedged under a cairn, marking exactly which handholds hold and which ones only look like they do. Whoever wrote them clearly knew this ridge better than anyone currently walking it — which is either reassuring or exactly the opposite.",
+    reward: { type: "xp" } },
+  { id: "peaks_used_to_be_person", kind: "dilemma", zoneId: "peaks", title: "Something That Used to Be a Person",
+    prose: "A shape stands on the ridge ahead, wind-scoured and hollow-eyed, wearing the rough shape of a climber who never came back down. It raises a hand toward you — not a threat, not quite a greeting — and waits to see what you'll do with the gesture.",
+    safeLabel: "Leave it be and climb around", riskLabel: "Approach and put it down",
+    riskFlavor: "It moves like the wind's been doing its thinking for it. Wind changes its mind." },
+
+  // -- The Threshold Watch --
+  { id: "threshold_seam_exhales", kind: "lore", zoneId: "threshold_watch", title: "The Seam Breathes Out",
+    prose: "Stand close enough to the Threshold on watch and you can feel it breathe — a slow exhale against your face that smells of somewhere that isn't here. The sentries log the rhythm every shift. Nobody has ever written down what it smells like on the inhale, and nobody who's noticed will explain why." },
+  { id: "threshold_sentry_kit", kind: "boon", zoneId: "threshold_watch", title: "Left Behind at the Last Watch",
+    prose: "A sentry's kit sits neatly stowed at an abandoned watch-post, blanket folded, boots paired, nothing missing except the sentry. Whatever made them leave in a hurry, it wasn't in a hurry itself — everything here was put away properly first.",
+    reward: { type: "item" } },
+  { id: "threshold_breathes_back", kind: "dilemma", zoneId: "threshold_watch", title: "Something Breathes Back",
+    prose: "For one held second the Threshold's breathing stops, and something on the other side of the seam breathes in instead — a long, patient pull, aimed, unmistakably, at you standing this close to the crack. The other sentries have already backed off three paces. They're waiting to see if you will.",
+    safeLabel: "Fall back with the sentries", riskLabel: "Hold your ground",
+    riskFlavor: "Whatever's pulling air through that seam hasn't gotten a taste yet. Holding still isn't the same as being safe." }
 ];
 
 // Reward for the risky door — flat "half an hour of this zone's output",
@@ -2190,11 +2375,20 @@ function grantBoonReward(hero, zone, def){
 // gold swings. No-ops past MAX_PENDING_ENCOUNTERS. activity.sessionGold is
 // guarded with `|| 0` for a mid-questing activity from before this feature
 // existed (an old save resuming a training session that predates the field).
+//
+// The draw pool is every generic (zoneId-less) entry plus whatever's scoped
+// to this zone specifically — generic entries stay eligible everywhere.
+// Guarded twice against ever throwing: if somehow nothing matches the zone,
+// fall back to the generic pool; if even that's empty, fall back to the
+// full table rather than indexing into a zero-length array.
 function fireQuestEncounter(hero, zone){
   if (!Array.isArray(state.pendingEncounters)) state.pendingEncounters = [];
   if (state.pendingEncounters.length >= MAX_PENDING_ENCOUNTERS) return false;
 
-  const def = QUEST_ENCOUNTERS[Math.floor(Math.random() * QUEST_ENCOUNTERS.length)];
+  const genericPool = QUEST_ENCOUNTERS.filter(e => !e.zoneId);
+  const zonePool = QUEST_ENCOUNTERS.filter(e => !e.zoneId || e.zoneId === zone.id);
+  const pool = zonePool.length > 0 ? zonePool : (genericPool.length > 0 ? genericPool : QUEST_ENCOUNTERS);
+  const def = pool[Math.floor(Math.random() * pool.length)];
   const sessionGold = state.activity.sessionGold || 0;
   const rawToll = sessionGold * ENCOUNTER_TOLL_FRACTION;
   const tollCap = zone.goldPerHour * ENCOUNTER_TOLL_MAX_HOURS;
@@ -3060,8 +3254,38 @@ function createEmptyStats(){
    MODIFIERS  (single place each system resolves through)
 ================================================================ */
 
+// The level cost curve. The base term (100 * L^1.9) is the one every number
+// in the POWER MODEL block was tuned against and is deliberately left alone:
+// at levels 1-60 xpNeeded returns exactly what it always has, because both
+// tier multipliers below are exactly 1 there.
+//
+// Above 60 the curve steepens, and above 80 it steepens again. Each tier is a
+// RAMP rather than a step: the multiplier grows with how far past the
+// threshold the hero is, so it passes through 1.0 at the threshold itself and
+// there is no cliff at exactly 61 or 81. Tier 2 multiplies on top of tier 1
+// (it compounds, it does not replace it).
+//
+//   mult(L) = (1 + 0.15 * clamp(L-60)/20) * (1 + 0.35 * clamp(L-80)/20)
+//
+// so the per-level cost is 1.00x at 60, 1.075x at 70, 1.15x at 80, 1.44x at
+// 90 and 1.76x at 100. Content all sits at or below level 60, so this only
+// touches the post-campaign grind.
+const XP_CURVE_TIER1_LEVEL = 60;   // above this, each level costs more
+const XP_CURVE_TIER2_LEVEL = 80;   // and more again above this
+const XP_CURVE_TIER1_MULT  = 1.15; // "slightly" — reached at the tier-2 level
+const XP_CURVE_TIER2_MULT  = 1.35; // compounding on tier 1, not replacing it
+// Levels it takes each tier's multiplier to ramp from 1.0 to its full value.
+const XP_CURVE_RAMP_LEVELS = XP_CURVE_TIER2_LEVEL - XP_CURVE_TIER1_LEVEL;
+
 function xpNeeded(level){
-  return Math.round(100 * Math.pow(level, 1.9));
+  // Defensive: fractional, missing or out-of-range levels collapse to a sane
+  // integer >= 1 so the grantXp loop can never be handed NaN/Infinity.
+  const L = Math.max(1, Math.floor(Number(level) || 1));
+  const t1 = 1 + (XP_CURVE_TIER1_MULT - 1) *
+                 Math.max(0, L - XP_CURVE_TIER1_LEVEL) / XP_CURVE_RAMP_LEVELS;
+  const t2 = 1 + (XP_CURVE_TIER2_MULT - 1) *
+                 Math.max(0, L - XP_CURVE_TIER2_LEVEL) / XP_CURVE_RAMP_LEVELS;
+  return Math.round(100 * Math.pow(L, 1.9) * t1 * t2);
 }
 
 function getRace(hero){ return RACES[hero.raceId]; }
@@ -3243,12 +3467,14 @@ function checkAchievementUnlocks(){
 function availableTitles(hero){
   const out = [];
   getRenownMilestonesReached(hero).filter(m => m.threshold > 0).forEach(m => {
-    out.push({ id: "renown_" + m.threshold, title: m.title, source: "renown", bonusText: m.bonusText });
+    out.push({ id: "renown_" + m.threshold, title: m.title, source: "renown", bonusText: m.bonusText,
+      earnedText: "Earned at " + fmtNumber(m.threshold) + " renown." });
   });
   const unlockedIds = (state && state.legacy && Array.isArray(state.legacy.achievements)) ? state.legacy.achievements : [];
   ACHIEVEMENTS.forEach(ach => {
     if (unlockedIds.indexOf(ach.id) !== -1){
-      out.push({ id: ach.id, title: ach.title, source: "achievement", bonusText: ach.bonusText });
+      out.push({ id: ach.id, title: ach.title, source: "achievement", bonusText: ach.bonusText,
+        earnedText: "Earned: " + ach.desc });
     }
   });
   return out;
@@ -4824,7 +5050,7 @@ const ICON_ART = {
   // colosseum (arena). Bbox ~14.8 x 16.6 centred near 12,11.5, in line with
   // its neighbours; the sockets are circles rather than dashes so they stay
   // legible at the 15px subtab size.
-  worldboss: '<path d="M8.2 8.4 C5.6 7.4 4.2 5.4 4.6 3.2 C7 3.8 8.8 5.4 9.4 7.6"/><path d="M15.8 8.4 C18.4 7.4 19.8 5.4 19.4 3.2 C17 3.8 15.2 5.4 14.6 7.6"/><path d="M7 13.6 a5 5 0 0 1 10 0 v1.7 a2.5 2.5 0 0 1 -1.3 2.2 L12 19.6 L8.3 17.5 A2.5 2.5 0 0 1 7 15.3 Z"/><circle cx="10" cy="13.4" r="1"/><circle cx="14" cy="13.4" r="1"/><path d="M12 15.4 v1.7"/>',
+  worldboss: '<path d="M4.4 16.6 C2.9 11.4 3.3 7.4 5.1 4.6 C6.7 7.9 7.9 10.1 9.4 11.7 L12 4.2 L14.6 11.7 C16.1 10.1 17.3 7.9 18.9 4.6 C20.7 7.4 21.1 11.4 19.6 16.6 Z"/><path d="M4.2 16.9 H19.8 V20.1 H4.2 Z"/><circle cx="12" cy="18.5" r="1.05" fill="none" stroke-width="1.3"/>',
   // --- Gear slots (registry only; gear-panel agent consumes these) ---
   weapon: '<path d="M12 2.5 L13.4 5 V13 H10.6 V5 Z"/><path d="M8 14 H16"/><path d="M12 14 V19.4"/><circle cx="12" cy="20.7" r="1.3"/>',
   helm: '<path d="M4.5 16 a7.5 7.5 0 0 1 15 0"/><path d="M4.5 16 h15"/><path d="M12 8.5 V19.5"/>',
@@ -6010,6 +6236,7 @@ function renderTitlesPanel(){
       return "<div class=\"pick-card" + (active ? " selected" : "") + "\" data-title-id=\"" + escapeHtml(t.id) + "\">" +
         "<h4>" + escapeHtml(t.title) + "</h4>" +
         "<div class=\"flavor\">" + (t.source === "renown" ? "Renown title" : "Achievement title") + "</div>" +
+        "<div class=\"title-earned-line\">" + escapeHtml(t.earnedText) + "</div>" +
         "<div class=\"bonus\">" + escapeHtml(t.bonusText) + "</div>" +
       "</div>";
     }).join("") + "</div>";
@@ -6065,23 +6292,30 @@ function skillCardHtml(skillId, hero, now){
   const cdReadyAt = (hero.skillCooldowns || {})[skillId] || 0;
   const activeBuff = (hero.buffs || []).find(b => b.id === skillId);
 
-  let stateHtml, useDisabled = false;
+  // cardState also drives the outer card's class — "cooling"/"nomend" both
+  // read as the same muted/desaturated treatment, "active" and "ready" each
+  // get their own accent. See the .skill-card.* rules in the stylesheet.
+  let stateHtml, useDisabled = false, cardState;
   if (activeBuff){
+    cardState = "active";
     stateHtml = "<span class=\"skill-state active\">Active — <span data-skill-cd=\"" + activeBuff.expiresAt + "\">" +
       fmtCountdown(activeBuff.expiresAt - now) + "</span></span>";
     useDisabled = true;
   } else if (cdReadyAt > now){
+    cardState = "cooling";
     stateHtml = "<span class=\"skill-state cooling\">Ready in <span data-skill-cd=\"" + cdReadyAt + "\">" +
       fmtCountdown(cdReadyAt - now) + "</span></span>";
     useDisabled = true;
   } else if (arc.effect === "healInjury" && hero.injuries <= 0){
+    cardState = "nomend";
     stateHtml = "<span class=\"skill-state cooling\">No injuries to mend</span>";
     useDisabled = true;
   } else {
+    cardState = "ready";
     stateHtml = "<span class=\"skill-state ready\">Ready</span>";
   }
 
-  return "<div class=\"skill-card\">" +
+  return "<div class=\"skill-card " + cardState + "\">" +
     "<div class=\"skill-card-head\"><h4>" + escapeHtml(skill.name) + "</h4>" + stateHtml + "</div>" +
     "<div class=\"skill-card-meta\">" + escapeHtml(archetypeLabel(skill.archetypeId)) + " — " + escapeHtml(skill.desc) + "</div>" +
     "<button class=\"btn small\" data-use-skill=\"" + skillId + "\"" + (useDisabled ? " disabled" : "") + ">Use</button>" +
@@ -6282,7 +6516,7 @@ function renderLegendsPanel(){
       return "<span class=\"b\">" + escapeHtml(boon.name) + "</span> ×" + n +
         " (" + escapeHtml(boon.desc) + (n > 1 ? " each" : "") + ")";
     }).filter(Boolean);
-    html += "<div class=\"legend-boons-line\"><b>Blood of Legends:</b> " + parts.join(", ") + "</div>";
+    html += "<div class=\"legend-boons-line\"><b>Aura of Legends:</b> " + parts.join(", ") + "</div>";
   }
 
   if (legacy.legends.length === 0){
@@ -7919,7 +8153,12 @@ function buyTavernBuff(buffId){
   if (hero.gold < cost) return;
   spendGold(hero, cost);
   const now = Date.now();
-  hero.buffs = (hero.buffs || []).filter(b => b.key !== def.effect.key); // one active per key; rebuying refreshes
+  // One active TAVERN buff per effect key — rebuying the same drink refreshes it, and a
+  // different drink sharing a key replaces it. Skill buffs are never touched here: they
+  // carry their own skill id, not a TAVERN_BUFFS id, so they're excluded from this filter
+  // and stack with tavern buffs exactly as tavern buffs stack with skill buffs.
+  const tavernIds = new Set(TAVERN_BUFFS.map(b => b.id));
+  hero.buffs = (hero.buffs || []).filter(b => !(tavernIds.has(b.id) && b.key === def.effect.key));
   hero.buffs.push({ id: def.id, key: def.effect.key, value: def.effect.value, expiresAt: now + def.durationMin * 60000, name: def.name });
   addLog("Bought a round of " + def.name + " at the tavern.", "system");
   saveGame();
