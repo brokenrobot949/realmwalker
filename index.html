@@ -1281,27 +1281,38 @@ const ACTIVITY_SUBTAB_MAP = { training:"training", dungeon:"dungeons", raid:"rai
      -- BLACKSMITH_UPGRADE_POWER_STEP nerfed 0.2 -> 0.1 below, so the
         +5 cap now tops out at x1.5 gear power instead of x2.
    powerMult = race power bonus (ignored here; assumed neutral race) *
-               evolution perk powerMult (none pre-20, ~1.09 avg tier-2
-               from level 20, ~1.15 avg tier-3 from level 40 — see
-               pendingEvolutionTier()).
+               evolution perk powerMult (none pre-20, TRUE mean 1.045
+               tier-2 from level 20, TRUE mean 1.136667 tier-3 from
+               level 40 — see pendingEvolutionTier()). The tables below
+               are anchored on these true means, not on "always takes a
+               power evolution."
 
-               ⚠ KNOWN ANCHOR GAP — reported here, deliberately NOT fixed.
-               The 1.09/1.15 figures above are the anchors this table was
-               BUILT on, but they are not the true averages across the
-               EVOLUTIONS roster: three of six tier-2 options (Ranger,
-               Thief, Acolyte) grant no powerMult at all, so the real
-               tier-2 mean is 1.045, and the real tier-3 mean is 1.13667.
-               Difficulty here is therefore effectively anchored on TAKING
-               a power evolution. Measured at Ch5 (level 30, difficulty
-               223) the tier-2 spread is 70.3% (Ranger/Thief/Acolyte) to
-               83.7% (Berserker); at Ch10 (level 60, difficulty 480) the
-               tier-3 spread is 58.4% (Cleric) to 75.1% (Archmage/
-               Sharpshooter). Closing that means re-anchoring the
-               difficulty tables against the true means, which is its own
-               piece of work — the v6 fork rebalance deliberately held
-               BOTH tier averages bit-identical (1.045 / 1.13667) rather
-               than touch it, and only narrowed the tier-3 spread from
-               19.8 points to 16.7 as a side effect.
+               ⚠ ANCHOR GAP — FIXED (v6 re-anchor pass). A prior pass of
+               this table anchored difficulty on 1.09/1.15, i.e. on the
+               assumption every hero takes a powerMult evolution. That
+               was wrong: three of six tier-2 options (Ranger, Thief,
+               Acolyte) and one of six tier-3 options (Cleric) grant no
+               powerMult at all, so the true tier-2 mean is 1.045 and the
+               true tier-3 mean is 1.136667 — both lower than assumed, so
+               content was measurably harder than documented for a
+               genuinely average hero. Because ratio = power/difficulty,
+               every DUNGEONS/RAIDS/CAMPAIGN_SPINE difficulty (levelReq
+               >= 20) has been scaled by the same factor power was
+               over-estimated by (0.9587156 for the 20-39 band, 0.9884058
+               for 40+), which restores the intended ratio exactly —
+               see the per-entry table below, now measured against the
+               true means. WORLD_BOSSES was deliberately left untouched
+               (see the comment at that array).
+
+               The remaining per-class spread is NOT a defect and should
+               NOT be homogenised away. A non-powerMult evolution trades
+               success-rate for something else — the fork audit measured
+               Cleric (a non-power tier-3 evolution) against Necromancer
+               (a power tier-3 evolution) at 1.003 total value once
+               downtime/injury savings are counted, i.e. effectively
+               even. The spread across classes is intentional
+               compensation baked into the perk design, not an imbalance
+               left over from anchoring.
 
                The three base classes (squire/
                scout/apprentice) carry small perks of their own
@@ -1322,12 +1333,13 @@ const ACTIVITY_SUBTAB_MAP = { training:"training", dungeon:"dungeons", raid:"rai
 
    Anchor levels (era checkpoints) with this typical gear:
 
-     Level | Era | Best zone tier      | Avg item pwr (post-BS) | Base(10+5L) | EvoMult | Power
-     ------+-----+---------------------+------------------------+-------------+---------+-------
-       24  |  1  | T4 Sunken Marsh     |         ~14.3          |     130     |  1.09   | ~196
-       40  |  2  | T5 Emberfall Ruins  |         ~18.2          |     210     |  1.15   | ~315
-       60  |  3  | T7 The Threshold    |         ~28.5          |     310     |  1.15   | ~471
-        (gearPower = avg item pwr * 3.5 equipped items)
+     Level | Era | Best zone tier      | Avg item pwr (post-BS) | Base(10+5L) | EvoMult  | Power
+     ------+-----+---------------------+------------------------+-------------+----------+-------
+       24  |  1  | T4 Sunken Marsh     |         ~14.3          |     130     | 1.045    | ~188
+       40  |  2  | T5 Emberfall Ruins  |         ~18.2          |     210     | 1.136667 | ~311
+       60  |  3  | T7 The Threshold    |         ~28.5          |     310     | 1.136667 | ~466
+        (gearPower = avg item pwr * 3.5 equipped items; EvoMult is the TRUE
+         evolution mean for that level's tier, per the fixed anchor above)
 
    Difficulty anchors below were chosen so ratio = power/difficulty
    lands near 1.0-1.15 (successChance ~70-95%, see successChance())
@@ -1346,21 +1358,26 @@ const ACTIVITY_SUBTAB_MAP = { training:"training", dungeon:"dungeons", raid:"rai
    against). Dungeon and campaign entries target ratio ~1.09 (~80%);
    raids and era-floor/finale content sit deliberately lower.
 
+     (Below-20 rows are unchanged — no evolution exists yet either way, so
+     the old and new models agree exactly there. 20+ rows now measured
+     against the TRUE evoMult means, 1.045 / 1.136667, against the
+     RE-ANCHORED difficulty — see the v6 fix above.)
+
      Dungeon              lvlReq  diff  ratio  success
      Ashen Crypt              1     40  0.98    67%
      Wolfsbane Hollow         6     65  1.09    81%
      Drowned Chapel          12    100  1.09    81%
-     Gallows Hill            26    190  1.09    81%
-     Emberfall Catacombs     32    237  1.08    79%
-     The Cinder Maw          40    330  0.96    65%   <- Era-2 ceiling
-     Frostbound Vault        55    480  0.92    61%   <- Era-3 floor
-     The Shattered Throne    60    600  0.79    47%   <- Era-3 finale
+     Gallows Hill            26    182  1.09    81%
+     Emberfall Catacombs     32    227  1.08    79%
+     The Cinder Maw          40    326  0.95    65%   <- Era-2 ceiling
+     Frostbound Vault        55    474  0.92    61%   <- Era-3 floor
+     The Shattered Throne    60    593  0.79    47%   <- Era-3 finale
 
      Raid                 lvlReq  diff  ratio  success
      Siege of Thornwood      15    119  1.04    75%
-     The Sunken Court        28    280  0.83    52%
-     The Ember Conclave      45    430  0.84    53%
-     The Shattered Vigil     60    700  0.67    36%   <- Era-3 finale
+     The Sunken Court        28    268  0.83    52%
+     The Ember Conclave      45    425  0.84    53%
+     The Shattered Vigil     60    692  0.67    36%   <- Era-3 finale
 
      The campaign is anchored ABOVE the dungeon/raid tables on purpose.
      It is the story spine: linear, gated, long-duration (20-90 min per
@@ -1378,13 +1395,13 @@ const ACTIVITY_SUBTAB_MAP = { training:"training", dungeon:"dungeons", raid:"rai
      Ch1 Vanishing Road       1     35  1.11    84%
      Ch2 Tracks Before Dawn   8     73  1.11    83%
      Ch3 Hermit's Archive    16    120  1.08    79%
-     Ch4 Raid the Waystation 25    185  1.09    81%
-     Ch5 The Marsh Column    30    223  1.09    81%
-     Ch6 Beneath Old Crown   38    265  1.08    80%
-     Ch7 Choir's Calendar    46    340  1.08    80%
-     Ch8 Recover the Warden  55    420  1.05    76%
-     Ch9 Threshold Ritual    58    450  1.02    73%
-     Ch10 What Throne Rmbrs  60    480  0.98    68%   <- story climax
+     Ch4 Raid the Waystation 25    177  1.09    81%
+     Ch5 The Marsh Column    30    214  1.09    81%
+     Ch6 Beneath Old Crown   38    254  1.09    80%
+     Ch7 Choir's Calendar    46    336  1.08    80%
+     Ch8 Recover the Warden  55    415  1.05    76%
+     Ch9 Threshold Ritual    58    445  1.02    72%
+     Ch10 What Throne Rmbrs  60    474  0.98    68%   <- story climax
 
    The Arena needs no DIFFICULTY anchor here: arenaMonsterPower() derives
    monster power FROM computePower(hero), so the hero/monster ratio is
@@ -2041,11 +2058,11 @@ const DUNGEONS = [
   { id: "ashen_crypt", name: "The Ashen Crypt", flavor: "A collapsed mausoleum on the Millbrook road, its dead restless since the roof came down.", durationMin: 15, difficulty: 40, levelReq: 1, xp: 300, gold: 15, renown: 3, dropRolls: 2, dropTierBonus: 0 },
   { id: "wolfsbane_hollow", name: "Wolfsbane Hollow", flavor: "A poisoned dell where the wolves stopped dying and started waiting.", durationMin: 20, difficulty: 65, levelReq: 6, xp: 1333, gold: 67, renown: 4, dropRolls: 2, dropTierBonus: 0 },
   { id: "drowned_chapel", name: "The Drowned Chapel", flavor: "A chapel the marsh swallowed whole, its bell still ringing when the water goes still.", durationMin: 25, difficulty: 100, levelReq: 12, xp: 11667, gold: 583, renown: 5, dropRolls: 3, dropTierBonus: 1 },
-  { id: "gallows_hill", name: "Gallows Hill", flavor: "Executions stopped here a century ago; the gallows never got the message.", durationMin: 30, difficulty: 190, levelReq: 26, xp: 21000, gold: 1050, renown: 6, dropRolls: 3, dropTierBonus: 1 },
-  { id: "emberfall_catacombs", name: "Emberfall Catacombs", flavor: "Beneath the ruins, tunnels the old empire dug for reasons no one wrote down.", durationMin: 40, difficulty: 237, levelReq: 32, xp: 40000, gold: 2000, renown: 8, dropRolls: 3, dropTierBonus: 1 },
-  { id: "cinder_maw", name: "The Cinder Maw", flavor: "A fissure of permanent fire at Emberfall's heart, said to breathe like something alive.", durationMin: 45, difficulty: 330, levelReq: 40, xp: 45000, gold: 2250, renown: 10, dropRolls: 4, dropTierBonus: 2 },
-  { id: "frostbound_vault", name: "Frostbound Vault", flavor: "A treasury sealed in ice long before anyone alive was born, still guarding what it was told to guard.", durationMin: 55, difficulty: 480, levelReq: 55, xp: 137500, gold: 6875, renown: 13, dropRolls: 4, dropTierBonus: 2 },
-  { id: "shattered_throne", name: "The Shattered Throne", flavor: "The Peaks' broken summit hides a throne room that was never meant to be found again.", durationMin: 60, difficulty: 600, levelReq: 60, xp: 150000, gold: 7500, renown: 16, dropRolls: 4, dropTierBonus: 2 },
+  { id: "gallows_hill", name: "Gallows Hill", flavor: "Executions stopped here a century ago; the gallows never got the message.", durationMin: 30, difficulty: 182, levelReq: 26, xp: 21000, gold: 1050, renown: 6, dropRolls: 3, dropTierBonus: 1 },
+  { id: "emberfall_catacombs", name: "Emberfall Catacombs", flavor: "Beneath the ruins, tunnels the old empire dug for reasons no one wrote down.", durationMin: 40, difficulty: 227, levelReq: 32, xp: 40000, gold: 2000, renown: 8, dropRolls: 3, dropTierBonus: 1 },
+  { id: "cinder_maw", name: "The Cinder Maw", flavor: "A fissure of permanent fire at Emberfall's heart, said to breathe like something alive.", durationMin: 45, difficulty: 326, levelReq: 40, xp: 45000, gold: 2250, renown: 10, dropRolls: 4, dropTierBonus: 2 },
+  { id: "frostbound_vault", name: "Frostbound Vault", flavor: "A treasury sealed in ice long before anyone alive was born, still guarding what it was told to guard.", durationMin: 55, difficulty: 474, levelReq: 55, xp: 137500, gold: 6875, renown: 13, dropRolls: 4, dropTierBonus: 2 },
+  { id: "shattered_throne", name: "The Shattered Throne", flavor: "The Peaks' broken summit hides a throne room that was never meant to be found again.", durationMin: 60, difficulty: 593, levelReq: 60, xp: 150000, gold: 7500, renown: 16, dropRolls: 4, dropTierBonus: 2 },
   // The Forgotten Beyond — the endgame's one gamble. It drops no ordinary
   // gear at all (dropRolls 0): its whole payout is xp/gold/renown scaled by
   // the span it ROLLS at the moment you set out (randomDurationMin/Max, in
@@ -2058,16 +2075,16 @@ const DUNGEONS = [
   // this def. See mythicContentRewards / MYTHIC_XP_PER_HOUR.
   { id: "forgotten_beyond", name: "The Forgotten Beyond",
     flavor: "Past the seam the ground keeps going and the hours do not. Expeditions sent out at dawn come back at dawn, or four days on, every one of them swearing they were gone an afternoon.",
-    difficulty: 480, levelReq: 60, dropRolls: 0, dropTierBonus: 0,
+    difficulty: 474, levelReq: 60, dropRolls: 0, dropTierBonus: 0,
     randomDurationMin: 30, randomDurationMax: 360,   // minutes; rolled at start
     mythicSource: true }
 ];
 
 const RAIDS = [
   { id: "siege_of_thornwood_keep", name: "Siege of Thornwood Keep", flavor: "A ruined keep retaken by something organized enough to post sentries.", durationMin: 120, difficulty: 119, levelReq: 15, xp: 70000, gold: 3500, renown: 21, dropRolls: 4, dropTierBonus: 1 },
-  { id: "the_sunken_court", name: "The Sunken Court", flavor: "A drowned noble house beneath the Marsh, holding court for guests who never leave.", durationMin: 150, difficulty: 280, levelReq: 28, xp: 187500, gold: 9375, renown: 35, dropRolls: 5, dropTierBonus: 2 },
-  { id: "the_ember_conclave", name: "The Ember Conclave", flavor: "A gathering of the Hollow Choir's faithful, deep in Emberfall's burning heart.", durationMin: 200, difficulty: 430, levelReq: 45, xp: 400000, gold: 20000, renown: 46, dropRolls: 5, dropTierBonus: 3 },
-  { id: "the_shattered_vigil", name: "The Shattered Vigil", flavor: "What's left of an army that marched into the Peaks and forgot to march back out.", durationMin: 240, difficulty: 700, levelReq: 60, xp: 750000, gold: 37500, renown: 58, dropRolls: 6, dropTierBonus: 3 }
+  { id: "the_sunken_court", name: "The Sunken Court", flavor: "A drowned noble house beneath the Marsh, holding court for guests who never leave.", durationMin: 150, difficulty: 268, levelReq: 28, xp: 187500, gold: 9375, renown: 35, dropRolls: 5, dropTierBonus: 2 },
+  { id: "the_ember_conclave", name: "The Ember Conclave", flavor: "A gathering of the Hollow Choir's faithful, deep in Emberfall's burning heart.", durationMin: 200, difficulty: 425, levelReq: 45, xp: 400000, gold: 20000, renown: 46, dropRolls: 5, dropTierBonus: 3 },
+  { id: "the_shattered_vigil", name: "The Shattered Vigil", flavor: "What's left of an army that marched into the Peaks and forgot to march back out.", durationMin: 240, difficulty: 692, levelReq: 60, xp: 750000, gold: 37500, renown: 58, dropRolls: 6, dropTierBonus: 3 }
 ];
 
 /* ================================================================
@@ -2095,6 +2112,12 @@ const RAIDS = [
    applyTimedContentProgress, which skips the whole drop block for
    this type rather than relying on dropRolls being absent.
 ================================================================ */
+// NOT anchored on the POWER MODEL's success-rate table (see that block) —
+// this ladder was designed outside that framework as a "how far can you
+// climb" chase where the upper rungs are meant to be unreachable.
+// Deliberately EXEMPT from the v6 evoMult re-anchoring pass that scaled
+// DUNGEONS/RAIDS/CAMPAIGN_SPINE difficulty by 0.9587/0.9884. Do not
+// "helpfully" apply that scaling here.
 const WORLD_BOSSES = [
   { id: "sangrell", name: "Sangrell, the Bloodletter",
     flavor: "He does not kill for hunger or for orders — he opens people the way a surgeon does, carefully, and stands back to watch what runs out. The villages he has visited are all still standing. That is the part nobody can explain.",
@@ -2415,13 +2438,13 @@ const CAMPAIGN_SPINE = [
   { id: "ch1_empty_road",      chapter: 1,  levelReq: 1,  mission: { durationMin: 20, difficulty: 35,  xp: 600,    gold: 30,    renown: 5  } },
   { id: "ch2_marks_in_mud",    chapter: 2,  levelReq: 8,  mission: { durationMin: 25, difficulty: 73,  xp: 2500,   gold: 125,   renown: 6  } },
   { id: "ch3_hermits_warning", chapter: 3,  levelReq: 16, mission: { durationMin: 30, difficulty: 120, xp: 21000,  gold: 1050,  renown: 8  } },
-  { id: "ch4_tithe_road",      chapter: 4,  levelReq: 25, mission: { durationMin: 35, difficulty: 185, xp: 36750,  gold: 1838,  renown: 10 } },
-  { id: "ch5_marsh_keeps",     chapter: 5,  levelReq: 30, mission: { durationMin: 45, difficulty: 223, xp: 67500,  gold: 3375,  renown: 13 } },
-  { id: "ch6_unmade_king",     chapter: 6,  levelReq: 38, mission: { durationMin: 50, difficulty: 265, xp: 75000,  gold: 3750,  renown: 16 } },
-  { id: "ch7_cinders_secrets", chapter: 7,  levelReq: 46, mission: { durationMin: 60, difficulty: 340, xp: 144000, gold: 7200,  renown: 20 } },
-  { id: "ch8_wardens_price",   chapter: 8,  levelReq: 55, mission: { durationMin: 70, difficulty: 420, xp: 262500, gold: 13125, renown: 25 } },
-  { id: "ch9_into_the_peaks",  chapter: 9,  levelReq: 58, mission: { durationMin: 80, difficulty: 450, xp: 300000, gold: 15000, renown: 32 } },
-  { id: "ch10_sleeper_stirs",  chapter: 10, levelReq: 60, mission: { durationMin: 90, difficulty: 480, xp: 337500, gold: 16875, renown: 40 } }
+  { id: "ch4_tithe_road",      chapter: 4,  levelReq: 25, mission: { durationMin: 35, difficulty: 177, xp: 36750,  gold: 1838,  renown: 10 } },
+  { id: "ch5_marsh_keeps",     chapter: 5,  levelReq: 30, mission: { durationMin: 45, difficulty: 214, xp: 67500,  gold: 3375,  renown: 13 } },
+  { id: "ch6_unmade_king",     chapter: 6,  levelReq: 38, mission: { durationMin: 50, difficulty: 254, xp: 75000,  gold: 3750,  renown: 16 } },
+  { id: "ch7_cinders_secrets", chapter: 7,  levelReq: 46, mission: { durationMin: 60, difficulty: 336, xp: 144000, gold: 7200,  renown: 20 } },
+  { id: "ch8_wardens_price",   chapter: 8,  levelReq: 55, mission: { durationMin: 70, difficulty: 415, xp: 262500, gold: 13125, renown: 25 } },
+  { id: "ch9_into_the_peaks",  chapter: 9,  levelReq: 58, mission: { durationMin: 80, difficulty: 445, xp: 300000, gold: 15000, renown: 32 } },
+  { id: "ch10_sleeper_stirs",  chapter: 10, levelReq: 60, mission: { durationMin: 90, difficulty: 474, xp: 337500, gold: 16875, renown: 40 } }
 ];
 
 // Narrative arcs — flavor only. chapters[i] corresponds to CAMPAIGN_SPINE[i].
