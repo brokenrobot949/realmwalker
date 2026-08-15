@@ -1268,8 +1268,11 @@ let uiPrefs = loadUiPrefs();
 const ACTIVITY_SUBTAB_MAP = { training:"training", dungeon:"dungeons", raid:"raids", quest:"quests", arena:"arena", worldboss:"worldboss" };
 
 /* ================================================================
-   POWER MODEL  (v5 content-era rebalance; re-anchored for the
-                 level 20/40 evolution gates)
+   POWER MODEL  (v7 expected-gear re-anchor; supersedes the v5
+                 content-era rebalance and v6 evoMult fix below for
+                 DUNGEONS/RAIDS/CAMPAIGN_SPINE difficulty — history
+                 kept in place since classPowerMult still depends on
+                 the v6 fix)
    ----------------------------------------------------------------
    Built BEFORE any difficulty/xp numbers below were chosen. Every
    dungeon/raid/quest difficulty and every zone xpPerHour in this file
@@ -1304,6 +1307,36 @@ const ACTIVITY_SUBTAB_MAP = { training:"training", dungeon:"dungeons", raid:"rai
                true means. WORLD_BOSSES was deliberately left untouched
                (see the comment at that array).
 
+               ⚠ ANCHOR GAP #2 — FIXED (v7 expected-gear re-anchor). The
+               v6 pass above fixed the evoMult but left a bigger error
+               standing: the "typical gear" table it (and v5 before it)
+               was anchored on assumed a hero equips gear rolled at
+               their CURRENT best-unlocked zone tier, but the ~3.5-slots
+               /+2-upgrade table below was itself anchored on numbers
+               (3.4-6.2 power/slot at low-to-mid levels) far below what
+               that assumption actually produces — real expected gear at
+               those levels runs 14-40 power/slot. The result: nearly
+               all dungeon/raid/campaign content sat pinned at the 95%
+               successChance cap from the moment it unlocked, because
+               the difficulty was tuned against a hero far weaker than
+               the one who'd actually be attempting it.
+
+               v7 replaces "typical gear" with EXPECTED GEAR AT LEVEL —
+               see the block below — and re-anchors every DUNGEONS/
+               RAIDS/CAMPAIGN_SPINE difficulty against it directly
+               (not as a multiplicative correction on top of v6; the
+               v6 evoMult fix is still load-bearing inside expectedPower
+               via classPowerMult, it's just no longer the only error
+               being corrected). Two deliberate exceptions keep their
+               identity as the hardest of their type rather than being
+               normalised to the type target: `shattered_throne` (60%)
+               and `the_shattered_vigil` (52%). Two entries are
+               deliberately HELD at their pre-v7 numbers rather than
+               re-anchored: `ashen_crypt` (40) and `ch1_empty_road` (35)
+               — see the expected-gear block below for why. WORLD_BOSSES
+               remains untouched by v7 for the same reason it was
+               untouched by v6 (see the comment at that array).
+
                The remaining per-class spread is NOT a defect and should
                NOT be homogenised away. A non-powerMult evolution trades
                success-rate for something else — the fork audit measured
@@ -1324,60 +1357,71 @@ const ACTIVITY_SUBTAB_MAP = { training:"training", dungeon:"dungeons", raid:"rai
                prepared player brings to a marginal attempt, never a
                prerequisite for the rates tabulated below.
 
-   "Typical gear" assumption: a hero equips ~3.5 of the 6 gear slots
-   with drops rolled at their current best-unlocked zone tier
-   (zoneTierForHero), using rollItemTier's ACTUAL weighted tier odds
-   at that zoneTier (not just "uncommon") averaged against
-   POWER_RANGES and computeItemPower's zoneTier scaling, then
-   blacksmith-upgraded to an average of +2 (post-nerf x1.2 power).
+   "EXPECTED GEAR AT LEVEL" assumption (v7 — supersedes the "typical
+   gear" assumption this block used through v6). The v6 table above was
+   anchored around 3.4-6.2 power/slot at low-to-mid levels while real
+   gear at those levels is 14-40 power/slot, which is why nearly
+   everything sat at the 95% successChance cap from the moment it
+   unlocked regardless of the evoMult fix. v7 anchors instead on the
+   probability-weighted mean of the BEST of 4 drops per slot, rolled at
+   the level's own zone tier (rollItemTier's actual weighted tier odds
+   at that zoneTier, against POWER_RANGES and computeItemPower's
+   zoneTier scaling) — i.e. the gear a hero who has actually been
+   playing at that level realistically holds, not a hand-picked
+   "typical" sample.
 
-   Anchor levels (era checkpoints) with this typical gear:
+   Expected gear per slot by zone tier (mean of best-of-4 drops,
+   already scaled by the zone-tier factor):
 
-     Level | Era | Best zone tier      | Avg item pwr (post-BS) | Base(10+5L) | EvoMult  | Power
-     ------+-----+---------------------+------------------------+-------------+----------+-------
-       24  |  1  | T4 Sunken Marsh     |         ~14.3          |     130     | 1.045    | ~188
-       40  |  2  | T5 Emberfall Ruins  |         ~18.2          |     210     | 1.136667 | ~311
-       60  |  3  | T7 The Threshold    |         ~28.5          |     310     | 1.136667 | ~466
-        (gearPower = avg item pwr * 3.5 equipped items; EvoMult is the TRUE
-         evolution mean for that level's tier, per the fixed anchor above)
+     Zone tier            1       2       3       4       5       6       7
+     Power/slot         8.14   11.08   14.66   20.01   26.72   34.71   43.80
 
-   Difficulty anchors below were chosen so ratio = power/difficulty
-   lands near 1.0-1.15 (successChance ~70-95%, see successChance())
-   for a hero freshly into a given content's own era, and well under
-   0.6 (~<30%) for a hero attempting content a full era ahead of their
-   own (e.g. a level-10, still-Era-1 hero vs Era-2 content). Content
-   sitting at the EXACT floor level of a freshly-opened era (e.g. a
-   level-60 hero vs level60-gated Era-3 finale content) will read
-   Challenging (40-65%) rather than the full 70-85% band — that's
-   intentional: the hardest thing in a brand-new era should feel hard
-   on day one of that era, and eases into the 70-95% band within a
-   handful of levels.
+   expectedPower(level) =
+     round( (10 + 5*level + 6 * expectedGearPerSlot[zoneTierForLevel(level)])
+            * classPowerMult )
+   classPowerMult = the TRUE roster mean from the v6 fix above: 1.0
+   below level 20, 1.045 at 20-39, 1.136667 at 40+. (6 gear slots, all
+   assumed filled — expected gear already accounts for the realistic
+   mean, so there's no separate "~3.5 of 6 equipped" discount here.)
 
-   Per-entry anchor: successChance for the typical-gear hero standing
-   at each entry's OWN levelReq (the number the difficulty was chosen
-   against). Dungeon and campaign entries target ratio ~1.09 (~80%);
-   raids and era-floor/finale content sit deliberately lower.
+   Difficulty anchors below were chosen so successChance(expectedPower
+   (levelReq) / difficulty) lands on a per-type TARGET success rate at
+   the hero's OWN levelReq (the number the difficulty was chosen
+   against): campaign 82%, dungeon 75%, raid 66%. Two deliberate
+   exceptions keep their identity as the hardest of their type instead
+   of being normalised to the type target: `shattered_throne` (60%) and
+   `the_shattered_vigil` (52%).
 
-     (Below-20 rows are unchanged — no evolution exists yet either way, so
-     the old and new models agree exactly there. 20+ rows now measured
-     against the TRUE evoMult means, 1.045 / 1.136667, against the
-     RE-ANCHORED difficulty — see the v6 fix above.)
+   Two deliberate HOLDS: `ashen_crypt` (40) and `ch1_empty_road` (35)
+   keep their original, pre-v7 difficulty. The expected-gear model
+   assumes a hero who has been playing AT that level, which is false at
+   level 1 — a brand-new hero starts with NO equipped gear at all
+   (power 15, i.e. just the base 10 + 5*1 term). Re-anchoring these two
+   to the 75%/82% targets like the rest of their type would have taken
+   a genuinely new hero's very first quest/dungeon from a ~17%/~14%
+   opening success down to ~7%. The proper fix is granting new heroes
+   basic starting gear so the expected-gear premise holds from level 1;
+   until that exists, these two stay held at their old numbers and a
+   fresh hero keeps roughly the odds they always had.
 
      Dungeon              lvlReq  diff  ratio  success
-     Ashen Crypt              1     40  0.98    67%
-     Wolfsbane Hollow         6     65  1.09    81%
-     Drowned Chapel          12    100  1.09    81%
-     Gallows Hill            26    182  1.09    81%
-     Emberfall Catacombs     32    227  1.08    79%
-     The Cinder Maw          40    326  0.95    65%   <- Era-2 ceiling
-     Frostbound Vault        55    474  0.92    61%   <- Era-3 floor
-     The Shattered Throne    60    593  0.79    47%   <- Era-3 finale
+     Ashen Crypt              1     40  1.60    95%   <- HELD, see above
+     Wolfsbane Hollow         6    103  1.04    75%
+     Drowned Chapel          12    152  1.04    75%
+     Gallows Hill            26    261  1.04    75%
+     Emberfall Catacombs     32    331  1.04    75%
+     The Cinder Maw          40    404  1.04    75%
+     Frostbound Vault        55    598  1.04    75%
+     The Shattered Throne    60    714  0.91    60%   <- deliberate exception
+     (The Forgotten Beyond, difficulty 625 @ lvl60, isn't in this table
+     — it has no fixed xp/gold/renown to target a rate against — but it
+     was re-anchored the same way and lands at the dungeon target, 75%.)
 
      Raid                 lvlReq  diff  ratio  success
-     Siege of Thornwood      15    119  1.04    75%
-     The Sunken Court        28    268  0.83    52%
-     The Ember Conclave      45    425  0.84    53%
-     The Shattered Vigil     60    692  0.67    36%   <- Era-3 finale
+     Siege of Thornwood      15    179  0.97    66%
+     The Sunken Court        28    336  0.96    66%
+     The Ember Conclave      45    522  0.97    66%
+     The Shattered Vigil     60    777  0.84    52%   <- deliberate exception
 
      The campaign is anchored ABOVE the dungeon/raid tables on purpose.
      It is the story spine: linear, gated, long-duration (20-90 min per
@@ -1387,21 +1431,20 @@ const ACTIVITY_SUBTAB_MAP = { training:"training", dungeon:"dungeons", raid:"rai
      and a multi-hour rest on top of the lost timers, and the story
      cannot be routed around while that happens. Dungeons and raids are
      the optional, repeatable, shorter challenge content and keep the
-     lower Challenging bands; the campaign instead runs a gentle
-     descending ramp from comfortable to tense, with Ch10 the hardest
-     chapter but still clearly favourable.
+     lower target; the campaign runs at a steady, comfortable 82%
+     start-to-finish (Ch1 held far above it, see above).
 
      Campaign             lvlReq  diff  ratio  success
-     Ch1 Vanishing Road       1     35  1.11    84%
-     Ch2 Tracks Before Dawn   8     73  1.11    83%
-     Ch3 Hermit's Archive    16    120  1.08    79%
-     Ch4 Raid the Waystation 25    177  1.09    81%
-     Ch5 The Marsh Column    30    214  1.09    81%
-     Ch6 Beneath Old Crown   38    254  1.09    80%
-     Ch7 Choir's Calendar    46    336  1.08    80%
-     Ch8 Recover the Warden  55    415  1.05    76%
-     Ch9 Threshold Ritual    58    445  1.02    72%
-     Ch10 What Throne Rmbrs  60    474  0.98    68%   <- story climax
+     Ch1 Vanishing Road       1     35  1.83    95%   <- HELD, see above
+     Ch2 Tracks Before Dawn   8    106  1.10    83%
+     Ch3 Hermit's Archive    16    162  1.10    82%
+     Ch4 Raid the Waystation 25    243  1.10    82%
+     Ch5 The Marsh Column    30    305  1.10    82%
+     Ch6 Beneath Old Crown   38    343  1.10    82%
+     Ch7 Choir's Calendar    46    464  1.10    82%
+     Ch8 Recover the Warden  55    567  1.10    82%
+     Ch9 Threshold Ritual    58    582  1.10    82%
+     Ch10 What Throne Rmbrs  60    592  1.10    82%
 
    The Arena needs no DIFFICULTY anchor here: arenaMonsterPower() derives
    monster power FROM computePower(hero), so the hero/monster ratio is
@@ -1696,7 +1739,21 @@ const ZONES = [
     tasks:["Fighting a hollow revenant off the pass","Scaling a wind-scoured ridge","Holding footing against the mountain's own gales","Standing vigil near the sealed Threshold","Driving back something that used to be a person"] },
   { id:"threshold_watch", name:"The Threshold Watch", tier:7, levelReq:55, xpPerHour:75000, goldPerHour:3750, dropChance:0.11,
     flavor:"The last watch before the seam in the world, where the Threshold breathes, and something breathes back.",
-    tasks:["Standing the long watch over the seam beneath the Peaks","Turning back pilgrims still chasing the Hollow Choir's promises","Binding a crack in the stone before something notices it's open","Putting down whatever crawled through before the seal caught it","Listening to the Threshold breathe, and reporting that it still does"] }
+    tasks:["Standing the long watch over the seam beneath the Peaks","Turning back pilgrims still chasing the Hollow Choir's promises","Binding a crack in the stone before something notices it's open","Putting down whatever crawled through before the seal caught it","Listening to the Threshold breathe, and reporting that it still does"] },
+  { id:"gilded_ossuary", name:"The Gilded Ossuary", tier:7, levelReq:60, xpPerHour:20000, goldPerHour:11250, dropChance:0.04,
+    // excludeFromBest: this zone is deliberately the best gold in the game and
+    // deliberately poor at everything else (27% of Threshold Watch's xp, ~1/3
+    // its drop chance). It must NOT be picked up by bestUnlockedZone/
+    // zoneTierForLevel's "walk ZONES, keep the last one the hero qualifies for"
+    // logic, or every level-60+ hero's progression tier would collapse onto it —
+    // tripling itemShopPrice (anchored to bestUnlockedZone(hero).goldPerHour),
+    // gutting arenaRewardZone's xp (which reads bestUnlockedZone's xpPerHour),
+    // and dragging drop-tier rolls down with it. The flag keeps the Ossuary
+    // fully selectable and playable as a questing destination — it only
+    // excludes it from representing the hero's progression tier.
+    excludeFromBest: true,
+    flavor:"A drowned treasury where the old kings were interred with everything they couldn't take with them, and the water never quite finished taking it either.",
+    tasks:["Prying rings from fingers the water didn't finish","Breaking a sealed vault meant to stay sealed","Sifting silt for coin spilled from a rotted purse","Levering a sarcophagus lid off its moorings","Hauling grave-goods up through the flooded stair"] }
 ];
 
 const DROP_INTERVAL_MS = 120 * 1000; // one drop roll per 2 minutes of training
@@ -1731,6 +1788,13 @@ const POWER_RANGES = {
   legendary: [32, 48],
   mythic:    [52, 72]
 };
+
+// Every new hero starts in the same humble kit: one weapon, one piece of
+// armor, both fixed at the top of the common power range rather than rolled,
+// so the opening is identical for every hero and every class. This exists
+// because content difficulty is anchored on "expected gear at level", and a
+// gearless hero sits far below that anchor — see the POWER MODEL block.
+const STARTING_ITEM_POWER = 5;
 
 // Relic bonus keys feed the matching central modifier function.
 const RELIC_BOOST_KEYS = ["xpMult", "goldMult", "dropMult"];       // values >1 are good
@@ -1770,7 +1834,16 @@ function rollBonusForSlot(slot, tierId){
 }
 
 const SELL_VALUE_BY_TIER = { common:1, uncommon:3, rare:10, epic:30, legendary:100, mythic:300 };
-const SHOP_PRICE_MULT = 5;
+
+// Shop prices are anchored to the hero's CURRENT questing income, not to a
+// flat sell value. SELL_VALUE_BY_TIER is flat per tier while zone gold/hour
+// scales ~125x across the level range, so a flat multiplier made the shop
+// unaffordable at level 1 and pocket change at 60. These are hours of the
+// hero's best-unlocked zone's gold/hour that each rarity costs to buy.
+const SHOP_PRICE_HOURS = {
+  common: 0.10, uncommon: 0.25, rare: 0.58,
+  epic: 1.25, legendary: 2.50, mythic: 6.00
+};
 
 // Salvage: an alternative to selling that yields dust (Enchanter currency,
 // added in a later pass) instead of gold. Independent of SELL_VALUE_BY_TIER.
@@ -2056,13 +2129,13 @@ const EVOLUTIONS = {
 
 const DUNGEONS = [
   { id: "ashen_crypt", name: "The Ashen Crypt", flavor: "A collapsed mausoleum on the Millbrook road, its dead restless since the roof came down.", durationMin: 15, difficulty: 40, levelReq: 1, xp: 300, gold: 15, renown: 3, dropRolls: 2, dropTierBonus: 0 },
-  { id: "wolfsbane_hollow", name: "Wolfsbane Hollow", flavor: "A poisoned dell where the wolves stopped dying and started waiting.", durationMin: 20, difficulty: 65, levelReq: 6, xp: 1333, gold: 67, renown: 4, dropRolls: 2, dropTierBonus: 0 },
-  { id: "drowned_chapel", name: "The Drowned Chapel", flavor: "A chapel the marsh swallowed whole, its bell still ringing when the water goes still.", durationMin: 25, difficulty: 100, levelReq: 12, xp: 11667, gold: 583, renown: 5, dropRolls: 3, dropTierBonus: 1 },
-  { id: "gallows_hill", name: "Gallows Hill", flavor: "Executions stopped here a century ago; the gallows never got the message.", durationMin: 30, difficulty: 182, levelReq: 26, xp: 21000, gold: 1050, renown: 6, dropRolls: 3, dropTierBonus: 1 },
-  { id: "emberfall_catacombs", name: "Emberfall Catacombs", flavor: "Beneath the ruins, tunnels the old empire dug for reasons no one wrote down.", durationMin: 40, difficulty: 227, levelReq: 32, xp: 40000, gold: 2000, renown: 8, dropRolls: 3, dropTierBonus: 1 },
-  { id: "cinder_maw", name: "The Cinder Maw", flavor: "A fissure of permanent fire at Emberfall's heart, said to breathe like something alive.", durationMin: 45, difficulty: 326, levelReq: 40, xp: 45000, gold: 2250, renown: 10, dropRolls: 4, dropTierBonus: 2 },
-  { id: "frostbound_vault", name: "Frostbound Vault", flavor: "A treasury sealed in ice long before anyone alive was born, still guarding what it was told to guard.", durationMin: 55, difficulty: 474, levelReq: 55, xp: 137500, gold: 6875, renown: 13, dropRolls: 4, dropTierBonus: 2 },
-  { id: "shattered_throne", name: "The Shattered Throne", flavor: "The Peaks' broken summit hides a throne room that was never meant to be found again.", durationMin: 60, difficulty: 593, levelReq: 60, xp: 150000, gold: 7500, renown: 16, dropRolls: 4, dropTierBonus: 2 },
+  { id: "wolfsbane_hollow", name: "Wolfsbane Hollow", flavor: "A poisoned dell where the wolves stopped dying and started waiting.", durationMin: 20, difficulty: 103, levelReq: 6, xp: 1333, gold: 67, renown: 4, dropRolls: 2, dropTierBonus: 0 },
+  { id: "drowned_chapel", name: "The Drowned Chapel", flavor: "A chapel the marsh swallowed whole, its bell still ringing when the water goes still.", durationMin: 25, difficulty: 152, levelReq: 12, xp: 11667, gold: 583, renown: 5, dropRolls: 3, dropTierBonus: 1 },
+  { id: "gallows_hill", name: "Gallows Hill", flavor: "Executions stopped here a century ago; the gallows never got the message.", durationMin: 30, difficulty: 261, levelReq: 26, xp: 21000, gold: 1050, renown: 6, dropRolls: 3, dropTierBonus: 1 },
+  { id: "emberfall_catacombs", name: "Emberfall Catacombs", flavor: "Beneath the ruins, tunnels the old empire dug for reasons no one wrote down.", durationMin: 40, difficulty: 331, levelReq: 32, xp: 40000, gold: 2000, renown: 8, dropRolls: 3, dropTierBonus: 1 },
+  { id: "cinder_maw", name: "The Cinder Maw", flavor: "A fissure of permanent fire at Emberfall's heart, said to breathe like something alive.", durationMin: 45, difficulty: 404, levelReq: 40, xp: 45000, gold: 2250, renown: 10, dropRolls: 4, dropTierBonus: 2 },
+  { id: "frostbound_vault", name: "Frostbound Vault", flavor: "A treasury sealed in ice long before anyone alive was born, still guarding what it was told to guard.", durationMin: 55, difficulty: 598, levelReq: 55, xp: 137500, gold: 6875, renown: 13, dropRolls: 4, dropTierBonus: 2 },
+  { id: "shattered_throne", name: "The Shattered Throne", flavor: "The Peaks' broken summit hides a throne room that was never meant to be found again.", durationMin: 60, difficulty: 714, levelReq: 60, xp: 150000, gold: 7500, renown: 16, dropRolls: 4, dropTierBonus: 2 },
   // The Forgotten Beyond — the endgame's one gamble. It drops no ordinary
   // gear at all (dropRolls 0): its whole payout is xp/gold/renown scaled by
   // the span it ROLLS at the moment you set out (randomDurationMin/Max, in
@@ -2075,16 +2148,16 @@ const DUNGEONS = [
   // this def. See mythicContentRewards / MYTHIC_XP_PER_HOUR.
   { id: "forgotten_beyond", name: "The Forgotten Beyond",
     flavor: "Past the seam the ground keeps going and the hours do not. Expeditions sent out at dawn come back at dawn, or four days on, every one of them swearing they were gone an afternoon.",
-    difficulty: 474, levelReq: 60, dropRolls: 0, dropTierBonus: 0,
+    difficulty: 625, levelReq: 60, dropRolls: 0, dropTierBonus: 0,
     randomDurationMin: 30, randomDurationMax: 360,   // minutes; rolled at start
     mythicSource: true }
 ];
 
 const RAIDS = [
-  { id: "siege_of_thornwood_keep", name: "Siege of Thornwood Keep", flavor: "A ruined keep retaken by something organized enough to post sentries.", durationMin: 120, difficulty: 119, levelReq: 15, xp: 70000, gold: 3500, renown: 21, dropRolls: 4, dropTierBonus: 1 },
-  { id: "the_sunken_court", name: "The Sunken Court", flavor: "A drowned noble house beneath the Marsh, holding court for guests who never leave.", durationMin: 150, difficulty: 268, levelReq: 28, xp: 187500, gold: 9375, renown: 35, dropRolls: 5, dropTierBonus: 2 },
-  { id: "the_ember_conclave", name: "The Ember Conclave", flavor: "A gathering of the Hollow Choir's faithful, deep in Emberfall's burning heart.", durationMin: 200, difficulty: 425, levelReq: 45, xp: 400000, gold: 20000, renown: 46, dropRolls: 5, dropTierBonus: 3 },
-  { id: "the_shattered_vigil", name: "The Shattered Vigil", flavor: "What's left of an army that marched into the Peaks and forgot to march back out.", durationMin: 240, difficulty: 692, levelReq: 60, xp: 750000, gold: 37500, renown: 58, dropRolls: 6, dropTierBonus: 3 }
+  { id: "siege_of_thornwood_keep", name: "Siege of Thornwood Keep", flavor: "A ruined keep retaken by something organized enough to post sentries.", durationMin: 120, difficulty: 179, levelReq: 15, xp: 70000, gold: 3500, renown: 21, dropRolls: 4, dropTierBonus: 1 },
+  { id: "the_sunken_court", name: "The Sunken Court", flavor: "A drowned noble house beneath the Marsh, holding court for guests who never leave.", durationMin: 150, difficulty: 336, levelReq: 28, xp: 187500, gold: 9375, renown: 35, dropRolls: 5, dropTierBonus: 2 },
+  { id: "the_ember_conclave", name: "The Ember Conclave", flavor: "A gathering of the Hollow Choir's faithful, deep in Emberfall's burning heart.", durationMin: 200, difficulty: 522, levelReq: 45, xp: 400000, gold: 20000, renown: 46, dropRolls: 5, dropTierBonus: 3 },
+  { id: "the_shattered_vigil", name: "The Shattered Vigil", flavor: "What's left of an army that marched into the Peaks and forgot to march back out.", durationMin: 240, difficulty: 777, levelReq: 60, xp: 750000, gold: 37500, renown: 58, dropRolls: 6, dropTierBonus: 3 }
 ];
 
 /* ================================================================
@@ -2436,15 +2509,15 @@ function fireQuestEncounter(hero, zone){
 // outro, mission name) is arc-specific, see CAMPAIGN_ARCS below.
 const CAMPAIGN_SPINE = [
   { id: "ch1_empty_road",      chapter: 1,  levelReq: 1,  mission: { durationMin: 20, difficulty: 35,  xp: 600,    gold: 30,    renown: 5  } },
-  { id: "ch2_marks_in_mud",    chapter: 2,  levelReq: 8,  mission: { durationMin: 25, difficulty: 73,  xp: 2500,   gold: 125,   renown: 6  } },
-  { id: "ch3_hermits_warning", chapter: 3,  levelReq: 16, mission: { durationMin: 30, difficulty: 120, xp: 21000,  gold: 1050,  renown: 8  } },
-  { id: "ch4_tithe_road",      chapter: 4,  levelReq: 25, mission: { durationMin: 35, difficulty: 177, xp: 36750,  gold: 1838,  renown: 10 } },
-  { id: "ch5_marsh_keeps",     chapter: 5,  levelReq: 30, mission: { durationMin: 45, difficulty: 214, xp: 67500,  gold: 3375,  renown: 13 } },
-  { id: "ch6_unmade_king",     chapter: 6,  levelReq: 38, mission: { durationMin: 50, difficulty: 254, xp: 75000,  gold: 3750,  renown: 16 } },
-  { id: "ch7_cinders_secrets", chapter: 7,  levelReq: 46, mission: { durationMin: 60, difficulty: 336, xp: 144000, gold: 7200,  renown: 20 } },
-  { id: "ch8_wardens_price",   chapter: 8,  levelReq: 55, mission: { durationMin: 70, difficulty: 415, xp: 262500, gold: 13125, renown: 25 } },
-  { id: "ch9_into_the_peaks",  chapter: 9,  levelReq: 58, mission: { durationMin: 80, difficulty: 445, xp: 300000, gold: 15000, renown: 32 } },
-  { id: "ch10_sleeper_stirs",  chapter: 10, levelReq: 60, mission: { durationMin: 90, difficulty: 474, xp: 337500, gold: 16875, renown: 40 } }
+  { id: "ch2_marks_in_mud",    chapter: 2,  levelReq: 8,  mission: { durationMin: 25, difficulty: 106, xp: 2500,   gold: 125,   renown: 6  } },
+  { id: "ch3_hermits_warning", chapter: 3,  levelReq: 16, mission: { durationMin: 30, difficulty: 162, xp: 21000,  gold: 1050,  renown: 8  } },
+  { id: "ch4_tithe_road",      chapter: 4,  levelReq: 25, mission: { durationMin: 35, difficulty: 243, xp: 36750,  gold: 1838,  renown: 10 } },
+  { id: "ch5_marsh_keeps",     chapter: 5,  levelReq: 30, mission: { durationMin: 45, difficulty: 305, xp: 67500,  gold: 3375,  renown: 13 } },
+  { id: "ch6_unmade_king",     chapter: 6,  levelReq: 38, mission: { durationMin: 50, difficulty: 343, xp: 75000,  gold: 3750,  renown: 16 } },
+  { id: "ch7_cinders_secrets", chapter: 7,  levelReq: 46, mission: { durationMin: 60, difficulty: 464, xp: 144000, gold: 7200,  renown: 20 } },
+  { id: "ch8_wardens_price",   chapter: 8,  levelReq: 55, mission: { durationMin: 70, difficulty: 567, xp: 262500, gold: 13125, renown: 25 } },
+  { id: "ch9_into_the_peaks",  chapter: 9,  levelReq: 58, mission: { durationMin: 80, difficulty: 582, xp: 300000, gold: 15000, renown: 32 } },
+  { id: "ch10_sleeper_stirs",  chapter: 10, levelReq: 60, mission: { durationMin: 90, difficulty: 592, xp: 337500, gold: 16875, renown: 40 } }
 ];
 
 // Narrative arcs — flavor only. chapters[i] corresponds to CAMPAIGN_SPINE[i].
@@ -2878,6 +2951,7 @@ const MYTHIC_CHANCE_MIN = 0.05;      // at the 30-minute floor
 const MYTHIC_CHANCE_MAX = 0.75;      // at the 6-hour ceiling — a hard cap
 
 // Arena tuning.
+const ARENA_LEVEL_REQ = 10;              // hero level required to enter the Arena at all
 const ARENA_MONSTER_POWER_BASE = 0.6;    // monster power = hero power × (base + step × fightNumber)
 const ARENA_MONSTER_POWER_STEP = 0.12;
 // xp per win = zone xp/hour × this × fightNumber. Sized by simulation (see the
@@ -2887,7 +2961,10 @@ const ARENA_MONSTER_POWER_STEP = 0.12;
 // → two injuries → one 6h long rest), so the run's EFFECTIVE rate is 3.62
 // zone-hours / 3.01h ≈ 1.21× the hero's questing rate — deliberately above
 // idling, and the price of that is the wound.
-const ARENA_XP_ZONE_FRACTION = 0.40;
+// Reduced from 0.40 to 0.30 (a 25% cut) — deep runs were still paying over
+// 1,000,000 XP once reward-stacking and the survival bonus compounded on
+// the per-fight `* a.fightNumber` triangular term.
+const ARENA_XP_ZONE_FRACTION = 0.30;
 // gold per win = zone gold/hour × THIS × fightNumber — deliberately a separate,
 // far smaller constant, NOT ARENA_XP_ZONE_FRACTION.
 //
@@ -3123,7 +3200,7 @@ function createEmptyEquipment(){
 }
 
 function createNewHero(name, raceId, classId){
-  return {
+  const hero = {
     name: name,
     raceId: raceId,
     classId: classId,
@@ -3144,6 +3221,13 @@ function createNewHero(name, raceId, classId){
     arenaRerolls: 0,      // Arena re-roll charges from second_wind; persist until consumed
     campaignArc: pickCampaignArc(null)  // which CAMPAIGN_ARCS story this hero is living; flavor only
   };
+  // Starting kit — see createStartingItem/STARTING_ITEM_POWER. Built after
+  // the hero object exists because the item names depend on hero.classId.
+  // Only weapon/armor are filled; helm/gloves/boots/relic stay empty and
+  // come from drops.
+  hero.equipment.weapon = createStartingItem("weapon", hero);
+  hero.equipment.armor = createStartingItem("armor", hero);
+  return hero;
 }
 
 function createDefaultState(name, raceId, classId){
@@ -4033,10 +4117,12 @@ function rollItemTier(effTier){
   return ITEM_TIERS[0];
 }
 
-// Highest zone tier a hero at `level` qualifies for.
+// Highest zone tier a hero at `level` qualifies for. Skips excludeFromBest
+// zones (e.g. the Gilded Ossuary) — see that flag's comment on the ZONES
+// entry for why they must never represent a hero's progression tier.
 function zoneTierForLevel(level){
   let tier = 1;
-  ZONES.forEach(z => { if (level >= z.levelReq) tier = z.tier; });
+  ZONES.forEach(z => { if (level >= z.levelReq && !z.excludeFromBest) tier = z.tier; });
   return tier;
 }
 
@@ -4125,6 +4211,34 @@ function rollItem(zone, hero){
   return rollGearItem(tier, zone.tier, hero);
 }
 
+// Builds the fixed weapon+armor a brand-new (or reborn) hero starts with —
+// see STARTING_ITEM_POWER. Deliberately NOT rollGearItem/rollGearName:
+// power is fixed rather than rolled, and the name is a fixed humble
+// qualifier over the class's own weapon/armor noun (from CLASS_GEAR_STYLE)
+// rather than drawn from the ITEM_NAMES_V2 pools, so every hero of a given
+// class gets the exact same starting item, every time. Shape otherwise
+// mirrors rollGearItem exactly (id/name/slot/tierId/tierName/power/
+// upgradeLevel/bonus/foundAt) so equip/sell/salvage/blacksmith/inventory
+// code can't tell a starting item from a dropped one. The slot name is
+// baked into the id so the weapon and armor ids can never collide even if
+// built in the same millisecond.
+function createStartingItem(slot, hero){
+  const style = CLASS_GEAR_STYLE[hero.classId] || CLASS_GEAR_STYLE.squire;
+  const noun = slot === "weapon" ? style.weapon : style.armor;
+  const tier = ITEM_TIERS.find(t => t.id === "common");
+  return {
+    id: "item_start_" + slot + "_" + Date.now() + "_" + Math.floor(Math.random()*100000),
+    name: "Threadbare " + capitalize(noun),
+    slot: slot,
+    tierId: tier.id,
+    tierName: tier.name,
+    power: STARTING_ITEM_POWER,
+    upgradeLevel: 0,
+    bonus: null,
+    foundAt: Date.now()
+  };
+}
+
 // The ONLY place a mythic item is ever created. Deliberately NOT
 // rollGearItem: the slot is forced to weapon (mythic armour and mythic
 // relics do not exist) and the tier is taken by id rather than rolled,
@@ -4161,12 +4275,26 @@ function itemSalvageValue(item){
 }
 
 function itemShopPrice(item, hero){
-  return Math.round(itemSellValue(item) * SHOP_PRICE_MULT * getShopPriceMultiplier(hero));
+  const zone = bestUnlockedZone(hero);
+  const hours = SHOP_PRICE_HOURS[item.tierId] != null ? SHOP_PRICE_HOURS[item.tierId] : SHOP_PRICE_HOURS.common;
+  return Math.max(1, Math.round(zone.goldPerHour * hours * getShopPriceMultiplier(hero)));
 }
 
+// Shop quality is the BETTER of two independent rollItemTier(zoneTier) rolls
+// (compared by ITEM_TIERS index — later index = better), which lifts average
+// stock quality above what a single roll would give. Both rolls still go
+// through rollItemTier(zoneTierForHero(hero)) with that exact argument, so
+// taking the max of two samples from that same distribution can never
+// produce a tier outside the distribution's support — the shop still cannot
+// stock anything the player could not find by questing in their own
+// best-unlocked zone. Mythic in particular stays impossible: rollItemTier
+// hard-zeroes its weight at every effTier, so no roll — one or two — can
+// ever return it.
 function rollShopItem(hero){
   const zoneTier = zoneTierForHero(hero);
-  const tier = rollItemTier(zoneTier);
+  const tierA = rollItemTier(zoneTier);
+  const tierB = rollItemTier(zoneTier);
+  const tier = ITEM_TIERS.indexOf(tierB) > ITEM_TIERS.indexOf(tierA) ? tierB : tierA;
   return rollGearItem(tier, zoneTier, hero);
 }
 
@@ -7387,9 +7515,12 @@ function arenaMonsterPower(hero, fightNumber){
 
 // The highest-levelReq zone the hero currently qualifies for. Shared by Arena
 // rewards ("zone-hour-scale") and Cleric Temple tithes (opportunity-cost pricing).
+// Skips excludeFromBest zones (e.g. the Gilded Ossuary) — see that flag's
+// comment on the ZONES entry for why they must never represent a hero's
+// progression tier.
 function bestUnlockedZone(hero){
   let zone = ZONES[0];
-  ZONES.forEach(z => { if (hero.level >= z.levelReq) zone = z; });
+  ZONES.forEach(z => { if (hero.level >= z.levelReq && !z.excludeFromBest) zone = z; });
   return zone;
 }
 
@@ -7399,6 +7530,7 @@ function arenaRewardZone(hero){
 
 function arenaBlockReason(){
   const hero = state.hero;
+  if (hero.level < ARENA_LEVEL_REQ) return "Requires level " + ARENA_LEVEL_REQ;
   if (hero.injuries >= MAX_INJURIES) return "Badly hurt — must rest";
   if (state.activity.type === "rest") return "Resting";
   if (isBusyWithContent() && state.activity.type !== "arena") return "Already engaged";
