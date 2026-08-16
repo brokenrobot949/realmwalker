@@ -201,6 +201,32 @@
   }
   #activity-tracker .activity-name{ color:var(--arcane); text-transform:none; letter-spacing:0; }
 
+  /* Daily Realm Decree banner — same treatment as .panel but compact,
+     sits under the activity tracker so it's visible without hunting. */
+  .decree-banner{
+    max-width:640px; margin:0.7rem auto 0; text-align:left;
+    background:linear-gradient(180deg, var(--bg-2), var(--bg-1));
+    border:1px solid var(--panel-border); border-radius:8px;
+    padding:0.55rem 0.85rem;
+  }
+  .decree-head{ display:flex; align-items:baseline; justify-content:space-between; gap:0.6rem; flex-wrap:wrap; }
+  .decree-label{
+    font-family:Georgia, serif; font-size:0.72rem; letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--parchment-dim);
+  }
+  .decree-name{ font-family:Georgia,'Times New Roman',serif; font-size:1rem; color:var(--gold-bright); }
+  .decree-flavor{
+    font-style:italic; color:var(--parchment-dim); font-size:0.82rem;
+    margin-top:0.2rem;
+  }
+  .decree-effects{ display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.4rem; }
+  .decree-effect{
+    font-size:0.75rem; border-radius:10px; padding:0.15rem 0.55rem;
+    border:1px solid var(--steel-dim); background:var(--bg-1);
+  }
+  .decree-effect.good{ color:var(--green); border-color:var(--green); }
+  .decree-effect.bad{ color:var(--red); border-color:var(--red); }
+
   .top-bar{ display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; }
   .hero-panel{ flex:1; }
   .hero-title-row{ display:flex; align-items:center; gap:0.7rem; flex-wrap:wrap; }
@@ -271,6 +297,19 @@
   .zone-stats{ display:flex; gap:1rem; font-size:0.8rem; color:var(--parchment-dim); flex-wrap:wrap; margin-top:0.25rem; }
   .zone-stats span b{ color:var(--parchment); }
   .zone-action{ min-width:110px; text-align:right; }
+
+  /* Ascend tier picker on eligible dungeon/raid cards — chips, not a new
+     component style, sized/positioned like .tier-badge and .buff-chip. */
+  .ascend-tier-row{ display:flex; gap:0.35rem; flex-wrap:wrap; margin-top:0.5rem; }
+  .ascend-chip{
+    font-family:Georgia,'Times New Roman',serif; font-size:0.72rem; padding:0.22rem 0.55rem;
+    border-radius:10px; border:1px solid var(--steel-dim); background:var(--bg-0); color:var(--steel);
+    cursor:pointer; transition:all 0.15s ease; line-height:1.3;
+  }
+  button.ascend-chip:hover{ border-color:var(--gold); color:var(--gold-bright); }
+  .ascend-chip.locked{ opacity:0.5; cursor:not-allowed; border-style:dashed; }
+  .ascend-chip.active{ border-color:var(--gold); color:var(--gold-bright); cursor:default; background:linear-gradient(180deg, #2a2314, var(--bg-1)); }
+  .ascend-mark{ font-size:0.7rem; color:var(--text-muted); margin-top:0.35rem; font-style:italic; }
 
   .training-progress{ margin-bottom:0.9rem; padding:0.6rem 0.8rem; background:var(--bg-1); border:1px solid var(--panel-border); border-radius:8px; }
   .training-progress .xp-bar-label span:first-child{ font-style:italic; color:var(--parchment-dim); }
@@ -411,7 +450,7 @@
   /* ================= TOWN HUB ================= */
   .town-grid{ display:grid; grid-template-columns:1fr 1fr; gap:1rem; align-items:start; }
   @media (max-width:900px){ .town-grid{ grid-template-columns:1fr; } }
-  .shop-list, .blacksmith-list, .tavern-list, .enchanter-list{
+  .shop-list, .blacksmith-list, .tavern-list, .enchanter-list, .stronghold-list{
     display:flex; flex-direction:column; gap:0.5rem; max-height:340px; overflow-y:auto; padding-right:0.3rem;
   }
   .shop-item, .blacksmith-item, .enchanter-item{
@@ -424,11 +463,12 @@
     background:var(--bg-1); border:1px solid var(--panel-border); border-radius:6px;
     padding:0.6rem 0.8rem; margin-bottom:0.5rem; font-size:0.9rem; flex-wrap:wrap;
   }
-  .tavern-item{
+  .tavern-item, .stronghold-item{
     display:flex; flex-direction:column; gap:0.25rem;
     background:var(--bg-1); border:1px solid var(--panel-border); border-radius:6px; padding:0.6rem 0.8rem; font-size:0.85rem;
   }
   .tavern-name{ color:var(--parchment); font-family:Georgia,'Times New Roman',serif; }
+  .stronghold-item .btn{ align-self:flex-start; }
 
   /* ================= ADVENTURE SUB-TABS ================= */
   .adv-subtab-row{ display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.9rem; border-bottom:1px solid var(--panel-border); padding-bottom:0.6rem; }
@@ -694,6 +734,14 @@
         <span id="age-tracker" class="age-tracker"></span>
       </div>
       <div id="activity-tracker">Idle — the realm awaits</div>
+      <div class="decree-banner" id="decree-banner">
+        <div class="decree-head">
+          <span class="decree-label">Today's Realm Decree</span>
+          <span class="decree-name" id="decree-name"></span>
+        </div>
+        <div class="decree-flavor" id="decree-flavor"></div>
+        <div class="decree-effects" id="decree-effects"></div>
+      </div>
     </div>
 
     <div class="top-bar">
@@ -848,6 +896,7 @@
         <button class="subtab-btn active" data-charsubtab="skills" data-icon="skills" data-icon-size="15">Skills</button>
         <button class="subtab-btn" data-charsubtab="stats" data-icon="character" data-icon-size="15">Stats</button>
         <button class="subtab-btn" data-charsubtab="titles" data-icon="renown" data-icon-size="15">Titles</button>
+        <button class="subtab-btn" data-charsubtab="bestiary" data-icon="chronicle" data-icon-size="15">Bestiary</button>
       </div>
       <div id="char-skills" class="char-subpanel">
         <div class="panel">
@@ -861,6 +910,13 @@
           <h3 data-icon="renown" data-icon-size="18">Titles</h3>
           <p class="section-flair">Every deed leaves a name behind; you choose which one is spoken.</p>
           <div id="titles-body"></div>
+        </div>
+      </div>
+      <div id="char-bestiary" class="char-subpanel hidden">
+        <div class="panel">
+          <h3 data-icon="chronicle" data-icon-size="18">Bestiary</h3>
+          <p class="section-flair">Every zone walked, every foe named, every tale finished — the realm remembers what you've seen, even where you haven't.</p>
+          <div id="bestiary-body"></div>
         </div>
       </div>
       <div id="char-stats" class="char-subpanel hidden">
@@ -931,6 +987,12 @@
           <p class="section-flair">Every rune bound to steel is a promise the metal did not ask to keep.</p>
           <div class="shop-restock" id="enchanter-dust-label"></div>
           <div id="enchanter-list" class="enchanter-list"></div>
+        </div>
+
+        <div class="panel" id="stronghold-panel" style="grid-column:1 / -1;">
+          <h3 data-icon="stronghold" data-icon-size="18">Stronghold</h3>
+          <p class="section-flair">Every stone laid here outlives the hero who paid for it — alone among your holdings, the Stronghold survives the Rite of Rebirth.</p>
+          <div id="stronghold-list" class="stronghold-list"></div>
         </div>
       </div>
     </div>
@@ -1161,12 +1223,15 @@
       <div class="codex-section"><b>The Arena.</b> Fights resolve every 10 seconds against escalating monsters, and there is no retreat — you fight until a wound or a beating carries you out. Wins bank XP, gold, and renown, and the longer you last, the bigger the survival bonus on your spoils (up to +50%).</div>
       <div class="codex-section"><b>World Bosses.</b> A ladder of ten things the realm never managed to kill, opened only once your hero has seen the Campaign through to its last chapter. You climb it one rung at a time: only the next unbeaten name is ever shown to you, and the one after it stays nameless until the one before it falls. They yield <b>no gear and no gold whatsoever</b> &mdash; only XP and renown far beyond anything else in the realm. They are also brutally dangerous whether you win or lose: a 35% chance of injury on a kill, and 85% on a defeat. Do not expect to reach the top of the ladder. The point is how far you get, and the Hall remembers by name whoever first felled each one, across every life you live.</div>
       <div class="codex-section"><b>Injuries &amp; Rest.</b> Injuries lock you out of adventuring at 2; rest to heal — a Short Rest (4 hours) heals one injury, a Long Rest (6 hours) heals both.</div>
-      <div class="codex-section"><b>Outgrowing an expedition.</b> Once your power overwhelms a dungeon, raid, or chapter, the extra strength stops buying better odds — the danger is already as good as beaten — and starts buying speed and safety instead. A venture you have thoroughly outgrown is marched through faster and is far less likely to leave a mark on you, up to three-quarters less likely. The duration shown on each card already accounts for it. But an old road pays an old road's toll: as a place stops being able to threaten you, its spoils dwindle toward what such a place was ever worth. This turns on the danger, not on the date — an expedition that still tests you yields its full measure however far your name has travelled since, while one you can walk through in your sleep gives up only what a sleepwalk deserves. Plunder worth having is found ahead of you, never behind.</div>
+      <div class="codex-section"><b>Outgrowing an expedition.</b> Once your power overwhelms a dungeon, raid, or chapter, the extra strength stops buying better odds — the danger is already as good as beaten — and starts buying speed and safety instead. A venture you have thoroughly outgrown is marched through faster and is far less likely to leave a mark on you, up to three-quarters less likely. The duration shown on each card already accounts for it. But an old road pays an old road's toll: as a place stops being able to threaten you, its spoils dwindle toward what such a place was ever worth. This turns on the danger, not on the date — an expedition that still tests you yields its full measure however far your name has travelled since, while one you can walk through in your sleep gives up only what a sleepwalk deserves. Plunder worth having is found ahead of you, never behind. The same holds for ascending a cleared dungeon or raid: its Ascended tiers pay a much richer bonus, but if your power already dwarfs even the hardest of them, that bonus fades too — ascending content you have massively outgrown is never as rewarding as it looks.</div>
       <div class="codex-section"><b>The odds of a wound.</b> A dungeon, raid, or campaign chapter carries a 10% chance of injury on success, and a steep 60% chance on failure. The Arena is gentler at first but grows crueler with every win — its injury chance climbs 3% per fight survived, and never strikes during an early run's safe fights. All these odds bend to your hero's own fortune: gear, race, class, renown, and legacy boons can all shift the chance of harm, for better or worse.</div>
       <div class="codex-section"><b>Town.</b> The Shop restocks over time, the Blacksmith upgrades gear, the Cleric Temple grants blessings that mend injuries or shorten a vigil in exchange for tithe, the Tavern sells buffs, and the Enchanter binds properties into weapons and relics.</div>
+      <div class="codex-section"><b>The Stronghold.</b> A holding in town, built up one of five buildings at a time — the Training Yard, Counting House, Infirmary, Forge Annex, and Reliquary — each ten levels deep, each with its own small permanent bonus to XP, gold, rest time, blacksmith prices, or drop chance. Costs climb steeply with every level. Unlike everything else you own, the Stronghold is not reset by the Rite of Rebirth &mdash; gold poured into it here stays spent for good, across every life you live afterward.</div>
+      <div class="codex-section"><b>The Daily Realm Decree.</b> Shown beneath the activity line at the top of the screen, a new Decree takes hold every day, the same one for every hero in every realm — it is not rolled for you, and it cannot be rerolled. Each Decree both gives and takes: read its effects before committing to a long venture, since what helps today may not tomorrow. It never touches Power, so it changes what a day is worth, never what a hero can survive.</div>
       <div class="codex-section"><b>Salvage &amp; the Enchanter.</b> Instead of selling gear to the Shop for coin, salvage it instead for dust — the Enchanter's own currency. The Enchanter works only on weapons and relics: Inscribe grants a bonus-less weapon its first property, Reroll gambles a fresh random property onto a weapon or relic that already has one (it can land on the very same property again — that's the wager), and Choose spends far more dust to set the exact property you want instead of leaving it to chance. A relic's property is always the stronger of the two; a weapon's is a lesser echo of it.</div>
       <div class="codex-section"><b>Rebirth.</b> Complete the Campaign to unlock the Rite of Rebirth: your hero is enshrined in the Hall of Legends, and a new hero rises bearing a permanent boon of your choice and a small gold inheritance. Boons stack across every life.</div>
       <div class="codex-section"><b>Achievements &amp; Titles.</b> Lifetime deeds — Arena wins, dungeons cleared, gold earned, and more — unlock permanent titles, each with its own small bonus. Every bonus you've unlocked stays active always; which title displays beside your name (Character &gt; Titles) is purely cosmetic. Unlike renown titles, which reset to nothing every rebirth, achievement progress is tracked account-wide and carries across every life you live.</div>
+      <div class="codex-section"><b>The Bestiary.</b> Every zone, encounter, dungeon, raid, World Boss, Campaign chapter, and item tier you've ever seen is chronicled account-wide (Character &gt; Bestiary), each with the flavor text behind it — nothing here is ever forgotten to a rebirth. Reach 25%, 50%, 75%, and 100% overall completion for a small permanent bonus at each threshold. Anything you haven't yet encountered stays a nameless locked entry until you do — the Bestiary reveals nothing ahead of you, the World Boss ladder least of all.</div>
       <div class="codex-section"><b>Saving.</b> Your journey saves automatically to this browser; use the gear menu to export or import a backup, or to reset.</div>
       <div class="modal-actions"><button class="btn" id="codex-close-btn">Close</button></div>
     </div>
@@ -1246,7 +1311,7 @@
 
 const SAVE_KEY = "realmwalker_save";
 const SAVE_KEY_CORRUPT = "realmwalker_save_corrupt";
-const SAVE_VERSION = 13;
+const SAVE_VERSION = 16;
 
 // UI-only preferences (last tab/subtab viewed) — deliberately a separate
 // localStorage key from the game save so it never touches SAVE_VERSION
@@ -1951,6 +2016,94 @@ const TAVERN_BUFFS = [
   { id: "widows_brew", name: "Widow's Brew", flavor: "Named for the tavern-keeper who claims it's kept her burying fewer regulars than she should.", durationMin: 120, effect: { key: "injuryChanceMult", value: 0.80 }, cost: 200 }
 ];
 
+/* ================================================================
+   THE DAILY REALM DECREE
+   One entry is live per calendar day, the same for every player —
+   derived from the date (see activeDecree below), never stored and
+   never rolled. Every decree trades a benefit for a cost; none of
+   them touch powerMult/computePower, so the content difficulty curve
+   never moves day to day. Effect keys are the same multiplier family
+   consumed elsewhere (xpMult, goldMult, dropMult, injuryChanceMult,
+   restTimeMult, rewardMult, shopPriceMult, timerMult) — for
+   injuryChanceMult/restTimeMult/shopPriceMult/timerMult a value below
+   1 is the benefit (lower is better on those four); for the rest a
+   value above 1 is the benefit.
+================================================================ */
+const DECREES = [
+  { id: "harvest_tithe", name: "The Harvest Tithe",
+    flavor: "The stewards have called in the season's due, and coin changes hands quicker than the merchants can count it.",
+    effects: { goldMult: 1.30, shopPriceMult: 1.20 } },
+  { id: "long_vigil", name: "The Long Vigil",
+    flavor: "The temple bells toll long into the night, and every wound taken now lingers where a lesser hurt once passed unnoticed.",
+    effects: { rewardMult: 1.25, restTimeMult: 1.30 } },
+  { id: "reckless_hour", name: "The Reckless Hour",
+    flavor: "Something in the air urges haste over caution, and caution has never once slowed a blade already swinging.",
+    effects: { xpMult: 1.25, injuryChanceMult: 1.30 } },
+  { id: "quartermasters_purge", name: "The Quartermaster's Purge",
+    flavor: "The garrison empties its stores before the season turns, though what's left out on the roads has already been picked over.",
+    effects: { shopPriceMult: 0.80, dropMult: 0.85 } },
+  { id: "swift_currents", name: "Swift Currents",
+    flavor: "The old paths run short tonight, but shortcuts were named that for a reason.",
+    effects: { timerMult: 0.80, injuryChanceMult: 1.25 } },
+  { id: "penitents_fast", name: "The Penitent's Fast",
+    flavor: "The faithful surrender their coin at the shrine, and in trade the wounded are tended without question.",
+    effects: { restTimeMult: 0.75, goldMult: 0.80 } },
+  { id: "black_market_glut", name: "The Black Market Glut",
+    flavor: "Fences and peddlers are buying anything with an edge, though none of them have patience left to teach a lesson twice.",
+    effects: { dropMult: 1.35, xpMult: 0.80 } },
+  { id: "warlords_muster", name: "The Warlord's Muster",
+    flavor: "The war-camps pay well for every kill, but a muster this size moves slower than any single company ever did.",
+    effects: { rewardMult: 1.30, timerMult: 1.20 } },
+  { id: "bounty_on_their_backs", name: "Bounty on Their Backs",
+    flavor: "Fresh bounties draw blades from every corner of the realm, and reckless company breeds reckless wounds.",
+    effects: { goldMult: 1.25, injuryChanceMult: 1.20 } },
+  { id: "sages_toll", name: "The Sage's Toll",
+    flavor: "Wandering scholars have set up in every town square, sharpening minds for a price the shopkeepers have matched.",
+    effects: { xpMult: 1.20, shopPriceMult: 1.25 } },
+  { id: "clerics_blessing", name: "The Cleric's Blessing",
+    flavor: "Healers move through the land tending every hurt they find, leaving little behind for the scavengers who follow.",
+    effects: { restTimeMult: 0.70, dropMult: 0.85 } },
+  { id: "forced_march", name: "The Forced March",
+    flavor: "Word has come to move fast and move now, and there's no time left to haggle over wages along the way.",
+    effects: { timerMult: 0.75, goldMult: 0.85 } }
+];
+
+// One-shot 32-bit integer mixer (the mulberry32 finalizer step) — turns a
+// small, densely-sequential input like a day index into a well-scattered
+// unsigned int. Deliberately NOT Math.random: the whole point of the
+// decree is that it's reproducible from the date alone, on every device,
+// with nothing persisted.
+function mixDayHash(seed){
+  let t = (seed + 0x6D2B79F5) | 0;
+  t = Math.imul(t ^ (t >>> 15), t | 1);
+  t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+  return (t ^ (t >>> 14)) >>> 0;
+}
+
+// Days since epoch in the PLAYER'S LOCAL calendar, not UTC — shifting the
+// timestamp by the local UTC offset before flooring means the count rolls
+// over at local midnight, so a player near midnight sees the decree change
+// when their own day changes rather than whenever UTC's day happens to.
+function localDayIndex(now){
+  const d = new Date(now);
+  const localMs = d.getTime() - d.getTimezoneOffset() * 60000;
+  return Math.floor(localMs / 86400000);
+}
+
+// The day's Realm Decree — a pure function of the calendar date. Same
+// date -> same decree everywhere, forever; nothing about it is stored or
+// rolled, so it can't drift between devices or across a save. Mixing the
+// day index before reducing to a table index (rather than the naive
+// `dayIndex % DECREES.length`) avoids a perfectly periodic cycle — with
+// 12 entries, `% 12` alone would repeat the same decree every 12 days
+// forever. Takes an explicit timestamp (default Date.now()) so it's
+// testable and so offline catch-up can ask "what was live at instant t".
+function activeDecree(now){
+  const day = localDayIndex(typeof now === "number" ? now : Date.now());
+  const h = mixDayHash(day);
+  return DECREES[h % DECREES.length];
+}
+
 /* ---- v2 phase 2: evolutions, timed content, renown, arena ---- */
 
 const EVOLUTIONS = {
@@ -2004,14 +2157,23 @@ const EVOLUTIONS = {
     type: "magical", weapon: "Runed Staff",
     flavor: "The apprentice's fumbling sparks become a controlled, hungry fire.",
     skillNames: ["Arcane Bolt", "Mind Ward", "Kindling Surge"],
-    perks: { powerMult: 1.08 }
+    // 2026-08-15 difficulty re-anchor rebalance: this was a pure
+    // power-vs-no-power fork (Mage powerMult only, Acolyte restTimeMult
+    // only) and measured worst in the game once the re-anchor made
+    // powerMult worth roughly 3.6x what it used to buy. Acolyte now
+    // carries a powerMult of its own; the pair's power SUM is unchanged
+    // (1.08 + 1.0 = 1.06 + 1.02), so the tier-2 average is untouched.
+    perks: { powerMult: 1.06 }
   },
   acolyte: {
     id: "acolyte", name: "Acolyte", parentId: "apprentice", tier: 2, levelReq: 20,
     type: "magical", weapon: "Warstaff & Prayer Beads",
     flavor: "The apprentice trades raw power for something steadier — a whispered rite, a borrowed grace.",
     skillNames: ["Mending Light", "Ward of Faith", "Bound Spirit"],
-    perks: { restTimeMult: 0.92 }
+    // See Mage above. restTimeMult deepened 0.92 -> 0.90 alongside the new
+    // powerMult so Acolyte stays the rest-focused pick rather than a
+    // smaller Mage.
+    perks: { powerMult: 1.02, restTimeMult: 0.90 }
   },
 
   /* ---------------- TIER 3 (levelReq 40) ---------------- */
@@ -2085,7 +2247,13 @@ const EVOLUTIONS = {
     // is ~3h x restTimeMult of forgone questing, so this is the branch's
     // real currency), +2 power from Assassin, drops 1.08 -> 1.12. Still
     // clearly behind Cleric on total durability (0.80 injury x 0.75 rest).
-    perks: { injuryChanceMult: 0.78, powerMult: 1.12, dropMult: 1.12 }
+    // 2026-08-15 difficulty re-anchor rebalance: measured 3.8-6.3% behind
+    // Assassin (widening as gold weight rises) because dropMult is a weak
+    // perk — it only touches zone drops, and dungeon/raid dropRolls ignore
+    // it entirely. Added rewardMult so the branch has a real income axis
+    // alongside the evasion. No powerMult touched, so the tier-3 average
+    // is unchanged by construction.
+    perks: { injuryChanceMult: 0.78, powerMult: 1.12, dropMult: 1.12, rewardMult: 1.06 }
   },
   archmage: {
     id: "archmage", name: "Archmage", parentId: "mage", tier: 3, levelReq: 40,
@@ -2460,6 +2628,7 @@ function grantBoonReward(hero, zone, def){
   }
   const item = rollItem(zone || ZONES[0], hero);
   state.inventory.push(item);
+  recordBestiary("tiers", item.tierId);
   if (state.stats) state.stats.itemsFound += 1;
   addLog("Found " + itemDisplayName(item) + " in a forgotten pack.", "drop");
   return itemDisplayName(item);
@@ -2485,6 +2654,7 @@ function fireQuestEncounter(hero, zone){
   const zonePool = QUEST_ENCOUNTERS.filter(e => !e.zoneId || e.zoneId === zone.id);
   const pool = zonePool.length > 0 ? zonePool : (genericPool.length > 0 ? genericPool : QUEST_ENCOUNTERS);
   const def = pool[Math.floor(Math.random() * pool.length)];
+  recordBestiary("encounters", def.id);
   const sessionGold = state.activity.sessionGold || 0;
   const rawToll = sessionGold * ENCOUNTER_TOLL_FRACTION;
   const tollCap = zone.goldPerHour * ENCOUNTER_TOLL_MAX_HOURS;
@@ -2846,6 +3016,136 @@ function campaignChapters(){
   });
 }
 
+/* ================================================================
+   BESTIARY — account-wide archive of everything encountered
+   ----------------------------------------------------------------
+   state.legacy.bestiary is { [category]: { [id]: true } } — plain
+   objects used as sets (never a JS Set: it must survive
+   JSON.stringify/parse for the save file). Account-wide and SURVIVES
+   REBIRTH, exactly like legacy.achievements/worldBossFirsts.
+
+   ⚠ THE LEGACY TRAP: legacy fields are enumerated EXPLICITLY in FIVE
+   places, not the three you'd expect — createEmptyLegacy,
+   normalizeLegacy, and buildSavePayload, but ALSO performRebirth's
+   newLegacy object and createDefaultState's own `legacy = {...}`
+   (the latter already carries its own "same trap" warning comment).
+   bestiary must stay listed in all five or it silently drops on a
+   boot, a save, or a rebirth.
+
+   Rosters are always read live off the actual content arrays (never
+   a hardcoded count) so future content automatically grows both the
+   numerator's ceiling and the denominator — see bestiaryRoster.
+================================================================ */
+const BESTIARY_CATEGORY_KEYS = ["zones", "encounters", "dungeons", "raids", "bosses", "chapters", "tiers"];
+
+// Live roster array for one Bestiary category — the single place a
+// category key maps to the content array backing it, so nothing else
+// ever hand-copies a roster or its count.
+function bestiaryRoster(category){
+  switch (category){
+    case "zones": return ZONES;
+    case "encounters": return QUEST_ENCOUNTERS;
+    case "dungeons": return DUNGEONS;
+    case "raids": return RAIDS;
+    case "bosses": return WORLD_BOSSES;
+    case "chapters": return CAMPAIGN_SPINE;
+    case "tiers": return ITEM_TIERS;
+    default: return [];
+  }
+}
+
+// Fresh, empty archive — one object-as-set per category, all seven
+// pre-created so recordBestiary/normalizeLegacy never need to guess a
+// category's shape on first write.
+function createEmptyBestiary(){
+  return { zones:{}, encounters:{}, dungeons:{}, raids:{}, bosses:{}, chapters:{}, tiers:{} };
+}
+
+/* ================================================================
+   STRONGHOLD — account-wide holding in town, SURVIVES REBIRTH
+   ----------------------------------------------------------------
+   state.legacy.stronghold is { [buildingId]: level } (each 0-10), a plain
+   object exactly like legacy.bestiary above — account-wide, JSON-safe, and
+   never reset by performRebirth. It exists because late-game gold
+   otherwise has nowhere to go: the best questing zones out-earn what the
+   Shop ever asks for.
+
+   ⚠ THE LEGACY TRAP (same five sites bestiary warns about above):
+   createEmptyLegacy, normalizeLegacy, buildSavePayload, performRebirth's
+   newLegacy object, and createDefaultState's own `legacy = {...}` literal.
+   stronghold must stay listed in all five or it silently drops on a boot,
+   a save, or a rebirth — defeating the entire point of the feature.
+
+   Every building's effect is deliberately NON-POWER — nothing here ever
+   touches computePower/getPowerMultiplier. Content difficulty is anchored
+   on the power curve; an account-wide, rebirth-surviving POWER bonus would
+   silently shift every success rate in the game. Do not add one.
+================================================================ */
+const STRONGHOLD_MAX_LEVEL = 10;
+const STRONGHOLD_COST_BASE = 2500;
+const STRONGHOLD_COST_GROWTH = 1.55;
+
+// effectKey feeds getStrongholdBonusMult(key), drawing from the same
+// xpMult/goldMult/restTimeMult/dropMult family every other multiplier
+// contributor uses — EXCEPT forge_annex's forgeCostMult, which
+// blacksmithUpgradeCost reads directly since it isn't part of that shared
+// getXxxMultiplier chain.
+const STRONGHOLD_BUILDINGS = [
+  { id: "training_yard",  name: "Training Yard",  flavor: "Drill grounds worn smooth by boots that didn't all make it back.", effectKey: "xpMult", perLevel: 0.015 },
+  { id: "counting_house", name: "Counting House",  flavor: "A vault of ledgers that remembers every coin more precisely than the town remembers its dead.", effectKey: "goldMult", perLevel: 0.02 },
+  { id: "infirmary",      name: "Infirmary",       flavor: "More cots than the last war needed, and fewer than the next one will.", effectKey: "restTimeMult", perLevel: -0.02 },
+  { id: "forge_annex",    name: "Forge Annex",     flavor: "A second hearth bolted onto the smithy, so the hammers never have to wait for the first to cool.", effectKey: "forgeCostMult", perLevel: -0.03 },
+  { id: "reliquary",      name: "Reliquary",       flavor: "Shelves of things pulled from the dead, sorted by people who stopped asking questions long ago.", effectKey: "dropMult", perLevel: 0.02 }
+];
+
+// Fresh, empty stronghold — all five buildings at level 0, pre-created so
+// normalizeLegacy/upgradeStronghold never need to guess a building's shape
+// on first write (mirrors createEmptyBestiary).
+function createEmptyStronghold(){
+  const s = {};
+  STRONGHOLD_BUILDINGS.forEach(def => { s[def.id] = 0; });
+  return s;
+}
+
+// Current level of one building, clamped and self-guarded — safe during
+// hero creation/offline catch-up, before state/legacy necessarily exist,
+// same shape as bestiarySeenIds/getBestiaryBonusMult.
+function strongholdLevel(buildingId){
+  if (!state || !state.legacy || !state.legacy.stronghold) return 0;
+  const lvl = state.legacy.stronghold[buildingId];
+  return (typeof lvl === "number") ? Math.max(0, Math.min(STRONGHOLD_MAX_LEVEL, lvl)) : 0;
+}
+
+// Effect multiplier from ONE building at a given level — the single
+// formula every building's per-level effect resolves through, so a future
+// building never needs its own bespoke math.
+function strongholdBuildingMult(def, level){
+  const lvl = Math.max(0, Math.min(STRONGHOLD_MAX_LEVEL, level));
+  return 1 + def.perLevel * lvl;
+}
+
+// Product of every Stronghold building's effect matching `key` — same
+// self-guarding, hero-less shape as getBestiaryBonusMult/
+// getAchievementBonusMult. Consumed by getXpMultiplier/getGoldMultiplier/
+// getRestTimeMultiplier/getDropChanceMultiplier; forgeCostMult is consumed
+// directly by blacksmithUpgradeCost instead.
+function getStrongholdBonusMult(key){
+  if (!state || !state.legacy) return 1;
+  let mult = 1;
+  STRONGHOLD_BUILDINGS.forEach(def => {
+    if (def.effectKey === key) mult *= strongholdBuildingMult(def, strongholdLevel(def.id));
+  });
+  return mult;
+}
+
+// Gold cost to take one building from `level` to `level + 1`. Routed
+// through getShopPriceMultiplier, same as itemShopPrice/
+// blacksmithUpgradeCost, so the tiefling shop discount and any
+// price-affecting Decree apply here too.
+function strongholdUpgradeCost(level, hero){
+  return Math.round(STRONGHOLD_COST_BASE * Math.pow(STRONGHOLD_COST_GROWTH, level) * getShopPriceMultiplier(hero));
+}
+
 const RENOWN_MILESTONES = [
   { threshold: 0, title: "the Unproven", bonus: { key: "xpMult", value: 1.00 }, bonusText: "No bonus yet — reputation is earned, not given." },
   { threshold: 10, title: "the Known", bonus: { key: "dropMult", value: 1.03 }, bonusText: "+3% item drop chance" },
@@ -2931,6 +3231,19 @@ const CONTENT_INJURY_CHANCE_FAILURE = 0.60;   // × getInjuryChanceMultiplier
 const CONTENT_FAILURE_REWARD_FRACTION = 0.30; // failure pays 30% xp/gold, no renown, no drops
 const QUEST_DROP_ROLLS = 2;                   // quest missions carry no dropRolls in data
 const QUEST_DROP_TIER_BONUS = 1;
+
+// Ascended tiers: replay cleared dungeons and raids harder for more.
+// Index 0 is normal (no ascension). xp/gold scale steeply with risk;
+// renown scales far more gently ON PURPOSE — renown/hour already inverts
+// slightly toward mid-tier content (short duration, decent renown), and
+// scaling it at the xp/gold rate would let a geared hero farm Ascended III
+// on a low-level dungeon for roughly 5.7x the endgame renown rate.
+const ASCEND_TIERS = [
+  null,
+  { tier: 1, name: "Ascended I",   difficultyMult: 1.4, rewardMult: 2.0, renownMult: 1.5, dropTierBonus: 1, injuryMult: 1.25 },
+  { tier: 2, name: "Ascended II",  difficultyMult: 2.0, rewardMult: 4.0, renownMult: 2.0, dropTierBonus: 2, injuryMult: 1.5 },
+  { tier: 3, name: "Ascended III", difficultyMult: 2.8, rewardMult: 8.0, renownMult: 3.0, dropTierBonus: 3, injuryMult: 1.8 }
+];
 
 // World bosses replace the two constants above for their type only, and
 // nothing else about the resolve changes: both are still multiplied by
@@ -3247,9 +3560,10 @@ function createDefaultState(name, raceId, classId){
   if (src.lastArcId) hero.campaignArc = pickCampaignArc(src.lastArcId);
   // ⚠ Enumerated field-by-field, same trap as normalizeLegacy and
   // buildSavePayload: a legacy field missing here is silently dropped the
-  // moment a new hero is created after a rebirth. worldBossFirsts is
-  // account-wide and must survive that transition.
-  const legacy = { rebirths: src.rebirths, boons: src.boons, legends: src.legends, totals: src.totals, achievements: src.achievements, worldBossFirsts: src.worldBossFirsts };
+  // moment a new hero is created after a rebirth. worldBossFirsts,
+  // bestiary, and stronghold are all account-wide and must survive that
+  // transition.
+  const legacy = { rebirths: src.rebirths, boons: src.boons, legends: src.legends, totals: src.totals, achievements: src.achievements, worldBossFirsts: src.worldBossFirsts, bestiary: src.bestiary, stronghold: src.stronghold };
   pendingRebirthLegacy = null;
 
   return {
@@ -3264,6 +3578,11 @@ function createDefaultState(name, raceId, classId){
     // questProgress — a fresh hero starts the ladder from the bottom. Only
     // legacy.worldBossFirsts is account-wide.
     worldBossProgress: 0,
+    // Per-content ascend high-water mark: { [contentId]: highest tier
+    // cleared }, 0 = cleared on Normal, absent = never cleared. Per-hero
+    // progression exactly like questProgress/worldBossProgress — resets on
+    // rebirth (a fresh hero here always gets a fresh {}), NOT a legacy field.
+    ascendProgress: {},
     stats: createEmptyStats(),
     legacy: legacy,   // { rebirths, boons:[boonId], legends:[legendRecord] } — Rebirth (prestige)
     lastTick: Date.now()
@@ -3275,7 +3594,7 @@ function createEmptyLegacy(){
   // worldBossFirsts: { [bossId]: { heroName, at } } — who first felled each
   // World Boss, account-wide and never overwritten by a later kill of the
   // same boss. See applyTimedContentProgress.
-  return { rebirths: 0, boons: [], legends: [], totals: createEmptyStats(), achievements: [], worldBossFirsts: {} };
+  return { rebirths: 0, boons: [], legends: [], totals: createEmptyStats(), achievements: [], worldBossFirsts: {}, bestiary: createEmptyBestiary(), stronghold: createEmptyStronghold() };
 }
 
 // Coerce any stored/partial legacy blob into a well-formed one. Preserves
@@ -3310,6 +3629,26 @@ function normalizeLegacy(legacy){
         if (rec && typeof rec === "object" && typeof rec.heroName === "string"){
           l.worldBossFirsts[k] = { heroName: rec.heroName, at: (typeof rec.at === "number") ? rec.at : 0 };
         }
+      });
+    }
+    // Copied category-by-category, id-by-id, same shape guard as
+    // worldBossFirsts above — a partial/hand-edited bestiary blob still
+    // ends up with all seven createEmptyBestiary() categories present.
+    if (legacy.bestiary && typeof legacy.bestiary === "object"){
+      BESTIARY_CATEGORY_KEYS.forEach(cat => {
+        const src = legacy.bestiary[cat];
+        if (src && typeof src === "object"){
+          Object.keys(src).forEach(id => { if (src[id]) l.bestiary[cat][id] = true; });
+        }
+      });
+    }
+    // Copied building-by-building with a shape/range guard, same pattern as
+    // bestiary above — a partial/hand-edited stronghold blob still ends up
+    // with all five STRONGHOLD_BUILDINGS keys present, each clamped 0-10.
+    if (legacy.stronghold && typeof legacy.stronghold === "object"){
+      STRONGHOLD_BUILDINGS.forEach(def => {
+        const lvl = legacy.stronghold[def.id];
+        if (typeof lvl === "number") l.stronghold[def.id] = Math.max(0, Math.min(STRONGHOLD_MAX_LEVEL, Math.round(lvl)));
       });
     }
   }
@@ -3621,6 +3960,84 @@ function getLegacyBonusMult(key){
   return mult;
 }
 
+/* ---- bestiary ---- */
+
+// Marks category/id as seen — the ONE place any content path records a
+// Bestiary sighting; every hook below (questing, encounters, dungeon/raid/
+// worldboss/quest-chapter completion, every item-entry site) calls this and
+// nothing else touches state.legacy.bestiary directly. Null-safe (rebuilds
+// state.legacy and the category's set as needed, same shape-guard style as
+// checkAchievementUnlocks) and idempotent — writing the same id twice
+// leaves the set exactly as large as after the first write, since a
+// category is a plain object used as a set.
+function recordBestiary(category, id){
+  if (!state || !id) return;
+  if (!state.legacy || typeof state.legacy !== "object") state.legacy = createEmptyLegacy();
+  if (!state.legacy.bestiary || typeof state.legacy.bestiary !== "object") state.legacy.bestiary = createEmptyBestiary();
+  if (!state.legacy.bestiary[category] || typeof state.legacy.bestiary[category] !== "object") state.legacy.bestiary[category] = {};
+  state.legacy.bestiary[category][id] = true;
+}
+
+// Ids seen so far in one Bestiary category. Null-safe (returns {} rather
+// than throwing) so every reader below can skip its own guard.
+function bestiarySeenIds(category){
+  if (!state || !state.legacy || !state.legacy.bestiary) return {};
+  const cat = state.legacy.bestiary[category];
+  return (cat && typeof cat === "object") ? cat : {};
+}
+
+function bestiarySeenCount(category){
+  return Object.keys(bestiarySeenIds(category)).length;
+}
+
+// Numerator/denominator of the overall completion percentage. The roster
+// total is the sum of every live roster's length (see bestiaryRoster), so
+// new content grows the denominator automatically rather than needing a
+// hardcoded count kept in sync by hand.
+function bestiaryTotalSeen(){
+  return BESTIARY_CATEGORY_KEYS.reduce((sum, cat) => sum + bestiarySeenCount(cat), 0);
+}
+
+function bestiaryTotalRoster(){
+  return BESTIARY_CATEGORY_KEYS.reduce((sum, cat) => sum + bestiaryRoster(cat).length, 0);
+}
+
+function bestiaryCompletionFraction(){
+  const total = bestiaryTotalRoster();
+  return total > 0 ? bestiaryTotalSeen() / total : 0;
+}
+
+// Milestone bonuses at 25/50/75/100% overall completion. Deliberately
+// NON-POWER, same balance constraint as ACHIEVEMENTS (see that block's
+// comment): none of these may key off powerMult or arenaEdgeMult, since an
+// account-wide power bonus would silently invalidate the content
+// difficulty curve everything else is anchored against. Cumulative like
+// RENOWN_MILESTONES — every threshold reached stays active regardless of
+// which one was reached most recently, and these ride on legacy so they
+// persist through rebirth along with the archive itself.
+const BESTIARY_MILESTONES = [
+  { threshold: 0.25, key: "xpMult",       value: 1.02, label: "25% Chronicled",  bonusText: "+2% XP from all sources" },
+  { threshold: 0.50, key: "goldMult",     value: 1.03, label: "50% Chronicled",  bonusText: "+3% gold from all sources" },
+  { threshold: 0.75, key: "dropMult",     value: 1.03, label: "75% Chronicled",  bonusText: "+3% item drop chance" },
+  { threshold: 1.00, key: "restTimeMult", value: 0.96, label: "100% Chronicled", bonusText: "-4% rest time" }
+];
+
+function getBestiaryMilestonesReached(){
+  const frac = bestiaryCompletionFraction();
+  return BESTIARY_MILESTONES.filter(m => frac >= m.threshold);
+}
+
+// Product of every reached Bestiary milestone's bonus matching key — same
+// self-guarding, hero-less shape as getAchievementBonusMult/
+// getLegacyBonusMult (safe during hero creation/offline catch-up, before
+// state/legacy necessarily exist).
+function getBestiaryBonusMult(key){
+  if (!state || !state.legacy) return 1;
+  let mult = 1;
+  getBestiaryMilestonesReached().forEach(m => { if (m.key === key) mult *= m.value; });
+  return mult;
+}
+
 // A gear bonus only applies while equipped, and stacks across every
 // equipped slot whose bonus matches `key` — today only relics and (via the
 // Enchanter) weapons ever carry a bonus, but this iterates all SLOTS
@@ -3647,6 +4064,34 @@ function getBuffMultiplier(hero, key){
   return mult;
 }
 
+// The instant used to resolve "which day's decree is live" from inside
+// the multiplier functions below (none of which take a timestamp of
+// their own). state.lastTick is the instant currently being resolved:
+// pinned to "now" by the 1s online tick, and walked forward one segment
+// boundary at a time by applyOfflineProgress (which now includes local
+// day boundaries in that segmentation — see localDayBoundariesBetween).
+// Subtracting 1ms matters at a segment boundary that IS a day boundary:
+// a segment [prev, t) covering the tail end of day D is resolved with
+// state.lastTick set to t, which is the first instant of day D+1 — using
+// t itself would credit that whole segment to the WRONG day's decree, so
+// this reads the last instant strictly inside the segment instead. Falls
+// back to Date.now() when state doesn't exist yet (hero creation, etc.),
+// matching the self-guarding style of getAchievementBonusMult.
+function decreeClockNow(){
+  const now = (state && typeof state.lastTick === "number") ? state.lastTick : Date.now();
+  return now - 1;
+}
+
+// Multiplier the day's Realm Decree contributes for `key`, or 1 if the
+// active decree doesn't touch that key. Never touches powerMult — no
+// decree effect is allowed to, since that would move the difficulty
+// curve day to day (see DECREES).
+function getDecreeMult(key){
+  const decree = activeDecree(decreeClockNow());
+  const v = decree.effects && decree.effects[key];
+  return (typeof v === "number") ? v : 1;
+}
+
 function getXpMultiplier(hero){
   let mult = 1;
   const race = getRace(hero);
@@ -3657,6 +4102,9 @@ function getXpMultiplier(hero){
   mult *= getRenownBonusMult(hero, "xpMult");
   mult *= getLegacyBonusMult("xpMult");
   mult *= getAchievementBonusMult("xpMult");
+  mult *= getBestiaryBonusMult("xpMult");
+  mult *= getStrongholdBonusMult("xpMult");
+  mult *= getDecreeMult("xpMult");
   return mult;
 }
 
@@ -3670,6 +4118,9 @@ function getGoldMultiplier(hero){
   mult *= getRenownBonusMult(hero, "goldMult");
   mult *= getLegacyBonusMult("goldMult");
   mult *= getAchievementBonusMult("goldMult");
+  mult *= getBestiaryBonusMult("goldMult");
+  mult *= getStrongholdBonusMult("goldMult");
+  mult *= getDecreeMult("goldMult");
   return mult;
 }
 
@@ -3683,6 +4134,9 @@ function getDropChanceMultiplier(hero){
   mult *= getRenownBonusMult(hero, "dropMult");
   mult *= getLegacyBonusMult("dropMult");
   mult *= getAchievementBonusMult("dropMult");
+  mult *= getBestiaryBonusMult("dropMult");
+  mult *= getStrongholdBonusMult("dropMult");
+  mult *= getDecreeMult("dropMult");
   return mult;
 }
 
@@ -3698,6 +4152,7 @@ function getInjuryChanceMultiplier(hero){
   mult *= getRenownBonusMult(hero, "injuryChanceMult");
   mult *= getLegacyBonusMult("injuryChanceMult");
   mult *= getAchievementBonusMult("injuryChanceMult");
+  mult *= getDecreeMult("injuryChanceMult");
   return mult;
 }
 
@@ -3712,6 +4167,9 @@ function getRestTimeMultiplier(hero){
   mult *= getRenownBonusMult(hero, "restTimeMult");
   mult *= getLegacyBonusMult("restTimeMult");
   mult *= getAchievementBonusMult("restTimeMult");
+  mult *= getBestiaryBonusMult("restTimeMult");
+  mult *= getStrongholdBonusMult("restTimeMult");
+  mult *= getDecreeMult("restTimeMult");
   return mult;
 }
 
@@ -3720,6 +4178,7 @@ function getTimerMultiplier(hero){
   let mult = 1;
   mult *= getBuffMultiplier(hero, "timerMult");
   mult *= getEvolutionPerkMult(hero, "timerMult"); // Dragoon 0.80
+  mult *= getDecreeMult("timerMult");
   return mult;
 }
 
@@ -3733,6 +4192,7 @@ function getRewardMultiplier(hero){
   mult *= getBuffMultiplier(hero, "rewardMult");
   mult *= getEvolutionPerkMult(hero, "rewardMult"); // Raider 1.25, Assassin 1.15, Warlord 1.10
   mult *= getAchievementBonusMult("rewardMult");
+  mult *= getDecreeMult("rewardMult");
   return mult;
 }
 
@@ -3751,6 +4211,7 @@ function getShopPriceMultiplier(hero){
   const race = getRace(hero);
   if (race.shopDiscount) mult *= (1 - race.shopDiscount);
   mult *= getBuffMultiplier(hero, "priceMult");
+  mult *= getDecreeMult("shopPriceMult");
   // future systems (renown) extend here
   return mult;
 }
@@ -3847,6 +4308,15 @@ const SURPLUS_SAFETY_PER_DOUBLING = 0.25; // 25% less likely to be hurt per doub
 const SURPLUS_SAFETY_FLOOR = 0.25;        // at most a 75% reduction
 const SURPLUS_TIER_FULL_CLAMP = 4;        // surplus at which loot fully drops to the content's own tier
 
+// The Ascended reward bonus fades as surplus rises: ascending content you
+// have hugely outgrown pays far less of its tier bonus. Mirrors the existing
+// surplus speed/safety curves (same 1 - k*log2(s) shape) so the whole
+// "you have outgrown this" family behaves consistently. Only the BONUS
+// portion fades — normal (unascended) rewards are never touched, and content
+// that is still genuinely hard at its ascended tier keeps the full bonus.
+const ASCEND_REWARD_SURPLUS_PER_DOUBLING = 0.60;
+const ASCEND_REWARD_SURPLUS_FLOOR = 0.20;
+
 // >1 only when the hero has power beyond what the content can use.
 // Guards a missing/zero difficulty (old saves, malformed defs) by
 // reporting no surplus at all.
@@ -3884,6 +4354,14 @@ function contentSafetyMultiplier(hero, def){
   const s = powerSurplus(hero, def);
   if (!(s > 1)) return 1;
   return Math.max(SURPLUS_SAFETY_FLOOR, 1 - SURPLUS_SAFETY_PER_DOUBLING * Math.log2(s));
+}
+
+function ascendRewardScale(hero, def){
+  // `def` MUST be the already-ascended def — the whole point is to measure
+  // surplus against the difficulty actually being fought.
+  const s = powerSurplus(hero, def);
+  if (!(s > 1)) return 1;
+  return Math.max(ASCEND_REWARD_SURPLUS_FLOOR, 1 - ASCEND_REWARD_SURPLUS_PER_DOUBLING * Math.log2(s));
 }
 
 // Effective drop tier for a timed-content success, INCLUDING dropTierBonus.
@@ -4409,28 +4887,81 @@ function applyRestProgress(summary){
 
 /* ---- timed content: dungeons / raids / quests ---- */
 
+// Ascension applies to dungeons and raids ONLY, and within those, NOT to
+// forgotten_beyond. Excluded and why:
+//   • campaign (quest) — a story spine meant to be walked once; it has its
+//     own frontier guard (state.questProgress).
+//   • worldboss — deliberately outside the difficulty framework entirely
+//     (see the WORLD_BOSSES header comment — do not disturb it).
+//   • forgotten_beyond — bespoke reward structure: mythicSource, a rolled
+//     duration, no fixed xp/gold/renown, and dropRolls:0. Scaling it would
+//     mean scaling the mythic chase, which must stay exactly as tuned.
+// Used everywhere ascend-eligibility is checked, rather than repeating
+// this condition at each call site.
+function canAscend(type, def){
+  return (type === "dungeon" || type === "raid") && !!def && !def.mythicSource && def.id !== "forgotten_beyond";
+}
+
+// Produces a SCALED COPY of a timed-content def so the existing pipeline
+// (successChance, powerSurplus, contentSafetyMultiplier, contentDropTier,
+// the xp/gold/renown payout) consumes ascended values unchanged — nothing
+// downstream needs to know ascension exists. Never mutates `def`: the base
+// DUNGEONS/RAIDS entries are module-level constants, and mutating one would
+// permanently corrupt the game until reload.
+function ascendDef(def, ascendTier){
+  if (!ascendTier || !def) return def;
+  const t = ASCEND_TIERS[ascendTier];
+  if (!t) return def;
+  const out = Object.assign({}, def);
+  out.difficulty = Math.round(def.difficulty * t.difficultyMult);
+  // Only scale a reward key that actually exists on this def (e.g. a world
+  // boss def has no gold field at all — never invent one here). The
+  // unascended original is tagged on alongside the scaled value (baseXp/
+  // baseGold/baseRenown) so applyTimedContentProgress can later apply
+  // ascendRewardScale to just the bonus portion without dividing a rounded
+  // number back out. ascendDef itself stays hero-independent — it does NOT
+  // apply that scale, since it's called from render paths with no hero.
+  if (typeof def.xp === "number") { out.xp = Math.round(def.xp * t.rewardMult); out.baseXp = def.xp; }
+  if (typeof def.gold === "number") { out.gold = Math.round(def.gold * t.rewardMult); out.baseGold = def.gold; }
+  if (typeof def.renown === "number") { out.renown = Math.round(def.renown * t.renownMult); out.baseRenown = def.renown; }
+  out.dropTierBonus = (def.dropTierBonus || 0) + t.dropTierBonus; // ADD, don't replace
+  out.ascendTier = t.tier;
+  out.ascendName = t.name;
+  return out;
+}
+
 // Normalized definition for a piece of timed content. Quest chapters
 // keep their mission stats nested, so this flattens them into the same
 // shape dungeons and raids already have.
-function getTimedContentDef(type, contentId){
-  if (type === "dungeon") return DUNGEONS.find(d => d.id === contentId) || null;
-  if (type === "raid") return RAIDS.find(r => r.id === contentId) || null;
+//
+// Optional third argument: an ascend tier (1-3). Every existing call site
+// omits it, so getTimedContentDef(type, contentId) keeps returning base
+// values exactly as before — ascendDef(def, undefined) is the identity.
+// canAscend() gates which types/defs are ever actually scaled, so passing
+// an ascendTier for a quest/worldboss/forgotten_beyond id is silently a
+// no-op rather than corrupting one of those defs.
+function getTimedContentDef(type, contentId, ascendTier){
+  let def = null;
+  if (type === "dungeon") def = DUNGEONS.find(d => d.id === contentId) || null;
+  else if (type === "raid") def = RAIDS.find(r => r.id === contentId) || null;
   // A world boss def is already flat and deliberately carries no gold,
   // dropRolls, dropTierBonus or levelReq — the ladder is gated on campaign
   // completion and the previous rung, not on level. Returned as-authored so
   // nothing downstream can read a reward off it that doesn't exist.
-  if (type === "worldboss") return WORLD_BOSSES.find(b => b.id === contentId) || null;
-  if (type === "quest"){
+  else if (type === "worldboss") def = WORLD_BOSSES.find(b => b.id === contentId) || null;
+  else if (type === "quest"){
     const ch = campaignChapters().find(q => q.id === contentId);
-    if (!ch) return null;
-    return {
-      id: ch.id, name: ch.mission.name, chapter: ch.chapter, title: ch.title,
-      durationMin: ch.mission.durationMin, difficulty: ch.mission.difficulty,
-      levelReq: ch.levelReq || 1, xp: ch.mission.xp, gold: ch.mission.gold, renown: ch.mission.renown,
-      dropRolls: QUEST_DROP_ROLLS, dropTierBonus: QUEST_DROP_TIER_BONUS
-    };
+    if (ch){
+      def = {
+        id: ch.id, name: ch.mission.name, chapter: ch.chapter, title: ch.title,
+        durationMin: ch.mission.durationMin, difficulty: ch.mission.difficulty,
+        levelReq: ch.levelReq || 1, xp: ch.mission.xp, gold: ch.mission.gold, renown: ch.mission.renown,
+        dropRolls: QUEST_DROP_ROLLS, dropTierBonus: QUEST_DROP_TIER_BONUS
+      };
+    }
   }
-  return null;
+  if (!def) return null;
+  return canAscend(type, def) ? ascendDef(def, ascendTier) : def;
 }
 
 // Display name for a timed-content type. One place, so the chronicle line,
@@ -4459,9 +4990,25 @@ function applyTimedContentProgress(summary){
 
   const hero = state.hero;
   const type = activity.type;
-  const def = getTimedContentDef(type, activity.contentId);
+  // Read BEFORE the reset below, same pattern as activity.endsAt/startedAt
+  // further down — activity is the pre-reset object. Resolving the def
+  // THROUGH the ascend tier (rather than resolving the base def and
+  // applying ascension elsewhere) is the whole point: powerSurplus divides
+  // by def.difficulty, so if ascension lived anywhere but the def, surplus
+  // would still be measured against the unascended difficulty and the hero
+  // would keep the full easy-mode speed/safety/drop-clamp bonuses while
+  // fighting a harder version. Routing everything through one scaled def
+  // is what prevents that double-dip.
+  const ascendTier = activity.ascendTier || 0;
+  const def = getTimedContentDef(type, activity.contentId, ascendTier);
   state.activity = { type:"idle", zoneId:null, startedAt: state.lastTick, dropAccumulatorMs: 0 };
   if (!def) return;
+  // Ascended I/II/III multiply the injury roll (1.25x/1.5x/1.8x) on top of
+  // the usual injury-chance multiplier and safety bonus. def.ascendTier is
+  // only ever set by ascendDef (canAscend-gated), so this is 1 for quests,
+  // world bosses, and the Forgotten Beyond regardless of what ascendTier
+  // this activity happens to carry.
+  const injuryMult = (def.ascendTier && ASCEND_TIERS[def.ascendTier]) ? ASCEND_TIERS[def.ascendTier].injuryMult : 1;
 
   const ratio = computePower(hero) / def.difficulty;
   const success = Math.random() < successChance(ratio);
@@ -4481,9 +5028,26 @@ function applyTimedContentProgress(summary){
   // A world boss pays XP and renown ONLY — its def carries no gold field at
   // all, so the 0 here is the authoritative value, not a fallback.
   const isWorldBoss = type === "worldboss";
-  const basePay = def.mythicSource
-    ? mythicContentRewards(def, rolledMs)
-    : { xp: def.xp, gold: isWorldBoss ? 0 : def.gold, renown: def.renown };
+  let basePay;
+  if (def.mythicSource){
+    basePay = mythicContentRewards(def, rolledMs);
+  } else if (def.ascendTier > 0){
+    // The Ascended reward BONUS fades with surplus (see ascendRewardScale) —
+    // normal (tier 0) rewards are never touched. def.baseXp/baseGold/
+    // baseRenown are the pre-ascension originals ascendDef tagged onto this
+    // def; scale multiplies only the portion of the tier bonus ABOVE 1x, so
+    // at scale 1 (no surplus) this reduces to exactly the old tier-scaled
+    // xp/gold/renown.
+    const scale = ascendRewardScale(hero, def);
+    const at = ASCEND_TIERS[def.ascendTier];
+    basePay = {
+      xp: Math.round(def.baseXp * (1 + (at.rewardMult - 1) * scale)),
+      gold: Math.round(def.baseGold * (1 + (at.rewardMult - 1) * scale)),
+      renown: Math.round(def.baseRenown * (1 + (at.renownMult - 1) * scale))
+    };
+  } else {
+    basePay = { xp: def.xp, gold: isWorldBoss ? 0 : def.gold, renown: def.renown };
+  }
   let xpGain = basePay.xp * rewardMult * getXpMultiplier(hero);
   let goldGain = basePay.gold * rewardMult * getGoldMultiplier(hero);
   let renownGain = basePay.renown;
@@ -4509,6 +5073,7 @@ function applyTimedContentProgress(summary){
       const item = rollGearItem(tier, effTier, hero);
       state.inventory.push(item);
       items.push(item);
+      recordBestiary("tiers", item.tierId);
       addLog("Recovered " + itemDisplayName(item) + " from " + def.name + ".", "drop");
     }
     // The Forgotten Beyond's entire yield, and the only source of mythic
@@ -4519,17 +5084,27 @@ function applyTimedContentProgress(summary){
       mythicItem = mintMythicWeapon(hero, contentDropTier(hero, def));
       state.inventory.push(mythicItem);
       items.push(mythicItem);
+      recordBestiary("tiers", mythicItem.tierId);
       if (state.stats) state.stats.mythicsFound = (state.stats.mythicsFound || 0) + 1;
       addLog(hero.name + " returns from " + def.name + " carrying " + itemDisplayName(mythicItem) +
         " — a MYTHIC weapon, and there is nowhere else in the realm one can be had.", "levelup");
     }
     if (state.stats) state.stats.itemsFound += items.length;
-    injured = Math.random() < CONTENT_INJURY_CHANCE_SUCCESS * getInjuryChanceMultiplier(hero) * safetyMult;
+    injured = Math.random() < CONTENT_INJURY_CHANCE_SUCCESS * getInjuryChanceMultiplier(hero) * safetyMult * injuryMult;
+
+    // Record the clear on this content's ascend high-water mark. Recorded
+    // for normal clears too (tier 0), since that is what unlocks Ascended I.
+    // Only dungeons/raids track this — quests use questProgress instead.
+    if (type === "dungeon" || type === "raid"){
+      if (!state.ascendProgress) state.ascendProgress = {};
+      const prior = (typeof state.ascendProgress[def.id] === "number") ? state.ascendProgress[def.id] : -1;
+      state.ascendProgress[def.id] = Math.max(prior, ascendTier);
+    }
   } else {
     xpGain *= CONTENT_FAILURE_REWARD_FRACTION;
     goldGain *= CONTENT_FAILURE_REWARD_FRACTION;
     renownGain = 0;
-    injured = Math.random() < (isWorldBoss ? WORLDBOSS_INJURY_CHANCE_FAILURE : CONTENT_INJURY_CHANCE_FAILURE) * getInjuryChanceMultiplier(hero) * safetyMult;
+    injured = Math.random() < (isWorldBoss ? WORLDBOSS_INJURY_CHANCE_FAILURE : CONTENT_INJURY_CHANCE_FAILURE) * getInjuryChanceMultiplier(hero) * safetyMult * injuryMult;
   }
 
   if (state.stats){
@@ -4537,6 +5112,7 @@ function applyTimedContentProgress(summary){
     else if (type === "raid") state.stats[success ? "raidsCompleted" : "raidsFailed"] += 1;
     else if (isWorldBoss && success) state.stats.worldBossesFelled = (state.stats.worldBossesFelled || 0) + 1;
   }
+  if (success && (type === "dungeon" || type === "raid")) recordBestiary(type === "dungeon" ? "dungeons" : "raids", def.id);
 
   summary.xpGained += xpGain;
   summary.goldGained += goldGain;
@@ -4546,7 +5122,8 @@ function applyTimedContentProgress(summary){
   summary.itemsFound = summary.itemsFound.concat(items);
 
   const typeLabel = contentTypeLabel(type);
-  addLog(typeLabel + " — " + def.name + ": " + (success ? "Success!" : "Failure.") +
+  addLog(typeLabel + " — " + def.name + (def.ascendName ? " [" + def.ascendName + "]" : "") + ": " +
+    (success ? "Success!" : "Failure.") +
     " +" + fmtNumber(xpGain) + " xp" + (isWorldBoss ? "" : ", +" + fmtNumber(goldGain) + " gold") +
     (renownGain > 0 ? ", +" + renownGain + " renown" : "") + ".",
     success ? "zone" : "system");
@@ -4557,6 +5134,7 @@ function applyTimedContentProgress(summary){
     // must never push the hero past the next unbeaten one.
     const idx = WORLD_BOSSES.findIndex(b => b.id === def.id);
     if (idx === (state.worldBossProgress || 0)) state.worldBossProgress = idx + 1;
+    recordBestiary("bosses", def.id);
     // Account-wide first-blood record. Written ONCE per boss, ever: a later
     // kill by this or any future hero leaves the original name standing.
     if (state.legacy){
@@ -4577,6 +5155,7 @@ function applyTimedContentProgress(summary){
         state.questProgress = ch.chapter;
         if (state.stats) state.stats.questChaptersCompleted += 1;
       }
+      recordBestiary("chapters", ch.id);
       outro = ch.outro;
       addLog("Chapter " + ch.chapter + " complete: \"" + ch.title + "\".", "levelup");
     } else if (ch){
@@ -4591,7 +5170,9 @@ function applyTimedContentProgress(summary){
     xp: xpGain, gold: goldGain, renown: renownGain,
     items: items, injured: injured, outro: outro,
     mythic: mythicItem,
-    questTitle: type === "quest" ? def.title : null
+    questTitle: type === "quest" ? def.title : null,
+    ascendTier: def.ascendTier || 0,
+    ascendName: def.ascendName || null
   };
 }
 
@@ -4636,6 +5217,7 @@ function applyTrainingProgress(elapsedMs, maxDrops, summary){
       const item = rollItem(zone, hero);
       state.inventory.push(item);
       summary.itemsFound.push(item);
+      recordBestiary("tiers", item.tierId);
       if (state.stats) state.stats.itemsFound += 1;
       addLog("Found " + itemDisplayName(item) + " at " + zone.name + ".", "drop");
     }
@@ -4670,6 +5252,10 @@ function buildSavePayload(){
     pendingEncounters: state.pendingEncounters || [],
     questProgress: state.questProgress || 0,
     worldBossProgress: state.worldBossProgress || 0,
+    // Per-hero ascend high-water marks — see createDefaultState. Explicitly
+    // enumerated like every other per-hero field here, or it silently drops
+    // on the next save.
+    ascendProgress: (state.ascendProgress && typeof state.ascendProgress === "object") ? state.ascendProgress : {},
     stats: state.stats || createEmptyStats(),
     // Rebirth (prestige) + achievements. Only these canonical fields persist
     // on a normal save — the transient pendingInheritance lives solely on a
@@ -4683,7 +5269,15 @@ function buildSavePayload(){
       legends: (state.legacy && Array.isArray(state.legacy.legends)) ? state.legacy.legends : [],
       totals: (state.legacy && state.legacy.totals) ? state.legacy.totals : createEmptyStats(),
       achievements: (state.legacy && Array.isArray(state.legacy.achievements)) ? state.legacy.achievements : [],
-      worldBossFirsts: (state.legacy && state.legacy.worldBossFirsts && typeof state.legacy.worldBossFirsts === "object") ? state.legacy.worldBossFirsts : {}
+      worldBossFirsts: (state.legacy && state.legacy.worldBossFirsts && typeof state.legacy.worldBossFirsts === "object") ? state.legacy.worldBossFirsts : {},
+      // Account-wide Bestiary archive (see BESTIARY_CATEGORY_KEYS) — must be
+      // enumerated here explicitly like every other legacy field above, or
+      // it silently fails to persist.
+      bestiary: (state.legacy && state.legacy.bestiary && typeof state.legacy.bestiary === "object") ? state.legacy.bestiary : createEmptyBestiary(),
+      // Account-wide Stronghold (see STRONGHOLD_BUILDINGS) — SURVIVES REBIRTH,
+      // which is the entire point of the feature, so it must be enumerated
+      // here explicitly like every other legacy field above.
+      stronghold: (state.legacy && state.legacy.stronghold && typeof state.legacy.stronghold === "object") ? state.legacy.stronghold : createEmptyStronghold()
     },
     lastTick: Date.now()
   };
@@ -4768,6 +5362,9 @@ function migrateSave(data){
   if (d.version === 10) d = migrateV10toV11(d);
   if (d.version === 11) d = migrateV11toV12(d);
   if (d.version === 12) d = migrateV12toV13(d);
+  if (d.version === 13) d = migrateV13toV14(d);
+  if (d.version === 14) d = migrateV14toV15(d);
+  if (d.version === 15) d = migrateV15toV16(d);
   return d;
 }
 
@@ -5002,6 +5599,83 @@ function migrateV12toV13(data){
   return data;
 }
 
+// v14 adds Ascended difficulty tiers. One new per-hero field:
+//   • data.ascendProgress — per-content ascend high-water mark, resets on
+//     rebirth exactly like questProgress/worldBossProgress. An existing
+//     hero has never run an Ascended tier of anything, so an empty object
+//     (which also means "no normal clears on record" — those will simply
+//     backfill themselves the next time each dungeon/raid is cleared).
+function migrateV13toV14(data){
+  if (!data.ascendProgress || typeof data.ascendProgress !== "object") data.ascendProgress = {};
+  data.version = 14;
+  return data;
+}
+
+// v15 adds the Bestiary — one new legacy field (see BESTIARY_CATEGORY_KEYS/
+// createEmptyBestiary), seeded empty and then BACKFILLED wherever an
+// existing save already carries a durable, unambiguous record of something
+// demonstrably already seen:
+//   • chapters — data.questProgress is a count of completed CAMPAIGN_SPINE
+//     chapters from the start, so every chapter below that count is implied.
+//   • bosses — data.worldBossProgress (this hero's own climbed rungs) implies
+//     every WORLD_BOSSES entry below it; data.legacy.worldBossFirsts (the
+//     account-wide first-kill roll, which can name bosses felled by a hero
+//     BEFORE a rebirth this hero's own worldBossProgress knows nothing about)
+//     is unioned in on top for the same reason it's already account-wide.
+//   • dungeons/raids — data.ascendProgress keys are only ever written on a
+//     successful clear (see applyTimedContentProgress; 0 = cleared on
+//     Normal), so every key present there is a demonstrated clear. Each key
+//     is tested against DUNGEONS/RAIDS to sort it into the right category.
+//   • tiers — every tierId already sitting in this hero's inventory or
+//     equipment is a tier the player has certainly obtained.
+// zones and encounters leave no durable per-id record on a pre-v15 save
+// (questing a zone or drawing an encounter was never logged anywhere
+// keyed by id) and are deliberately NOT backfilled — guessing would be
+// worse than an honest partial total.
+function migrateV14toV15(data){
+  if (!data.legacy || typeof data.legacy !== "object") data.legacy = createEmptyLegacy();
+  if (!data.legacy.bestiary || typeof data.legacy.bestiary !== "object") data.legacy.bestiary = createEmptyBestiary();
+  const b = data.legacy.bestiary;
+  BESTIARY_CATEGORY_KEYS.forEach(cat => { if (!b[cat] || typeof b[cat] !== "object") b[cat] = {}; });
+
+  const questProgress = (typeof data.questProgress === "number") ? data.questProgress : 0;
+  CAMPAIGN_SPINE.slice(0, questProgress).forEach(ch => { b.chapters[ch.id] = true; });
+
+  const worldBossProgress = (typeof data.worldBossProgress === "number") ? data.worldBossProgress : 0;
+  WORLD_BOSSES.slice(0, worldBossProgress).forEach(boss => { b.bosses[boss.id] = true; });
+  if (data.legacy.worldBossFirsts && typeof data.legacy.worldBossFirsts === "object"){
+    Object.keys(data.legacy.worldBossFirsts).forEach(id => { b.bosses[id] = true; });
+  }
+
+  const ascendProgress = (data.ascendProgress && typeof data.ascendProgress === "object") ? data.ascendProgress : {};
+  Object.keys(ascendProgress).forEach(id => {
+    if (DUNGEONS.some(d => d.id === id)) b.dungeons[id] = true;
+    else if (RAIDS.some(r => r.id === id)) b.raids[id] = true;
+  });
+
+  const equipped = data.hero && data.hero.equipment ?
+    Object.keys(data.hero.equipment).map(slot => data.hero.equipment[slot]).filter(Boolean) : [];
+  (Array.isArray(data.inventory) ? data.inventory : []).concat(equipped).forEach(item => {
+    if (item && item.tierId) b.tiers[item.tierId] = true;
+  });
+
+  data.legacy.bestiary = b;
+  data.version = 15;
+  return data;
+}
+
+// v16 adds the Stronghold — one new legacy field (see STRONGHOLD_BUILDINGS/
+// createEmptyStronghold), seeded empty (all five buildings at level 0).
+// Nothing to backfill: no pre-v16 save could ever have purchased a
+// stronghold level, since the feature didn't exist yet.
+function migrateV15toV16(data){
+  if (!data.legacy || typeof data.legacy !== "object") data.legacy = createEmptyLegacy();
+  if (!data.legacy.stronghold || typeof data.legacy.stronghold !== "object") data.legacy.stronghold = createEmptyStronghold();
+  STRONGHOLD_BUILDINGS.forEach(def => { if (typeof data.legacy.stronghold[def.id] !== "number") data.legacy.stronghold[def.id] = 0; });
+  data.version = 16;
+  return data;
+}
+
 function migrateItemToGear(item, hero){
   if (item.slot) return item; // already gear-shaped, leave as-is
   const slot = SLOTS[Math.floor(Math.random() * SLOTS.length)];
@@ -5092,6 +5766,27 @@ function rolledDurationRangeLabel(def){
   return compactMinutes(def.randomDurationMin) + " – " + compactMinutes(def.randomDurationMax);
 }
 
+// Every local-midnight instant strictly between start and end, walked by
+// incrementing calendar fields (not by adding 86400000ms) so a DST
+// transition's 23- or 25-hour day still lands each boundary on local
+// midnight rather than drifting. Used by applyOfflineProgress to split an
+// offline gap at day boundaries too, alongside buff expiries — an offline
+// span that crosses midnight crosses into a different Realm Decree, and
+// without this a multi-day gap would be paid out entirely under whichever
+// decree happens to be active when the player returns.
+function localDayBoundariesBetween(start, end){
+  const boundaries = [];
+  if (!(end > start)) return boundaries;
+  const d0 = new Date(start);
+  let next = new Date(d0.getFullYear(), d0.getMonth(), d0.getDate() + 1, 0, 0, 0, 0).getTime();
+  while (next < end){
+    boundaries.push(next);
+    const d = new Date(next);
+    next = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1, 0, 0, 0, 0).getTime();
+  }
+  return boundaries;
+}
+
 function applyOfflineProgress(){
   const now = Date.now();
   const start = state.lastTick;
@@ -5103,8 +5798,11 @@ function applyOfflineProgress(){
   // otherwise a 60-min buff would boost an entire multi-day offline gap.
   // A running rest/dungeon/raid/quest's endsAt is also a boundary, so it
   // resolves exactly at endsAt (with whatever buffs were live then) and
-  // the hero sits idle for the remainder of the gap.
-  const rawBoundaries = (state.hero.buffs || []).map(b => b.expiresAt);
+  // the hero sits idle for the remainder of the gap. Local day boundaries
+  // (see localDayBoundariesBetween) are folded into the same list so a
+  // gap crossing midnight also resolves each side under its own decree.
+  const rawBoundaries = (state.hero.buffs || []).map(b => b.expiresAt)
+    .concat(localDayBoundariesBetween(start, now));
   const a = state.activity;
   if ((a.type === "rest" || a.type === "dungeon" || a.type === "raid" || a.type === "quest" || a.type === "worldboss") && a.endsAt){
     rawBoundaries.push(a.endsAt);
@@ -5223,6 +5921,7 @@ const ICON_ART = {
   temple: '<path d="M5 21 H19"/><path d="M7 21 V12.5 A5 5 0 0 1 17 12.5 V21"/><path d="M12 21 V14"/><path d="M12 3 L12.8 5.6 L15.4 6.4 L12.8 7.2 L12 9.8 L11.2 7.2 L8.6 6.4 L11.2 5.6 Z"/>',
   tavern: '<path d="M6.5 7 h8 v13 h-8 Z"/><path d="M14.5 9.5 h2.2 a2 2 0 0 1 2 2 v3 a2 2 0 0 1 -2 2 h-2.2"/><path d="M6.5 7 c0 -2 2.2 -3 3.7 -1.6 C11.5 3.8 14.5 4.8 14.5 7"/><path d="M6.5 10 h8"/>',
   enchanter: '<circle cx="12" cy="7.3" r="3.1"/><path d="M12 4.7 V9.9 M9.9 5.9 L14.1 8.7 M14.1 5.9 L9.9 8.7"/><path d="M6.5 13 Q6.5 19.3 12 19.3 Q17.5 19.3 17.5 13"/><path d="M8.6 13 V10.6 M12 13 V9.9 M15.4 13 V10.6"/>',
+  stronghold: '<path d="M5 21 V9 H7.5 V6.5 H9.5 V9 H14.5 V6.5 H16.5 V9 H19 V21 Z"/><path d="M5 21 H19"/><path d="M10 21 V15 H14 V21"/><path d="M12 6.5 V3"/><path d="M12 3 L15 4"/>',
   // --- Misc ---
   settings: '<path d="M21 12 L17.82 14.41 L18.36 18.36 L14.41 17.82 L12 21 L9.59 17.82 L5.64 18.36 L6.18 14.41 L3 12 L6.18 9.59 L5.64 5.64 L9.59 6.18 L12 3 L14.41 6.18 L18.36 5.64 L17.82 9.59 Z"/><circle cx="12" cy="12" r="3.2"/>',
   codex: '<path d="M12 6 C9.5 4.5 6.5 4.5 4 5.5 V18 C6.5 17 9.5 17 12 18.5 C14.5 17 17.5 17 20 18 V5.5 C17.5 4.5 14.5 4.5 12 6 Z"/><path d="M12 6 V18.5"/><path d="M15.8 4.8 V10 l1.7 -1.3 1.7 1.3 V4.4"/>',
@@ -5582,13 +6281,14 @@ function renderHeroPanel(){
     activityEl.textContent = (act.restKind === "short" ? "Resting (short)" : "Resting (long)");
     trackerEl.innerHTML = "<span class=\"activity-name\">Resting</span> — " + humanizeDuration(remaining) + " remaining";
   } else if (act.type === "dungeon" || act.type === "raid" || act.type === "quest" || act.type === "worldboss"){
-    const def = getTimedContentDef(act.type, act.contentId);
+    const def = getTimedContentDef(act.type, act.contentId, act.ascendTier);
     const label = contentTypeLabel(act.type);
     const remaining = Math.max(0, act.endsAt - Date.now());
-    activityEl.textContent = label + ": " + (def ? def.name : "Unknown") + " — " + fmtCountdown(remaining) + " left";
+    const ascendSuffix = (def && def.ascendName) ? " [" + def.ascendName + "]" : "";
+    activityEl.textContent = label + ": " + (def ? def.name : "Unknown") + ascendSuffix + " — " + fmtCountdown(remaining) + " left";
     const verb = act.type === "dungeon" ? "Delving" : act.type === "raid" ? "Raiding" :
       act.type === "worldboss" ? "Hunting" : "On campaign:";
-    trackerEl.innerHTML = verb + " <span class=\"activity-name\">" + escapeHtml(def ? def.name : "Unknown") + "</span> — " + humanizeDuration(remaining) + " remaining";
+    trackerEl.innerHTML = verb + " <span class=\"activity-name\">" + escapeHtml(def ? def.name : "Unknown") + escapeHtml(ascendSuffix) + "</span> — " + humanizeDuration(remaining) + " remaining";
   } else if (act.type === "arena"){
     activityEl.textContent = "In the Arena — fight " + act.fightNumber;
     trackerEl.innerHTML = "Fighting in the <span class=\"activity-name\">Arena</span> — fight " + act.fightNumber;
@@ -5642,6 +6342,29 @@ function renderBuffRow(){
   el.innerHTML = buffs.map(b => {
     const remaining = Math.max(0, b.expiresAt - Date.now());
     return "<span class=\"buff-chip\">" + icon("buff", 13) + escapeHtml(b.name) + " — " + fmtCountdown(remaining) + "</span>";
+  }).join("");
+}
+
+// Today's Realm Decree, shown under the activity tracker. Re-derived from
+// Date.now() every render (never cached beyond the sig guard below) —
+// there's nothing to go stale, since the decree itself is never stored
+// (see activeDecree). Benefits/costs reuse the same good/bad language as
+// class perks (PERK_HIGHER_IS_BETTER) rather than inventing new colors.
+function renderDecreeBanner(){
+  const decree = activeDecree(Date.now());
+  if (contentRenderSigs["decree-banner"] === decree.id) return;
+  contentRenderSigs["decree-banner"] = decree.id;
+
+  document.getElementById("decree-name").textContent = decree.name;
+  document.getElementById("decree-flavor").textContent = decree.flavor;
+  document.getElementById("decree-effects").innerHTML = Object.keys(decree.effects).map(k => {
+    const v = decree.effects[k];
+    const isIncrease = v >= 1;
+    const pct = Math.round(Math.abs(v - 1) * 100);
+    const good = isIncrease === (PERK_HIGHER_IS_BETTER[k] !== false);
+    const label = PERK_LABELS[k] || k;
+    return "<span class=\"decree-effect " + (good ? "good" : "bad") + "\">" +
+      (isIncrease ? "+" : "-") + pct + "% " + escapeHtml(label) + "</span>";
   }).join("");
 }
 
@@ -5855,6 +6578,52 @@ function renderTavernPanel(){
   });
 }
 
+// Human-readable effect line for one Stronghold building at a given
+// level — forgeCostMult and restTimeMult read as a reduction (lower is
+// better, sign follows def.perLevel), the rest as a straight bonus. Mirrors
+// tavernEffectDesc's sign handling.
+function strongholdEffectText(def, level){
+  const mult = strongholdBuildingMult(def, level);
+  const pct = Math.round(Math.abs(mult - 1) * 1000) / 10;
+  const sign = def.perLevel >= 0 ? "+" : "-";
+  const label = def.effectKey === "forgeCostMult" ? "Blacksmith upgrade cost" : (RELIC_LABELS[def.effectKey] || def.effectKey);
+  return sign + pct + "% " + label;
+}
+
+// Stronghold panel: one row per STRONGHOLD_BUILDINGS entry, showing name,
+// flavor, current level, current/next effect, and the upgrade cost —
+// mirrors renderTavernPanel's entry-building exactly (reuses .tavern-name
+// and .inv-meta), the button disabled with the reason shown whenever the
+// hero can't afford it or the building is already maxed.
+function renderStrongholdPanel(){
+  const list = document.getElementById("stronghold-list");
+  if (!list) return;
+  list.innerHTML = "";
+  const hero = state.hero;
+  STRONGHOLD_BUILDINGS.forEach(def => {
+    const level = strongholdLevel(def.id);
+    const maxed = level >= STRONGHOLD_MAX_LEVEL;
+    const cost = maxed ? null : strongholdUpgradeCost(level, hero);
+    const afford = cost !== null && hero.gold >= cost;
+    const currentText = strongholdEffectText(def, level);
+    const nextText = maxed ? null : strongholdEffectText(def, level + 1);
+    const row = document.createElement("div");
+    row.className = "stronghold-item";
+    row.innerHTML =
+      "<div class=\"tavern-name\">" + escapeHtml(def.name) + " <span class=\"inv-meta\">— Level " + level + "/" + STRONGHOLD_MAX_LEVEL + "</span></div>" +
+      "<div class=\"inv-meta\" style=\"font-style:italic;\">" + escapeHtml(def.flavor) + "</div>" +
+      "<div class=\"inv-meta\">Current: " + currentText + (maxed ? "" : " &rarr; Next: " + nextText) + "</div>" +
+      (maxed ?
+        "<span class=\"inv-meta\">Fully built</span>" :
+        "<button class=\"btn small\" " + (afford ? "" : "disabled") + " data-stronghold=\"" + def.id + "\">Upgrade (" + fmtNumber(cost) + "g)</button>" +
+        (afford ? "" : "<div class=\"inv-meta\">Not enough gold</div>"));
+    list.appendChild(row);
+  });
+  list.querySelectorAll("[data-stronghold]").forEach(btn => {
+    btn.addEventListener("click", () => upgradeStronghold(btn.dataset.stronghold));
+  });
+}
+
 // The training progress bar tracks activity.dropAccumulatorMs directly —
 // the same counter applyTrainingProgress rolls drops against — so it's
 // always truthful to the actual find-chance cycle, resets the instant a
@@ -5968,15 +6737,27 @@ function contentBandInfo(ratio){
   return { label: "Overwhelming", color: "var(--red)" };
 }
 
+// Human-readable ascend high-water mark for a content id — used by both
+// the card's "Cleared:" line and nowhere else, so a wording change here
+// can't drift from the gating logic in timedContentBlockReason.
+function ascendMarkLabel(contentId){
+  const cleared = (state.ascendProgress && typeof state.ascendProgress[contentId] === "number") ? state.ascendProgress[contentId] : null;
+  if (cleared === null) return "Not yet cleared";
+  if (cleared === 0) return "Cleared: Normal";
+  return "Cleared: " + ASCEND_TIERS[cleared].name;
+}
+
 // Shared card list for dungeons and raids.
 function renderTimedContentList(type, defs, listElId){
   const hero = state.hero;
   const power = computePower(hero);
   const act = state.activity;
   const activeId = (act.type === type) ? act.contentId : null;
+  const activeTier = activeId ? (act.ascendTier || 0) : 0;
   const remaining = activeId ? Math.max(0, act.endsAt - Date.now()) : 0;
-  const sig = hero.level + "|" + power + "|" + act.type + "|" + activeId + "|" +
-    Math.floor(remaining / 1000) + "|" + (hero.injuries >= MAX_INJURIES) + "|" + getTimerMultiplier(hero);
+  const sig = hero.level + "|" + power + "|" + act.type + "|" + activeId + "|" + activeTier + "|" +
+    Math.floor(remaining / 1000) + "|" + (hero.injuries >= MAX_INJURIES) + "|" + getTimerMultiplier(hero) + "|" +
+    JSON.stringify(state.ascendProgress || {});
   if (contentRenderSigs[listElId] === sig) return;
   contentRenderSigs[listElId] = sig;
 
@@ -5984,51 +6765,98 @@ function renderTimedContentList(type, defs, listElId){
   list.innerHTML = "";
   defs.forEach(def => {
     const active = def.id === activeId;
-    const reason = timedContentBlockReason(type, def);
+    // While a run is underway, show the ACTUAL ascended def it's running
+    // at (so xp/gold/renown/difficulty read correctly mid-run); otherwise
+    // the base (Normal) def, exactly as before ascension existed.
+    const effDef = active ? getTimedContentDef(type, def.id, activeTier) : def;
+    // The Normal-tier reason for THIS card — activeTier only applies to
+    // whichever def is actually running, which may be a different piece of
+    // content of the same type (or none at all).
+    const reason = timedContentBlockReason(type, effDef, active ? activeTier : 0);
     const locked = !!reason && !active;
-    const ratio = power / def.difficulty;
+    const ratio = power / effDef.difficulty;
     const band = contentBandInfo(ratio);
     const chancePct = Math.round(successChance(ratio) * 100);
     // Prospective runs quote the shared helper (identical to what
     // startTimedContent will bank); the run already underway quotes its
     // own locked-in span, so the badge can never contradict the countdown
     // even if power/buffs change mid-run.
-    const dur = active ? Math.max(0, act.endsAt - act.startedAt) : timedContentDurationMs(hero, def);
+    const dur = active ? Math.max(0, act.endsAt - act.startedAt) : timedContentDurationMs(hero, effDef);
 
     // A rolled-duration expedition knows nothing about itself until you
     // commit to it: the span is drawn at the moment you set out, and every
     // payout plus the mythic chance is derived from that span. So the card
     // quotes RANGES before starting and the ACTUAL rolled figures once
     // underway — that reveal is the whole point of the content.
-    const rolled = hasRolledDuration(def);
-    const durLabel = (rolled && !active) ? rolledDurationRangeLabel(def) : humanizeDuration(dur);
+    const rolled = hasRolledDuration(effDef);
+    const durLabel = (rolled && !active) ? rolledDurationRangeLabel(effDef) : humanizeDuration(dur);
     let statsHtml;
     if (rolled){
-      const lo = mythicContentRewards(def, def.randomDurationMin * 60000);
-      const hi = mythicContentRewards(def, def.randomDurationMax * 60000);
-      const now0 = active ? mythicContentRewards(def, dur) : null;
+      const lo = mythicContentRewards(effDef, effDef.randomDurationMin * 60000);
+      const hi = mythicContentRewards(effDef, effDef.randomDurationMax * 60000);
+      const now0 = active ? mythicContentRewards(effDef, dur) : null;
       const range = (a, b) => fmtNumber(a) + " – " + fmtNumber(b);
       statsHtml =
         "<span><b>" + (now0 ? fmtNumber(now0.xp) : range(lo.xp, hi.xp)) + "</b> xp</span>" +
         "<span><b>" + (now0 ? fmtNumber(now0.gold) : range(lo.gold, hi.gold)) + "</b> gold</span>" +
         "<span><b>" + (now0 ? now0.renown : range(lo.renown, hi.renown)) + "</b> renown</span>" +
         "<span style=\"color:var(--tier-mythic)\"><b>" +
-          (active ? Math.round(mythicChance(def, dur) * 100) + "%"
+          (active ? Math.round(mythicChance(effDef, dur) * 100) + "%"
                   : Math.round(MYTHIC_CHANCE_MIN * 100) + "% – " + Math.round(MYTHIC_CHANCE_MAX * 100) + "%") +
           "</b> mythic</span>";
     } else {
       statsHtml =
-        "<span><b>" + fmtNumber(def.xp) + "</b> xp</span>" +
-        "<span><b>" + fmtNumber(def.gold) + "</b> gold</span>" +
-        "<span><b>" + def.renown + "</b> renown</span>" +
-        "<span><b>" + def.dropRolls + "</b> drops</span>";
+        "<span><b>" + fmtNumber(effDef.xp) + "</b> xp</span>" +
+        "<span><b>" + fmtNumber(effDef.gold) + "</b> gold</span>" +
+        "<span><b>" + effDef.renown + "</b> renown</span>" +
+        "<span><b>" + effDef.dropRolls + "</b> drops</span>";
+    }
+
+    const eligible = canAscend(type, def);
+
+    // Ascend tier picker — dungeons/raids only, never forgotten_beyond.
+    // Chips for tiers I-III sit below the Normal stats row: running,
+    // locked-with-reason, or clickable, mirroring how a locked card
+    // already communicates its reason elsewhere in this list.
+    let ascendHtml = "";
+    if (eligible){
+      const chips = ASCEND_TIERS.slice(1).map(t => {
+        if (active && activeTier === t.tier){
+          return "<span class=\"ascend-chip active\">" + escapeHtml(t.name) + " — running</span>";
+        }
+        const adef = getTimedContentDef(type, def.id, t.tier);
+        const tReason = timedContentBlockReason(type, adef, t.tier);
+        const tChancePct = Math.round(successChance(power / adef.difficulty) * 100);
+        // The reward BONUS fades once the hero has hugely outgrown even this
+        // ascended difficulty (see ascendRewardScale) — surfaced here so the
+        // reduction never reads as a silent nerf. Only the bonus portion
+        // fades: at scale 1 (no surplus) effMult === t.rewardMult exactly.
+        const rScale = ascendRewardScale(hero, adef);
+        const reduced = rScale < 1;
+        const effMult = 1 + (t.rewardMult - 1) * rScale;
+        const detail = "Difficulty " + fmtNumber(adef.difficulty) + " · " + tChancePct + "% chance · " +
+          t.rewardMult + "x xp/gold · " + t.renownMult + "x renown · +" + t.dropTierBonus + " drop tier" +
+          (reduced ? " · Outgrown — bonus reduced to " + effMult.toFixed(2) + "x" : "");
+        if (tReason){
+          return "<span class=\"ascend-chip locked\" title=\"" + escapeHtml(tReason + " — " + detail) + "\">" +
+            escapeHtml(t.name) + " — " + escapeHtml(tReason) + "</span>";
+        }
+        const multLabel = reduced
+          ? "<span style=\"color:var(--red)\">" + effMult.toFixed(2) + "x</span>"
+          : t.rewardMult + "x";
+        return "<button class=\"ascend-chip\" data-content-start=\"" + def.id + "\" data-ascend-tier=\"" + t.tier + "\" title=\"" +
+          escapeHtml(detail) + "\">" + escapeHtml(t.name) + " (" + tChancePct + "%, " + multLabel + ")</button>";
+      }).join("");
+      ascendHtml = "<div class=\"ascend-tier-row\">" + chips + "</div>" +
+        "<div class=\"ascend-mark\">" + escapeHtml(ascendMarkLabel(def.id)) + "</div>";
     }
 
     const card = document.createElement("div");
     card.className = "zone-card" + (locked ? " locked" : "") + (active ? " active" : "");
     card.innerHTML =
       "<div class=\"zone-info\">" +
-        "<div class=\"zone-name-row\"><h4 class=\"content-title\">" + escapeHtml(def.name) + "</h4>" +
+        "<div class=\"zone-name-row\"><h4 class=\"content-title\">" + escapeHtml(def.name) +
+          (active && activeTier ? " <span style=\"color:var(--gold)\">[" + escapeHtml(effDef.ascendName) + "]</span>" : "") + "</h4>" +
           "<span class=\"tier-badge\">" + escapeHtml(durLabel) + "</span></div>" +
         "<div class=\"content-flavor\">" + escapeHtml(def.flavor || "") + "</div>" +
         "<div class=\"zone-req\">" + (hero.level < def.levelReq ? "Requires level " + def.levelReq : "Level " + def.levelReq + "+") + "</div>" +
@@ -6036,6 +6864,7 @@ function renderTimedContentList(type, defs, listElId){
           statsHtml +
           "<span class=\"content-band\" style=\"color:" + band.color + "\">" + band.label + " (" + chancePct + "%)</span>" +
         "</div>" +
+        ascendHtml +
       "</div>" +
       "<div class=\"zone-action\">" +
         (active ? "<span class=\"content-countdown\">" + fmtCountdown(remaining) + "</span>" :
@@ -6046,7 +6875,7 @@ function renderTimedContentList(type, defs, listElId){
   });
 
   list.querySelectorAll("[data-content-start]").forEach(btn => {
-    btn.addEventListener("click", () => startTimedContent(type, btn.dataset.contentStart));
+    btn.addEventListener("click", () => startTimedContent(type, btn.dataset.contentStart, parseInt(btn.dataset.ascendTier, 10) || 0));
   });
 }
 
@@ -6722,6 +7551,86 @@ function renderWorldBossHallPanel(){
   el.innerHTML = html;
 }
 
+// Display name/flavor for one discovered Bestiary entry — the single place
+// that knows where each category's prose actually lives. Only ever called
+// for an id already confirmed present in state.legacy.bestiary; the caller
+// (renderBestiaryPanel) is what keeps an undiscovered entry from ever
+// reaching this function, since the point is that nothing here may leak.
+function bestiaryEntryDisplay(category, def, i){
+  if (category === "chapters"){
+    // Chapter prose is arc-specific (see CAMPAIGN_ARCS/campaignChapters) —
+    // CAMPAIGN_SPINE itself carries no title/flavor of its own. Shown
+    // through the CURRENT hero's assigned arc, same source renderQuests
+    // already reads chapter prose from.
+    const c = campaignChapters()[i] || {};
+    return { name: "Chapter " + def.chapter + ": " + (c.title || ""), flavor: c.intro || "" };
+  }
+  if (category === "encounters") return { name: def.title, flavor: def.prose };
+  if (category === "tiers") return { name: def.name, flavor: null };
+  // zones, dungeons, raids, bosses all share the same { name, flavor } shape.
+  return { name: def.name, flavor: def.flavor || null };
+}
+
+const BESTIARY_CATEGORY_LABELS = {
+  zones: "Zones", encounters: "Encounters", dungeons: "Dungeons", raids: "Raids",
+  bosses: "World Bosses", chapters: "Campaign Chapters", tiers: "Item Tiers"
+};
+
+// Character tab — Bestiary subtab: overall completion, the four milestone
+// bonuses with locked/unlocked state, and every category's roster with
+// discovered entries showing their name+flavor and undiscovered entries
+// reduced to an anonymous locked card — no name, no flavor, nothing that
+// could spoil what's still ahead. This is deliberately at least as strict
+// as renderWorldBosses' "never render an unreached rung" rule: every
+// category (not just bosses) hides id/name/flavor for anything not yet in
+// state.legacy.bestiary, so the World Boss ladder's spoiler rule falls out
+// as a special case of the general one rather than needing its own branch.
+function renderBestiaryPanel(){
+  const seenSig = BESTIARY_CATEGORY_KEYS.map(cat => Object.keys(bestiarySeenIds(cat)).sort().join(",")).join("|");
+  const sig = seenSig + "|" + (state.hero ? state.hero.campaignArc : "");
+  if (contentRenderSigs["bestiary-body"] === sig) return;
+  contentRenderSigs["bestiary-body"] = sig;
+
+  const totalSeen = bestiaryTotalSeen();
+  const totalRoster = bestiaryTotalRoster();
+  const frac = bestiaryCompletionFraction();
+  const pct = frac * 100;
+
+  let html = "<div class=\"renown-title-line\">" + fmtNumber(totalSeen) + " / " + fmtNumber(totalRoster) + " chronicled (" + pct.toFixed(1) + "%)</div>" +
+    "<div class=\"xp-bar-bg\" style=\"height:10px; margin:0.4rem 0 0.9rem;\"><div class=\"xp-bar-fill\" style=\"width:" + Math.min(100, pct).toFixed(1) + "%\"></div></div>";
+
+  html += "<div class=\"card-grid\">" + BESTIARY_MILESTONES.map(m => {
+    const reached = frac >= m.threshold;
+    return "<div class=\"pick-card" + (reached ? " selected" : " locked") + "\">" +
+      "<h4" + (reached ? "" : " style=\"color:var(--text-muted)\"") + ">" + escapeHtml(m.label) + "</h4>" +
+      "<div class=\"flavor\">" + Math.round(m.threshold * 100) + "% of the archive filled in</div>" +
+      "<div class=\"bonus" + (reached ? "" : " inert") + "\">" + escapeHtml(m.bonusText) + "</div>" +
+    "</div>";
+  }).join("") + "</div>";
+
+  BESTIARY_CATEGORY_KEYS.forEach(cat => {
+    const roster = bestiaryRoster(cat);
+    const seen = bestiarySeenIds(cat);
+    const seenCount = Object.keys(seen).length;
+    html += "<h4 style=\"margin-top:1.1rem; color:var(--steel);\">" + escapeHtml(BESTIARY_CATEGORY_LABELS[cat]) + " — " + seenCount + " / " + roster.length + "</h4>";
+    html += "<div class=\"card-grid\">" + roster.map((def, i) => {
+      if (!seen[def.id]){
+        return "<div class=\"pick-card locked\">" +
+          "<h4 style=\"color:var(--text-muted)\">???</h4>" +
+          "<div class=\"flavor\">Not yet chronicled.</div>" +
+        "</div>";
+      }
+      const display = bestiaryEntryDisplay(cat, def, i);
+      return "<div class=\"pick-card selected\">" +
+        "<h4>" + escapeHtml(display.name) + "</h4>" +
+        (display.flavor ? "<div class=\"flavor\">" + escapeHtml(display.flavor) + "</div>" : "") +
+      "</div>";
+    }).join("") + "</div>";
+  });
+
+  document.getElementById("bestiary-body").innerHTML = html;
+}
+
 // One retired hero's card. Reads only the legend record — race/class/
 // evolution names are resolved for display, nothing is recomputed.
 function legendCardHtml(legend){
@@ -6780,18 +7689,19 @@ let rebirthBoonOptions = [];     // the three boons currently offered
 const PERK_LABELS = {
   powerMult: "Power", xpMult: "XP", goldMult: "Gold", dropMult: "Drop Chance",
   injuryChanceMult: "Injury Chance", restTimeMult: "Rest Time",
-  timerMult: "Dungeon/Raid/Campaign Time", rewardMult: "Expedition Rewards"
+  timerMult: "Dungeon/Raid/Campaign Time", rewardMult: "Expedition Rewards",
+  shopPriceMult: "Shop & Smith Prices"
 };
 
 // Whether a HIGHER multiplier value is the direction that helps the
 // player, for each class-perk key. injuryChanceMult/restTimeMult/
-// timerMult are all "lower is better" (see their getXxxMultiplier()
-// getters above); every other key is "higher is better". Missing keys
-// default to true.
+// timerMult/shopPriceMult are all "lower is better" (see their
+// getXxxMultiplier() getters above); every other key is "higher is
+// better". Missing keys default to true.
 const PERK_HIGHER_IS_BETTER = {
   powerMult: true, xpMult: true, goldMult: true, dropMult: true,
   injuryChanceMult: false, restTimeMult: false, timerMult: false,
-  rewardMult: true, arenaExtraFights: true
+  rewardMult: true, arenaExtraFights: true, shopPriceMult: false
 };
 
 function perkLine(perks){
@@ -7108,7 +8018,7 @@ function wireEncounterModal(){
 
 function showContentResultModal(result){
   const typeLabel = contentTypeLabel(result.type);
-  document.getElementById("cr-title").textContent = typeLabel + ": " + result.name;
+  document.getElementById("cr-title").textContent = typeLabel + ": " + result.name + (result.ascendName ? " (" + result.ascendName + ")" : "");
   const outcomeEl = document.getElementById("cr-outcome");
   outcomeEl.textContent = result.success ? "Success!" : "Failure";
   outcomeEl.style.color = result.success ? "var(--green)" : "var(--red)";
@@ -7260,7 +8170,7 @@ function updateSubtabBeacons(){
   });
 }
 
-const CHAR_SUBTABS = ["skills", "stats", "titles"];
+const CHAR_SUBTABS = ["skills", "stats", "titles", "bestiary"];
 
 // Mirrors selectSubtab for the Character tab's own subtab row. Kept
 // separate (rather than generalizing selectSubtab) since the two rows
@@ -7363,6 +8273,7 @@ function render(){
   checkAchievementUnlocks();
   updateSubtabBeacons();
   updateEncounterBeacons();
+  renderDecreeBanner();
   renderHeroPanel();
   renderTrainingProgress();
   renderZones();
@@ -7380,6 +8291,7 @@ function render(){
   renderStatsPanel();
   renderLegendsPanel();
   renderWorldBossHallPanel();
+  renderBestiaryPanel();
   renderEvolutionBanner();
   renderInventory();
   renderEquipment();
@@ -7389,6 +8301,7 @@ function render(){
   renderEnchanterPanel();
   renderMedicPanel();
   renderTavernPanel();
+  renderStrongholdPanel();
 }
 
 /* ================================================================
@@ -7403,6 +8316,7 @@ function startTraining(zoneId){
   if (isBusyWithContent()) return; // expeditions and Arena runs aren't abandoned by training
 
   state.activity = { type:"training", zoneId: zoneId, startedAt: Date.now(), dropAccumulatorMs: 0, sessionGold: 0, task: pickTrainingTask(zone) };
+  recordBestiary("zones", zone.id);
   addLog("Began questing in " + zone.name + ".", "zone");
   saveGame();
   render();
@@ -7443,12 +8357,23 @@ function startRest(kind){
 
 // Why this piece of content can't be started right now, or null if it
 // can. Used both as the click guard and as the disabled-reason text.
-function timedContentBlockReason(type, def){
+// ascendTier (optional, dungeon/raid only) additionally gates on the
+// per-content ascend high-water mark: tier T needs T-1 already cleared —
+// so Ascended I needs a normal clear, II needs an Ascended I clear, III
+// needs an Ascended II clear. Enforced here (not just in the UI) so it
+// cannot be bypassed by any other call path into startTimedContent.
+function timedContentBlockReason(type, def, ascendTier){
   const hero = state.hero;
   if (hero.injuries >= MAX_INJURIES) return "Badly hurt — must rest";
   if (state.activity.type === "rest") return "Resting";
   if (isBusyWithContent()) return "Already engaged";
   if (def.levelReq && hero.level < def.levelReq) return "Requires level " + def.levelReq;
+  if ((type === "dungeon" || type === "raid") && ascendTier){
+    const cleared = (state.ascendProgress && typeof state.ascendProgress[def.id] === "number") ? state.ascendProgress[def.id] : -1;
+    if (cleared < ascendTier - 1){
+      return "Clear " + (ascendTier === 1 ? "Normal" : ASCEND_TIERS[ascendTier - 1].name) + " first";
+    }
+  }
   if (type === "quest"){
     const idx = campaignChapters().findIndex(q => q.id === def.id);
     if (idx !== (state.questProgress || 0)) return "The story hasn't reached this chapter";
@@ -7467,10 +8392,15 @@ function worldBossLadderUnlocked(){
   return !!state && (state.questProgress || 0) >= CAMPAIGN_SPINE.length;
 }
 
-function startTimedContent(type, contentId){
-  const def = getTimedContentDef(type, contentId);
+function startTimedContent(type, contentId, ascendTier){
+  // getTimedContentDef only actually applies ascendTier when canAscend()
+  // allows it (dungeon/raid, not forgotten_beyond) — so def.ascendTier
+  // below is the single source of truth for what tier this run is REALLY
+  // at, regardless of what a caller asked for.
+  const def = getTimedContentDef(type, contentId, ascendTier);
   if (!def) return;
-  if (timedContentBlockReason(type, def)) return;
+  const appliedTier = def.ascendTier || 0;
+  if (timedContentBlockReason(type, def, appliedTier)) return;
 
   if (state.activity.type === "training"){
     const zone = ZONES.find(z => z.id === state.activity.zoneId);
@@ -7485,13 +8415,14 @@ function startTimedContent(type, contentId){
   // draws its own span and takes NEITHER multiplier — see
   // rollTimedContentDurationMs for why shortening it would be a penalty.
   const dur = rollTimedContentDurationMs(state.hero, def);
-  state.activity = { type: type, contentId: contentId, startedAt: now, endsAt: now + dur };
+  state.activity = { type: type, contentId: contentId, startedAt: now, endsAt: now + dur, ascendTier: appliedTier };
 
   if (type === "worldboss"){
     addLog("Set out to hunt " + def.name + " (" + humanizeDuration(dur) + ").", "zone");
   } else {
     const typeLabel = type === "dungeon" ? "the dungeon" : type === "raid" ? "the raid" : "the campaign";
-    addLog("Set out for " + typeLabel + " \"" + def.name + "\" (" + humanizeDuration(dur) + ").", "zone");
+    addLog("Set out for " + typeLabel + " \"" + def.name + "\"" + (def.ascendName ? " (" + def.ascendName + ")" : "") +
+      " (" + humanizeDuration(dur) + ").", "zone");
   }
   saveGame();
   render();
@@ -7883,6 +8814,14 @@ function performRebirth(boonId){
     // The roll of first-killers is account-wide and outlives every hero on
     // it — carried through untouched, exactly like achievements.
     worldBossFirsts: prev.worldBossFirsts,
+    // The Bestiary archive is account-wide too — carried through untouched.
+    // A field missed here would silently reset every hero's Bestiary to 0%
+    // on every rebirth, defeating the whole point of an account-wide archive.
+    bestiary: prev.bestiary,
+    // The Stronghold IS the account-wide, rebirth-surviving holding — this
+    // is the single line that makes it survive a rebirth at all. Carried
+    // through untouched, exactly like bestiary/achievements/worldBossFirsts.
+    stronghold: prev.stronghold,
     pendingInheritance: rebirthInheritanceAmount(hero), // consumed by createDefaultState
     lastArcId: hero.campaignArc || null // consumed by createDefaultState to avoid a repeat arc
   };
@@ -8077,6 +9016,7 @@ function buyShopItem(itemId){
   spendGold(state.hero, price);
   state.shop.stock.splice(idx, 1);
   state.inventory.push(Object.assign({}, item, { id: "item_" + Date.now() + "_" + Math.floor(Math.random()*100000), foundAt: Date.now() }));
+  recordBestiary("tiers", item.tierId);
   addLog("Bought " + itemDisplayName(item) + " from the shop.", "system");
   saveGame();
   render();
@@ -8086,7 +9026,9 @@ function buyShopItem(itemId){
 
 function blacksmithUpgradeCost(item, hero){
   const tierMult = BLACKSMITH_TIER_COST_MULT[item.tierId] || 1;
-  return Math.round(BLACKSMITH_BASE_COST * Math.pow(BLACKSMITH_COST_GROWTH, item.upgradeLevel || 0) * tierMult * getShopPriceMultiplier(hero));
+  // Stronghold's Forge Annex discounts the Blacksmith directly (forgeCostMult
+  // isn't part of the shared xpMult/goldMult/... chain — see STRONGHOLD_BUILDINGS).
+  return Math.round(BLACKSMITH_BASE_COST * Math.pow(BLACKSMITH_COST_GROWTH, item.upgradeLevel || 0) * tierMult * getShopPriceMultiplier(hero) * getStrongholdBonusMult("forgeCostMult"));
 }
 
 function findGearById(itemId){
@@ -8316,6 +9258,27 @@ function buyTavernBuff(buffId){
   hero.buffs = (hero.buffs || []).filter(b => !(tavernIds.has(b.id) && b.key === def.effect.key));
   hero.buffs.push({ id: def.id, key: def.effect.key, value: def.effect.value, expiresAt: now + def.durationMin * 60000, name: def.name });
   addLog("Bought a round of " + def.name + " at the tavern.", "system");
+  saveGame();
+  render();
+}
+
+/* ---- v2: town hub — stronghold ----
+   Account-wide, SURVIVES REBIRTH (state.legacy.stronghold) — gold spent
+   here is still per-hero (spendGold(state.hero, ...)), but the level it
+   buys is written onto state.legacy, never state.hero, so it outlives the
+   hero that paid for it. */
+
+function upgradeStronghold(buildingId){
+  const def = STRONGHOLD_BUILDINGS.find(b => b.id === buildingId);
+  if (!def) return;
+  if (!state.legacy.stronghold || typeof state.legacy.stronghold !== "object") state.legacy.stronghold = createEmptyStronghold();
+  const level = strongholdLevel(buildingId);
+  if (level >= STRONGHOLD_MAX_LEVEL) return;
+  const cost = strongholdUpgradeCost(level, state.hero);
+  if (state.hero.gold < cost) return;
+  spendGold(state.hero, cost);
+  state.legacy.stronghold[buildingId] = level + 1;
+  addLog("Upgraded the " + def.name + " to level " + (level + 1) + ".", "system");
   saveGame();
   render();
 }
@@ -8678,8 +9641,9 @@ function showWelcomeBackModal(summary){
     const outcomeHtml = cr.success
       ? "<span style=\"color:var(--green)\">Success!</span>"
       : "<span style=\"color:var(--red)\">Failure.</span>";
+    const ascendSuffix = cr.ascendName ? " (" + cr.ascendName + ")" : "";
     contentNoteEl.innerHTML =
-      "Your " + typeLabel + ": " + escapeHtml(cr.name) + " — " + outcomeHtml +
+      "Your " + typeLabel + ": " + escapeHtml(cr.name) + escapeHtml(ascendSuffix) + " — " + outcomeHtml +
       " +" + fmtNumber(cr.xp) + " xp" + (cr.type === "worldboss" ? "" : ", +" + fmtNumber(cr.gold) + " gold") +
       (cr.renown > 0 ? ", +" + cr.renown + " renown" : "") +
       (cr.items.length > 0 ? ", " + cr.items.length + " item" + (cr.items.length === 1 ? "" : "s") : "") +
@@ -8825,6 +9789,7 @@ function boot(){
     pendingEncounters: Array.isArray(data.pendingEncounters) ? data.pendingEncounters : [],
     questProgress: (typeof data.questProgress === "number") ? data.questProgress : 0,
     worldBossProgress: (typeof data.worldBossProgress === "number") ? data.worldBossProgress : 0,
+    ascendProgress: (data.ascendProgress && typeof data.ascendProgress === "object") ? data.ascendProgress : {},
     stats: data.stats || createEmptyStats(),
     legacy: normalizeLegacy(data.legacy),
     lastTick: data.lastTick || Date.now()
