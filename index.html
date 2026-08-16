@@ -209,11 +209,30 @@
     border:1px solid var(--panel-border); border-radius:8px;
     padding:0.55rem 0.85rem;
   }
-  .decree-head{ display:flex; align-items:baseline; justify-content:space-between; gap:0.6rem; flex-wrap:wrap; }
+  /* The head doubles as the collapse toggle — it's a <button> for keyboard
+     and screen-reader support, so it needs the button chrome stripped. */
+  .decree-head{
+    display:flex; align-items:baseline; justify-content:space-between; gap:0.6rem; flex-wrap:wrap;
+    width:100%; background:none; border:0; padding:0; margin:0;
+    font:inherit; color:inherit; text-align:left; cursor:pointer;
+  }
+  .decree-head:hover .decree-name{ color:var(--gold-bright); filter:brightness(1.15); }
+  .decree-head:focus-visible{ outline:1px solid var(--gold-bright); outline-offset:3px; border-radius:4px; }
   .decree-label{
     font-family:Georgia, serif; font-size:0.72rem; letter-spacing:0.08em;
     text-transform:uppercase; color:var(--parchment-dim);
   }
+  /* Chevron rotates to point down when collapsed. */
+  .decree-caret{
+    display:inline-block; margin-right:0.35rem; color:var(--parchment-dim);
+    font-size:0.65rem; transition:transform 120ms ease; transform:rotate(90deg);
+  }
+  .decree-banner.collapsed .decree-caret{ transform:rotate(0deg); }
+  /* Collapsed hides the detail but never the name — the player must still be
+     able to see WHICH decree is in force at a glance. */
+  .decree-banner.collapsed .decree-flavor,
+  .decree-banner.collapsed .decree-effects{ display:none; }
+  .decree-banner.collapsed{ padding-top:0.45rem; padding-bottom:0.45rem; }
   .decree-name{ font-family:Georgia,'Times New Roman',serif; font-size:1rem; color:var(--gold-bright); }
   .decree-flavor{
     font-style:italic; color:var(--parchment-dim); font-size:0.82rem;
@@ -735,10 +754,10 @@
       </div>
       <div id="activity-tracker">Idle — the realm awaits</div>
       <div class="decree-banner" id="decree-banner">
-        <div class="decree-head">
-          <span class="decree-label">Today's Realm Decree</span>
+        <button type="button" class="decree-head" id="decree-toggle" aria-expanded="true" aria-controls="decree-flavor decree-effects">
+          <span class="decree-label"><span class="decree-caret" aria-hidden="true">&#9656;</span>Today's Realm Decree</span>
           <span class="decree-name" id="decree-name"></span>
-        </div>
+        </button>
         <div class="decree-flavor" id="decree-flavor"></div>
         <div class="decree-effects" id="decree-effects"></div>
       </div>
@@ -6350,6 +6369,22 @@ function renderBuffRow(){
 // there's nothing to go stale, since the decree itself is never stored
 // (see activeDecree). Benefits/costs reuse the same good/bad language as
 // class perks (PERK_HIGHER_IS_BETTER) rather than inventing new colors.
+// Decree collapse preference. Its own key, separate from the save — a display
+// choice shouldn't be wiped by "reset save" or need a migration. Both helpers
+// swallow storage errors so a browser with localStorage disabled (private mode,
+// blocked cookies) degrades to "always expanded" rather than throwing on boot.
+const DECREE_COLLAPSED_KEY = "realmwalker_decree_collapsed";
+
+function loadDecreeCollapsed(){
+  try { return localStorage.getItem(DECREE_COLLAPSED_KEY) === "1"; }
+  catch (e) { return false; }
+}
+
+function saveDecreeCollapsed(collapsed){
+  try { localStorage.setItem(DECREE_COLLAPSED_KEY, collapsed ? "1" : "0"); }
+  catch (e) { /* preference simply won't persist */ }
+}
+
 function renderDecreeBanner(){
   const decree = activeDecree(Date.now());
   if (contentRenderSigs["decree-banner"] === decree.id) return;
@@ -9522,6 +9557,28 @@ function wireGameScreen(){
   document.getElementById("codex-btn").addEventListener("click", () => {
     document.getElementById("codex-modal").classList.remove("hidden");
   });
+
+  // Decree banner collapse. The preference lives in its OWN localStorage key,
+  // deliberately not in the save: it's a display choice, not game state, so it
+  // must survive a save reset and must not ride a SAVE_VERSION migration.
+  // Applying the class to the container is safe against renderDecreeBanner's
+  // signature cache — that function only rewrites the banner's CHILDREN
+  // (name/flavor/effects), never the container, so the class survives a
+  // day-rollover re-render.
+  const decreeBanner = document.getElementById("decree-banner");
+  const decreeToggle = document.getElementById("decree-toggle");
+  if (decreeBanner && decreeToggle){
+    const applyDecreeCollapsed = (collapsed) => {
+      decreeBanner.classList.toggle("collapsed", collapsed);
+      decreeToggle.setAttribute("aria-expanded", collapsed ? "false" : "true");
+    };
+    applyDecreeCollapsed(loadDecreeCollapsed());
+    decreeToggle.addEventListener("click", () => {
+      const collapsed = !decreeBanner.classList.contains("collapsed");
+      applyDecreeCollapsed(collapsed);
+      saveDecreeCollapsed(collapsed);
+    });
+  }
 
   document.getElementById("reset-save-btn").addEventListener("click", () => {
     settingsMenu.classList.add("hidden");
