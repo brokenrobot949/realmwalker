@@ -1245,7 +1245,7 @@
       <div class="codex-section"><b>Outgrowing an expedition.</b> Once your power overwhelms a dungeon, raid, or chapter, the extra strength stops buying better odds — the danger is already as good as beaten — and starts buying speed and safety instead. A venture you have thoroughly outgrown is marched through faster and is far less likely to leave a mark on you, up to three-quarters less likely. The duration shown on each card already accounts for it. But an old road pays an old road's toll: as a place stops being able to threaten you, its spoils dwindle toward what such a place was ever worth. This turns on the danger, not on the date — an expedition that still tests you yields its full measure however far your name has travelled since, while one you can walk through in your sleep gives up only what a sleepwalk deserves. Plunder worth having is found ahead of you, never behind. The same holds for ascending a cleared dungeon or raid: its Ascended tiers pay a much richer bonus, but if your power already dwarfs even the hardest of them, that bonus fades too — ascending content you have massively outgrown is never as rewarding as it looks.</div>
       <div class="codex-section"><b>The odds of a wound.</b> A dungeon, raid, or campaign chapter carries a 10% chance of injury on success, and a steep 60% chance on failure. The Arena is gentler at first but grows crueler with every win — its injury chance climbs 3% per fight survived, and never strikes during an early run's safe fights. All these odds bend to your hero's own fortune: gear, race, class, renown, and legacy boons can all shift the chance of harm, for better or worse.</div>
       <div class="codex-section"><b>Town.</b> The Shop restocks over time, the Blacksmith upgrades gear, the Cleric Temple grants blessings that mend injuries or shorten a vigil in exchange for tithe, the Tavern sells buffs, and the Enchanter binds properties into weapons and relics.</div>
-      <div class="codex-section"><b>The Stronghold.</b> A holding in town, built up one of five buildings at a time — the Training Yard, Counting House, Infirmary, Forge Annex, and Reliquary — each ten levels deep, each with its own small permanent bonus to XP, gold, rest time, blacksmith prices, or drop chance. Costs climb steeply with every level. Unlike everything else you own, the Stronghold is not reset by the Rite of Rebirth &mdash; gold poured into it here stays spent for good, across every life you live afterward.</div>
+      <div class="codex-section"><b>The Stronghold.</b> A holding in town, built up one of six buildings at a time — the Training Yard, Counting House, Infirmary, Forge Annex, Reliquary, and Runeworks — each ten levels deep, each with its own small permanent bonus to XP, gold, rest time, blacksmith prices, drop chance, or enchanter dust prices. Costs climb steeply with every level. Unlike everything else you own, the Stronghold is not reset by the Rite of Rebirth &mdash; gold poured into it here stays spent for good, across every life you live afterward.</div>
       <div class="codex-section"><b>The Daily Realm Decree.</b> Shown beneath the activity line at the top of the screen, a new Decree takes hold every day, the same one for every hero in every realm — it is not rolled for you, and it cannot be rerolled. Each Decree both gives and takes: read its effects before committing to a long venture, since what helps today may not tomorrow. It never touches Power, so it changes what a day is worth, never what a hero can survive.</div>
       <div class="codex-section"><b>Salvage &amp; the Enchanter.</b> Instead of selling gear to the Shop for coin, salvage it instead for dust — the Enchanter's own currency. The Enchanter works only on weapons and relics: Inscribe grants a bonus-less weapon its first property, Reroll gambles a fresh random property onto a weapon or relic that already has one (it can land on the very same property again — that's the wager), and Choose spends far more dust to set the exact property you want instead of leaving it to chance. A relic's property is always the stronger of the two; a weapon's is a lesser echo of it.</div>
       <div class="codex-section"><b>Rebirth.</b> Complete the Campaign to unlock the Rite of Rebirth: your hero is enshrined in the Hall of Legends, and a new hero rises bearing a permanent boon of your choice and a small gold inheritance. Boons stack across every life.</div>
@@ -3106,18 +3106,19 @@ const STRONGHOLD_COST_GROWTH = 1.55;
 
 // effectKey feeds getStrongholdBonusMult(key), drawing from the same
 // xpMult/goldMult/restTimeMult/dropMult family every other multiplier
-// contributor uses — EXCEPT forge_annex's forgeCostMult, which
-// blacksmithUpgradeCost reads directly since it isn't part of that shared
-// getXxxMultiplier chain.
+// contributor uses — EXCEPT forge_annex's forgeCostMult and runeworks's
+// dustCostMult, which blacksmithUpgradeCost and enchantInscribeCost read
+// directly since neither is part of that shared getXxxMultiplier chain.
 const STRONGHOLD_BUILDINGS = [
   { id: "training_yard",  name: "Training Yard",  flavor: "Drill grounds worn smooth by boots that didn't all make it back.", effectKey: "xpMult", perLevel: 0.015 },
   { id: "counting_house", name: "Counting House",  flavor: "A vault of ledgers that remembers every coin more precisely than the town remembers its dead.", effectKey: "goldMult", perLevel: 0.02 },
   { id: "infirmary",      name: "Infirmary",       flavor: "More cots than the last war needed, and fewer than the next one will.", effectKey: "restTimeMult", perLevel: -0.02 },
   { id: "forge_annex",    name: "Forge Annex",     flavor: "A second hearth bolted onto the smithy, so the hammers never have to wait for the first to cool.", effectKey: "forgeCostMult", perLevel: -0.03 },
-  { id: "reliquary",      name: "Reliquary",       flavor: "Shelves of things pulled from the dead, sorted by people who stopped asking questions long ago.", effectKey: "dropMult", perLevel: 0.02 }
+  { id: "reliquary",      name: "Reliquary",       flavor: "Shelves of things pulled from the dead, sorted by people who stopped asking questions long ago.", effectKey: "dropMult", perLevel: 0.02 },
+  { id: "runeworks",      name: "The Runeworks",   flavor: "Dust ground finer and sifted twice, so nothing the Enchanter needs goes to waste on the way to the crucible.", effectKey: "dustCostMult", perLevel: -0.03 }
 ];
 
-// Fresh, empty stronghold — all five buildings at level 0, pre-created so
+// Fresh, empty stronghold — all six buildings at level 0, pre-created so
 // normalizeLegacy/upgradeStronghold never need to guess a building's shape
 // on first write (mirrors createEmptyBestiary).
 function createEmptyStronghold(){
@@ -3146,8 +3147,9 @@ function strongholdBuildingMult(def, level){
 // Product of every Stronghold building's effect matching `key` — same
 // self-guarding, hero-less shape as getBestiaryBonusMult/
 // getAchievementBonusMult. Consumed by getXpMultiplier/getGoldMultiplier/
-// getRestTimeMultiplier/getDropChanceMultiplier; forgeCostMult is consumed
-// directly by blacksmithUpgradeCost instead.
+// getRestTimeMultiplier/getDropChanceMultiplier; forgeCostMult and
+// dustCostMult are consumed directly by blacksmithUpgradeCost and
+// enchantInscribeCost instead.
 function getStrongholdBonusMult(key){
   if (!state || !state.legacy) return 1;
   let mult = 1;
@@ -3663,7 +3665,7 @@ function normalizeLegacy(legacy){
     }
     // Copied building-by-building with a shape/range guard, same pattern as
     // bestiary above — a partial/hand-edited stronghold blob still ends up
-    // with all five STRONGHOLD_BUILDINGS keys present, each clamped 0-10.
+    // with all six STRONGHOLD_BUILDINGS keys present, each clamped 0-10.
     if (legacy.stronghold && typeof legacy.stronghold === "object"){
       STRONGHOLD_BUILDINGS.forEach(def => {
         const lvl = legacy.stronghold[def.id];
@@ -5684,7 +5686,7 @@ function migrateV14toV15(data){
 }
 
 // v16 adds the Stronghold — one new legacy field (see STRONGHOLD_BUILDINGS/
-// createEmptyStronghold), seeded empty (all five buildings at level 0).
+// createEmptyStronghold), seeded empty (all six buildings at level 0).
 // Nothing to backfill: no pre-v16 save could ever have purchased a
 // stronghold level, since the feature didn't exist yet.
 function migrateV15toV16(data){
@@ -6613,6 +6615,14 @@ function renderTavernPanel(){
   });
 }
 
+// Labels for Stronghold effectKeys with no RELIC_LABELS entry (those keys
+// exist only here, never on a relic/weapon bonus) — read by
+// strongholdEffectText before falling back to RELIC_LABELS.
+const STRONGHOLD_ONLY_LABELS = {
+  forgeCostMult: "Blacksmith upgrade cost",
+  dustCostMult: "Enchanter dust cost"
+};
+
 // Human-readable effect line for one Stronghold building at a given
 // level — forgeCostMult and restTimeMult read as a reduction (lower is
 // better, sign follows def.perLevel), the rest as a straight bonus. Mirrors
@@ -6621,7 +6631,7 @@ function strongholdEffectText(def, level){
   const mult = strongholdBuildingMult(def, level);
   const pct = Math.round(Math.abs(mult - 1) * 1000) / 10;
   const sign = def.perLevel >= 0 ? "+" : "-";
-  const label = def.effectKey === "forgeCostMult" ? "Blacksmith upgrade cost" : (RELIC_LABELS[def.effectKey] || def.effectKey);
+  const label = STRONGHOLD_ONLY_LABELS[def.effectKey] || RELIC_LABELS[def.effectKey] || def.effectKey;
   return sign + pct + "% " + label;
 }
 
@@ -9098,8 +9108,14 @@ function upgradeItem(itemId){
    (the owner's explicit call) — every function below refuses on any slot
    but "weapon"/"relic". */
 
+// Runeworks (dustCostMult) is applied HERE ONLY. enchantRerollCost and
+// enchantChooseCost both derive their cost by calling this function, so
+// hooking this single root already discounts all three Enchanter actions —
+// do NOT also multiply by getStrongholdBonusMult("dustCostMult") in either
+// of those two, or the discount applies twice.
 function enchantInscribeCost(item){
-  return ENCHANT_BASE_COST[item.tierId] || ENCHANT_BASE_COST.common;
+  const base = ENCHANT_BASE_COST[item.tierId] || ENCHANT_BASE_COST.common;
+  return Math.max(1, Math.round(base * getStrongholdBonusMult("dustCostMult")));
 }
 function enchantRerollCost(item){
   return Math.round(enchantInscribeCost(item) * ENCHANT_REROLL_MULT);
