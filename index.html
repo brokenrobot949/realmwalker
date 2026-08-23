@@ -1237,7 +1237,7 @@
       <div class="codex-section"><b>Class evolutions.</b> At level 20 your class evolves into one of two paths, and at level 40 it evolves again into one of two further paths — eighteen evolved classes in all, six at the second tier and twelve at the third. Each evolution grants a stronger permanent bonus that replaces your previous class bonus rather than stacking, plus a new weapon and a new repertoire of skills. The choice is permanent for that hero.</div>
       <div class="codex-section"><b>Skills.</b> At levels 10, 25, 30, 45, 50, and 55 you choose a new skill from your current class's repertoire — six in all. Each is triggered from the Skills tab for a temporary effect, or an instant one like mending an injury, then goes on cooldown; the stronger the skill, the longer the wait before it's ready again.</div>
       <div class="codex-section"><b>Questing Zones.</b> Pick a zone under Adventure to quest passively for XP, gold, and item drops; a questing session caps at 8 hours, but you may stop questing at any time with no penalty — XP and drops are banked continuously as you go.</div>
-      <div class="codex-section"><b>Dungeons, Raids, Campaign.</b> Timed ventures on the Adventure tab that resolve after a set duration, win or lose; the Campaign advances chapter by chapter. Renown comes from these and the Arena — never from questing.</div>
+      <div class="codex-section"><b>Dungeons, Raids, Campaign.</b> Timed ventures on the Adventure tab that resolve after a set duration, win or lose; the Campaign advances chapter by chapter. Renown comes from these and the Arena — never from questing. Each hero lives one of many campaign stories, assigned at creation and never the one just finished — every story in the rotation is told at least once before any of them repeat, and completing every last one is its own recognised feat (see Achievements &amp; Titles).</div>
       <div class="codex-section"><b>The Forgotten Beyond.</b> A level-60 expedition past the seam in the world, where time does not keep step with the realm. Its length is not fixed and is not yours to choose: the span is rolled when you set out, anywhere from thirty minutes to six hours, and nothing shortens it &mdash; not haste, not a swiftness buff, not power far beyond what the place demands. XP, gold, and renown all scale with the span you drew, so a long crossing is a rich one. It yields no ordinary gear whatsoever. What it may yield is a <b>Mythic</b> weapon, a rarity above Legendary that exists nowhere else in the realm &mdash; not in any zone, dungeon, raid, chapter, or shop. The longer the rolled span, the better the odds, from 5% at the half-hour floor to a hard ceiling of 75% at six hours. An expedition that fails returns with nothing mythic, however long it was gone.</div>
       <div class="codex-section"><b>The Arena.</b> Fights resolve every 10 seconds against escalating monsters, and there is no retreat — you fight until a wound or a beating carries you out. Wins bank XP, gold, and renown, and the longer you last, the bigger the survival bonus on your spoils (up to +50%).</div>
       <div class="codex-section"><b>World Bosses.</b> A ladder of ten things the realm never managed to kill, opened only once your hero has seen the Campaign through to its last chapter. You climb it one rung at a time: only the next unbeaten name is ever shown to you, and the one after it stays nameless until the one before it falls. They yield <b>no gear and no gold whatsoever</b> &mdash; only XP and renown far beyond anything else in the realm. They are also brutally dangerous whether you win or lose: a 35% chance of injury on a kill, and 85% on a defeat. Do not expect to reach the top of the ladder. The point is how far you get, and the Hall remembers by name whoever first felled each one, across every life you live.</div>
@@ -1249,7 +1249,7 @@
       <div class="codex-section"><b>The Daily Realm Decree.</b> Shown beneath the activity line at the top of the screen, a new Decree takes hold every day, the same one for every hero in every realm — it is not rolled for you, and it cannot be rerolled. Each Decree both gives and takes: read its effects before committing to a long venture, since what helps today may not tomorrow. It never touches Power, so it changes what a day is worth, never what a hero can survive.</div>
       <div class="codex-section"><b>Salvage &amp; the Enchanter.</b> Instead of selling gear to the Shop for coin, salvage it instead for dust — the Enchanter's own currency. The Enchanter works only on weapons and relics: Inscribe grants a bonus-less weapon its first property, Reroll gambles a fresh random property onto a weapon or relic that already has one (it can land on the very same property again — that's the wager), and Choose spends far more dust to set the exact property you want instead of leaving it to chance. A relic's property is always the stronger of the two; a weapon's is a lesser echo of it.</div>
       <div class="codex-section"><b>Rebirth.</b> Complete the Campaign to unlock the Rite of Rebirth: your hero is enshrined in the Hall of Legends, and a new hero rises bearing a permanent boon of your choice and a small gold inheritance. Boons stack across every life.</div>
-      <div class="codex-section"><b>Achievements &amp; Titles.</b> Lifetime deeds — Arena wins, dungeons cleared, gold earned, and more — unlock permanent titles, each with its own small bonus. Every bonus you've unlocked stays active always; which title displays beside your name (Character &gt; Titles) is purely cosmetic. Unlike renown titles, which reset to nothing every rebirth, achievement progress is tracked account-wide and carries across every life you live.</div>
+      <div class="codex-section"><b>Achievements &amp; Titles.</b> Lifetime deeds — Arena wins, dungeons cleared, gold earned, and more — unlock permanent titles, each with its own small bonus. Every bonus you've unlocked stays active always; which title displays beside your name (Character &gt; Titles) is purely cosmetic. Unlike renown titles, which reset to nothing every rebirth, achievement progress is tracked account-wide and carries across every life you live. Living out every campaign story the rotation offers, across as many lives as it takes, earns its own title and by far the strongest bonus in the game.</div>
       <div class="codex-section"><b>The Bestiary.</b> Every zone, encounter, dungeon, raid, World Boss, Campaign chapter, and item tier you've ever seen is chronicled account-wide (Character &gt; Bestiary), each with the flavor text behind it — nothing here is ever forgotten to a rebirth. Reach 25%, 50%, 75%, and 100% overall completion for a small permanent bonus at each threshold. Anything you haven't yet encountered stays a nameless locked entry until you do — the Bestiary reveals nothing ahead of you, the World Boss ladder least of all.</div>
       <div class="codex-section"><b>Saving.</b> Your journey saves automatically to this browser; use the gear menu to export or import a backup, or to reset.</div>
       <div class="modal-actions"><button class="btn" id="codex-close-btn">Close</button></div>
@@ -2994,16 +2994,591 @@ const CAMPAIGN_ARCS = [
         intro: "Beneath the seam there is no time left to lose — the word has nearly stopped meaning anything. The last wave of stillness hangs half-launched above the world. What the Anchorite needs is not defeat. It needs what it has not had in nine hundred years: someone else to hold the door.",
         outro: "You hold the door while it lets go. The Anchorite pours nine centuries of hoarded stillness into the seam — stone into the wound, a seal instead of a sentry — and everywhere above, the world resumes gently: rivers land, the slide settles, the wedding finishes its dance. Odile gets her arm back. And far below, past the new seal, something that had been mid-step for nine hundred years finishes the step." }
     ]
+  },
+  {
+    id: "salt_ledger", name: "The Salt Ledger",
+    epilogue: "The ledger is closed and burned, and nobody in Millbrook owes anything to anyone dead. The ash, however, was collected by someone.",
+    chapters: [
+      {
+        title: "A Debt Unasked", missionName: "Walk the Collector's Round",
+        intro: "A tax-woman named Oreva Cann has been collecting in Millbrook for a month, and nobody remembers agreeing to owe her anything. They pay anyway. When the village reeve asks you to follow her rounds, he cannot explain why his own hands shake as he signs the request.",
+        outro: "You follow Cann from door to door and watch four households hand over coin they plainly cannot spare, each of them smiling as they do it. At the last house she notices you, tips her hat, and marks something in a salt-stained ledger. She does not seem worried. That is the part that troubles you."
+      },
+      {
+        title: "What the Salt Preserves", missionName: "The Salt House",
+        intro: "The reeve's records show Millbrook paying a salt tithe to a house that burned down eleven years ago. Someone has been signing for it ever since. He wants the salt house searched before he takes any of this to a man with authority over him.",
+        outro: "The salt house is not burned. It stands whole behind a screen of alders that no map admits to, packed floor to rafter with cured, labelled, carefully stacked debt — barrels of paper, each bundle tagged with a name. Some of those names belong to people born after the fire."
+      },
+      {
+        title: "The Reckoner's Clerk", missionName: "Find the Signing Hand",
+        intro: "One hand signed every receipt in that salt house, across eleven years and two hundred names. A retired notary in Thornwood, Yannick Pell, recognises the flourish at a glance, and then asks you to sit down before he explains whose it is.",
+        outro: "\"That is my hand,\" Pell says. \"I would swear to it in any court in the province, and I never wrote a line of it.\" He shows you his own ledgers, kept honestly for forty years. The forgeries are better than the originals. \"Whoever is doing this,\" he says, \"knows me rather better than I do.\""
+      },
+      {
+        title: "Collection Day", missionName: "Break the Round",
+        intro: "Cann's route ends at a Cragside counting-shed where the month's takings are tallied and moved on. Pell wants the books. The reeve wants Cann. You will most likely only get one of them out of that shed.",
+        outro: "You take the books. Cann walks out through a door you are certain was a wall a moment earlier, entirely unhurried, and the tally-clerks keep working as though nothing has happened. The books name a creditor in a script older than the kingdom: the Salt Ledger, and beneath it a column headed WHAT IS STILL OWED."
+      },
+      {
+        title: "The Marsh Accounts", missionName: "The Drowned Counting-House",
+        intro: "The oldest entries route through a counting-house the Sunken Marsh swallowed a century ago. Pell insists on coming. He has begun writing his own name on his forearm each morning, to be certain it is still his.",
+        outro: "The counting-house stands upright under six feet of black water, shutters open, lamps somehow lit. You surface with a single page. Every soul Millbrook has lost in a hundred years is listed there as a payment received, and every one of those payments is marked in the same steady hand as Pell's."
+      },
+      {
+        title: "The Creditor", missionName: "Read the Standing Column",
+        intro: "Pell finally admits what the marks in the margins mean. The Salt Ledger is not a cult and not a company. It is an accounting — one that has been running since long before anyone thought to audit it, and it does not regard death as a discharge of debt.",
+        outro: "\"It lends time,\" Pell says, very quietly. \"Years. Good harvests. A child that lived when it had no business living. And it collects in kind.\" He has gone grey overnight. \"Warden, I have had a remarkably lucky life. I have never once stopped to wonder why.\""
+      },
+      {
+        title: "Interest Accruing", missionName: "The Emberfall Vault",
+        intro: "The Ledger keeps its principal in a vault beneath Emberfall Ruins, where the heat has kept the paper from rotting far longer than paper should last. Pell has calculated the cost of buying Millbrook's debt outright. The figure is not in coin.",
+        outro: "The vault holds ledgers stacked to a ceiling you never quite see. You burn what you can carry and it changes nothing; the columns simply re-enter themselves in fresh ink as the ash settles. But you come away with the audit — a running total, and a date on which the Ledger intends to balance."
+      },
+      {
+        title: "The Notary's Price", missionName: "Recover Pell",
+        intro: "Pell goes to Cragside alone to file a legal challenge against a creditor that has never once appeared before a magistrate. It is, he says, the only weapon he has ever been any good at holding.",
+        outro: "You find him in the counting-shed, alive, having written his own name nine hundred times to keep hold of it. The challenge was accepted. \"They answered,\" he rasps, delighted and terrified in equal measure. \"Warden, they answered in writing. That means they can be held to something.\""
+      },
+      {
+        title: "The Audit", missionName: "Climb to the Reckoning",
+        intro: "The Ledger will balance its accounts at a counting-stone high in the Shattered Peaks, where the first entry was written. Pell has drafted a dispute he believes is watertight. He cannot hold a pen steadily enough to sign it.",
+        outro: "The climb costs you more than the cold can account for. You arrive having forgotten the name of the village you set out from, and get it back only when Pell bellows it at you through the wind. At the counting-stone the standing column lies open, and at the foot of it there is a space for a signature."
+      },
+      {
+        title: "Balance", missionName: "Close the Account",
+        intro: "The Salt Ledger offers terms, as it always has. Millbrook's debt cleared entire, against one signature freely given. Pell holds out the pen and does not tell you which way to choose.",
+        outro: "You close the account the only way it cannot be reopened: you sign the dispute rather than the debt, and let the whole standing column fall due against a creditor that has never been asked to pay anything. The salt house stands empty by morning. So do the barrels of ash — carried off, Pell notes, by someone."
+      }
+    ]
+  },
+  {
+    id: "drowned_bell", name: "The Drowned Bell",
+    epilogue: "The Chapel is silent and the marsh has stopped giving people back. Somewhere further down, something is still learning to ring.",
+    chapters: [
+      {
+        title: "The Bell at Low Water", missionName: "Answer the Ringing",
+        intro: "The Drowned Chapel's bell has rung four nights running, which would be unremarkable except that the bell has lain under nine feet of marsh water since before Millbrook had a name. A fisher called Halle Brun asks you to come and hear it for yourself.",
+        outro: "You hear it. It is not the sound of a bell struck underwater — it is the sound of a bell struck in a dry room, arriving from somewhere that is emphatically wet. Halle counts the tolls on her fingers and stops at eleven. \"Same as last night,\" she says. \"Eleven. There's eleven of us on this stretch.\""
+      },
+      {
+        title: "Those Who Came Back", missionName: "Walk the Waterline",
+        intro: "Two of Halle's neighbours went into the marsh after the second night's ringing and walked out again the following morning, unharmed and pleasant and entirely unable to say where they had been. She wants the waterline walked before a third goes in.",
+        outro: "The pair are fine. That is the trouble. They eat, they work, they laugh in the right places, and neither of them has blinked since Tuesday. Halle sets a cup in front of a neighbour of thirty years and he thanks her by name, correctly, in a voice that runs a half-beat behind his mouth."
+      },
+      {
+        title: "The Bell-Founder's Record", missionName: "The Foundry Ledgers",
+        intro: "Every bell in the province was cast at a single Thornwood foundry, and its old mistress, Sera Odenkirk, keeps a record of each one. She is not pleased to be asked about the Chapel bell, and rather less pleased that you knew to ask.",
+        outro: "\"We cast it twice,\" Odenkirk admits. \"The first came out wrong — rang flat, rang on its own, rang when the marsh wind was dead still. We sank it and cast a second.\" She will not meet your eye. \"The second is the one that's underwater. Nobody ever wrote down where we put the first.\""
+      },
+      {
+        title: "The Sunken Sound", missionName: "Raid the Tidewatch",
+        intro: "Odenkirk's foundry hands sank the first bell somewhere off the Cragside tidewatch, and the tidewatch has been quietly occupied for a season by people who do not fish, do not trade, and do not leave.",
+        outro: "They are hauling on a rope in shifts, day and night, and have been for months. You cut it. The occupants neither resist nor stop moving their arms. One of them, still working on nothing whatsoever, informs you pleasantly that the count is up to nine hundred."
+      },
+      {
+        title: "What the Marsh Kept", missionName: "The Column Beneath",
+        intro: "Halle's neighbours are not the first. Odenkirk's records list every hand who worked the first casting, and every one of them walked into the Sunken Marsh within a year of it — in a column, on the same night.",
+        outro: "You find the column where it stopped, kneeling in ranks beneath the water, patient and preserved and wholly unbothered by the century. Halle drags one free out of sheer stubbornness. He surfaces, coughs marsh out of lungs that ought to be soil by now, and asks whether the second bell has been cast yet."
+      },
+      {
+        title: "The Second Casting", missionName: "What Was Poured In",
+        intro: "Odenkirk explains at last why the first bell rang wrong: the foundry could not get the tone until someone suggested what to add to the melt. She was nineteen. She did not ask whose idea it had been, and has spent sixty years not asking.",
+        outro: "\"There's a name in that bronze,\" she says. \"Not scratched on it. In it.\" She has brought the original mould-book, and the ingredient list is written in a hand nobody at the foundry ever owned. \"It didn't want to be a bell,\" Odenkirk says. \"It wanted to be heard. We only gave it a shape.\""
+      },
+      {
+        title: "The Emberfall Mould", missionName: "The Pattern in the Ash",
+        intro: "The mould-book's script matches carvings in the Emberfall Ruins, where something was cast long before Thornwood had a foundry. If the first bell was a copy, then the original pattern is still down there.",
+        outro: "The pattern is a room rather than an object — a chamber shaped to ring, its floor worn smooth by a great many kneeling people. The carvings record the same casting performed eleven times across the centuries. Each time the count begins again. Each time it climbs higher before it stops."
+      },
+      {
+        title: "The Fisher's Price", missionName: "Recover Halle",
+        intro: "Halle goes back to the waterline alone to bring out the rest of the column, because they are her neighbours and because she has never once in her life waited for permission.",
+        outro: "You find her at the water's edge with eleven people standing behind her in the shallows, all of them counting under their breath. Her hands are clamped over her ears and there is blood on her jaw from clenching it. \"I can still hear it,\" she says. \"Don't you dare tell me to rest. Finish the count for me.\""
+      },
+      {
+        title: "Into the Ringing", missionName: "Climb to the Sounding",
+        intro: "The tolls are coming from high in the Shattered Peaks now, not the marsh at all, and they are no longer counting upward. Odenkirk says a bell only counts down for one reason: it is nearly finished being rung.",
+        outro: "The ascent is loud in a way stone should not permit. Twice you find yourself walking back the way you came with no memory of having turned. Near the summit the tolls fall to three, then two, and every echo in the pass answers in a voice you last heard at the waterline."
+      },
+      {
+        title: "One", missionName: "Silence the Bell",
+        intro: "The first bell hangs in a chamber cut to hold it, unrusted, unsunk, waiting on its final toll. Odenkirk offers you the only thing she has ever been certain of: a bell that is struck cannot be unstruck, but a bell that is broken has nothing left to say.",
+        outro: "You break it on the count of one. What comes out is not a bell, and it goes on considerably longer than the metal does. Down in the marsh eleven people stop counting and start weeping. Halle writes to say the water has gone quiet — and that something beneath it has begun, very slowly, to hum."
+      }
+    ]
+  },
+  {
+    id: "plague_of_saints", name: "A Plague of Saints",
+    epilogue: "The miracles have stopped and the province is poorer for it, which is precisely how you know it worked. Three shrines, however, were never found.",
+    chapters: [
+      {
+        title: "The Miracle at Millbrook", missionName: "Witness the Healing",
+        intro: "A cooper's daughter in Millbrook was dying of a wasting fever on Tuesday and was hauling water by Thursday. The village is delighted. The circuit-priest who happened to be passing through, Deacon Wren Calloway, is not, and asks you to look at the child with him.",
+        outro: "The girl is healthy. She is also, by her mother's own account, two inches taller than she was on Tuesday, and she has stopped being able to remember her grandmother's face. Calloway writes all of it down without comment. \"Healing takes something from somewhere,\" he says. \"I would like to know from where.\""
+      },
+      {
+        title: "The Second Saint", missionName: "The Thornwood Shrine",
+        intro: "A second healing at a roadside shrine near Thornwood, then a third the same week. Calloway has stopped calling them miracles in his notes and started calling them incidents, which he insists is not the same as scepticism.",
+        outro: "The shrine is new, well-built, and dedicated to a saint whose name appears in no calendar Calloway owns — and he owns all of them. Someone is raising these. The mortar is a fortnight old. \"Saints are made by the Church,\" Calloway says, \"slowly, and after a great deal of argument. Not by masons in a fortnight.\""
+      },
+      {
+        title: "The Unlisted Name", missionName: "The Diocesan Archive",
+        intro: "Calloway takes you to the diocesan archive at the Warden's Ford, where an archivist named Brother Tobin has spent thirty years cataloguing saints nobody prays to any more. He goes very still when he hears the name on the shrine.",
+        outro: "\"Struck from the rolls,\" Tobin says. \"Four hundred years ago, entire — every mention burned, every shrine pulled down.\" He will not say the name aloud himself. \"You do not strike a saint for being false, Warden. A false saint simply fades. You strike one for answering.\""
+      },
+      {
+        title: "The Alms Road", missionName: "Raid the Almshouse",
+        intro: "The new shrines are supplied from an almshouse above Cragside that takes in the sick and, by every account, sends them out well. Tobin wants its intake book. Calloway wants to know where the people go afterward.",
+        outro: "The intake book is meticulous. Two hundred admitted this year, two hundred discharged healthy, and not one forwarding parish among them. In the cellar you find the discharge ledger: the same two hundred names, each paired with a second name in the opposite column, and a word between them that Tobin translates as SUBSTITUTED."
+      },
+      {
+        title: "What the Marsh Keeps", missionName: "The Substituted",
+        intro: "The second column of names traces to a marsh hamlet that the diocese stopped visiting a decade ago, on the grounds that its congregation had grown remarkably devout and no longer required a priest.",
+        outro: "The hamlet is full and silent. Two hundred people sit in their houses in perfect health, each of them the exact age they were when their name entered that ledger, none of them able to say a word. Calloway kneels beside one and finds a pulse. \"They gave their years away,\" he says. \"Somebody spent them.\""
+      },
+      {
+        title: "The Struck Saint", missionName: "Read the Burned Rolls",
+        intro: "Tobin has kept, illegally and for thirty years, a copy of a page the Church ordered burned. He produces it with the air of a man finally justifying his life's one act of disobedience.",
+        outro: "The struck saint was not a person but an office — a role the desperate could be elevated into, granted the power to heal on the condition that the healing be paid for out of someone else's remaining life. \"It was never a heresy,\" Tobin says. \"That is why they burned it. It worked.\""
+      },
+      {
+        title: "The Ember Reliquary", missionName: "The Ash Shrine",
+        intro: "The office needs a relic to be conferred, and the last one was hidden in the Emberfall Ruins when the rolls were struck. Someone has clearly found it. Calloway intends to be second in line.",
+        outro: "The reliquary is open and empty, and the chamber around it is lined with four centuries of petitioners' names, the most recent cut this spring. Whoever holds the office now has been elevating others. The final wall lists nine saints currently in the field, and leaves room for a great many more."
+      },
+      {
+        title: "The Deacon's Price", missionName: "Recover Calloway",
+        intro: "Calloway rides to the almshouse alone to confront the man he believes is conferring the office, carrying nothing but his notes and a conviction that a heresy can be argued with.",
+        outro: "You find him alive, unmarked, and twenty years younger than he was on Tuesday — his own remaining life handed to him from someone else's account, without his consent and without his knowledge. He is incandescent. \"Whoever paid for this,\" he says, \"I will find out. Go. I will not be improved again.\""
+      },
+      {
+        title: "The Ninth Saint", missionName: "Climb to the High Shrine",
+        intro: "The office is conferred at a shrine high in the Shattered Peaks, and it is being conferred tonight. Tobin has calculated how many years the elevation will cost, and how many parishes will be quietly emptied to cover it.",
+        outro: "You climb past shrines built this season, each newer than the last, each dedicated to a saint made rather than recognised. The cold takes something from you that rest does not give back. At the top the ninth saint is already waiting, hands out, offering to heal the very injuries the ascent has just cost you."
+      },
+      {
+        title: "Unmade", missionName: "Strike the Rolls",
+        intro: "The office cannot be killed, only struck — removed from the rolls entirely, as the Church did four centuries ago. Tobin has the wording. It requires a name spoken by someone the office has never touched.",
+        outro: "You speak it, having taken nothing from anyone. The nine saints stop mid-gesture and simply become people again, most of them appalled. In the marsh hamlet two hundred voices come back at once. Calloway ages twenty years in an afternoon and calls it the best day's work of his life."
+      }
+    ]
+  },
+  {
+    id: "winter_that_stayed", name: "The Winter That Stayed",
+    epilogue: "Spring came late and came anyway. The Vault is sealed, the frost has pulled back to where it belongs, and one set of footprints leads out of it northward.",
+    chapters: [
+      {
+        title: "Frost in the Wrong Season", missionName: "Walk the Cold Line",
+        intro: "It is high summer and the north edge of Millbrook's barley has frozen solid in a line so straight you could lay a rule against it. A drover named Ketch Ammany found it at dawn and has refused to go near it since.",
+        outro: "The line has moved nine feet closer to the village by evening. On the cold side the barley is not dead but stopped — green, upright, and hard as iron. Ammany throws a stone across and it does not land. It hangs in the air about a foot up, and stays there."
+      },
+      {
+        title: "What Doesn't Thaw", missionName: "The Stopped Field",
+        intro: "By morning the line has taken a barn. Ammany wants his stock out before it takes the paddock too, and he wants someone with him who will not run, which he freely admits is not himself.",
+        outro: "You bring out eleven head of cattle and leave three behind, because the three are standing in mid-stride and cannot be moved, breathed on, or persuaded. One of them blinks. It takes the better part of a minute. \"That's not frozen,\" Ammany says. \"Frozen things stop. That one's still going. It's just going slow.\""
+      },
+      {
+        title: "The Vault Keeper's Daughter", missionName: "The Keeper's House",
+        intro: "The Frostbound Vault has had a keeper's family posted at its approach for six generations. The current one, Ilsabet Rhee, lives at the Warden's Ford and has not been to the Vault in twenty years. She knows exactly why you have come.",
+        outro: "\"It's leaking,\" Rhee says, before you finish the question. She has a chart of every recorded cold-line in six hundred years; there are four, and this is the largest by a considerable margin. \"The Vault doesn't hold treasure, Warden. My family were never guards. We were the seal.\""
+      },
+      {
+        title: "The Ice Road", missionName: "Break the Cold Camp",
+        intro: "Someone is camped along the cold line above Cragside, in tents pitched deliberately on the stopped side, and they have been there far longer than any human being ought to survive it.",
+        outro: "They are alive and slow — a whole camp moving at a fraction of proper speed, taking an hour to turn their heads. You break the camp in the time it takes one of them to draw breath. Their orders, left in a satchel, are to widen the line and hold it. The hand that wrote them is Rhee's grandmother's."
+      },
+      {
+        title: "What the Marsh Froze", missionName: "The Standing Water",
+        intro: "The cold line has reached the Sunken Marsh and stopped it — not frozen it, stopped it, water standing in mid-ripple for a mile in every direction. Rhee needs to see how far down the effect goes.",
+        outro: "It goes down as far as you can swim, and the marsh's dead are down there too, arrested in the act of rotting a century ago and no further along than the day they went under. Rhee surfaces white-faced. \"It isn't cold at all,\" she says. \"Cold was just the nearest word we had.\""
+      },
+      {
+        title: "The Sixth Generation", missionName: "The Keeper's Ledger",
+        intro: "Rhee finally opens the family book she has been carrying since the Ford. Six generations of keepers, and each one records the same duty in the same words, and each one records the year they stopped believing it was a metaphor.",
+        outro: "\"We weren't sealing something in,\" Rhee says. \"We were keeping something running.\" The Vault, the book says, holds a mechanism that has been counting since before the province was surveyed, and the keeper's task was to wind it. Her grandmother stopped. \"She thought stopping it would stop everything getting worse. She was right.\""
+      },
+      {
+        title: "The Ember Contrast", missionName: "The Warm Room",
+        intro: "There is one place the line will not cross: a chamber under Emberfall Ruins that has stayed hot for as long as anyone has records of it. Rhee thinks it is the mechanism's opposite number, and she wants to know why it still works.",
+        outro: "The warm room is a second mechanism, identical, still running, still wound — and beside it a keeper's cot, a made bed, and a kettle put on within the last day. Whoever tends this one has been doing the job faithfully for a very long time, and has left a note that reads only: WIND THE OTHER."
+      },
+      {
+        title: "The Keeper's Price", missionName: "Recover Rhee",
+        intro: "Rhee goes up to the Vault alone to do what her grandmother would not, on the grounds that it is her family's work and she has spent twenty years being ashamed of avoiding it.",
+        outro: "You find her a hundred yards short of the door, moving at a crawl, taking four minutes to lift a hand — inside the line and slowing further. It costs you a great deal to drag her out. When she can speak again she says, \"It's not leaking. Someone's holding the door open,\" and then, \"Go back without me.\""
+      },
+      {
+        title: "The Long Slow Climb", missionName: "Ascend the Stopped Pass",
+        intro: "The pass to the Vault runs through the deepest part of the line. Rhee's book gives one instruction for crossing it, written by a keeper four generations dead: do not stop moving, and do not count.",
+        outro: "You cross it moving and not counting, and even so the pass takes something — you emerge with frost in your lungs and the strong sense of having been on that slope considerably longer than the light suggests. The Vault door stands open. It has been propped, deliberately, with an iron bar."
+      },
+      {
+        title: "Wind the Mechanism", missionName: "Seal the Frostbound Vault",
+        intro: "The mechanism stands stopped, its counter arrested mid-figure, the cold pouring out of it in a slow flood. Rhee's grandmother is beside it, unaged, unmoving, and still gripping the bar that holds the door.",
+        outro: "You wind it, and the world resumes. Barley bends. The marsh ripples. Three cattle finish a step they began a fortnight ago. Rhee's grandmother finishes a sentence begun twenty years back — an apology — and then finishes ageing, all at once, in the space of a breath. Rhee closes the door herself."
+      }
+    ]
+  },
+  {
+    id: "forge_remembers", name: "What the Forge Remembers",
+    epilogue: "The pattern is broken and the blades in the province are only blades again. Eleven of them, though, were sold before the ledger was found.",
+    chapters: [
+      {
+        title: "The Good Blade", missionName: "The Smith's Complaint",
+        intro: "Millbrook's smith, Ordway Fenn, has made the finest blade of his life and wants rid of it. It cuts too well, holds too keen an edge, and he swears he did not put half the work into it that came out. He will not touch it again.",
+        outro: "The blade is superb. It is also, when you set it down, half an inch nearer your hand than where you left it. Fenn watches you notice and looks relieved rather than surprised. \"I've made four hundred blades,\" he says. \"That's the first that ever wanted anything.\""
+      },
+      {
+        title: "The Same Hand Twice", missionName: "Canvass the Smithies",
+        intro: "Fenn's blade is not unique. He has heard of three more in the province this year, all made by different smiths, all better than their makers, all faintly unwelcome to the men who forged them.",
+        outro: "You find two of the three. Different steel, different smiths, different counties — and an identical flaw a thumb's width above the hilt, the same tiny inclusion in the same place, as though all three were poured from one mould nobody used. Fenn goes very quiet and asks to see his own blade's flaw again."
+      },
+      {
+        title: "The Pattern-Book", missionName: "Vane's Old Shelves",
+        intro: "The flaw is a maker's mark, Fenn thinks, and marks are recorded. That takes you to a scholar's shelves at the Warden's Ford and a woman named Perrin Oakhurst who buys dead men's libraries and has never yet found the bottom of one.",
+        outro: "Oakhurst finds it in an hour: a pattern-book, four centuries old, describing a method for making a blade that improves itself. The method requires no unusual metal and no ritual. It requires only that the smith work while thinking, very hard, about a particular thing. The thing is not named. It is illustrated."
+      },
+      {
+        title: "The Charcoal Road", missionName: "Raid the Burners' Camp",
+        intro: "Every smith who made one of these blades bought charcoal from the same Cragside burners' camp this year. Oakhurst suspects the pattern is travelling in the fuel, which she admits sounds absurd, and then declines to withdraw it.",
+        outro: "The camp is burning something other than wood. In the stack you find bone, ledgered and labelled by parish, and a foreman who explains without much prompting that the burn has to be seeded or the charcoal comes out ordinary. He has been doing it for eleven years and has never once asked who supplies the seed."
+      },
+      {
+        title: "The Marsh Kiln", missionName: "The Drowned Furnace",
+        intro: "The seed comes from a kiln in the Sunken Marsh that has no business still being hot. Oakhurst wants a sample. Fenn, who has insisted on coming since Cragside, wants to see what a furnace looks like when it has been running unattended for four hundred years.",
+        outro: "The kiln is hot, tended, and swept. There is no one there and there has not been for a very long time, judging by the dust on everything except the tools. Fenn picks up a hammer, sets it down, and picks it up again. \"It's warm,\" he says. \"Warden, it's warm where a hand would be.\""
+      },
+      {
+        title: "What the Smith Thinks About", missionName: "Read the Illustration",
+        intro: "Oakhurst has been working on the pattern-book's illustration for a week and has finally admitted what it depicts. She would like to say it before Fenn hears it from anyone else, because Fenn has made four hundred blades and is going to take it badly.",
+        outro: "It depicts a man being remembered. Not a rite, not a sacrifice — a person held so firmly in mind during the making that some part of the pattern of them goes into the steel. \"The blades aren't haunted,\" Oakhurst says. \"They're remembering. And something has been feeding smiths the same memory for four centuries.\""
+      },
+      {
+        title: "The Ember Anvil", missionName: "The First Forge",
+        intro: "The pattern-book's diagrams match a forge chamber in the Emberfall Ruins, and the illustration's subject was, if Oakhurst reads the marginalia correctly, the man who built it.",
+        outro: "The first forge is enormous and cold, and its anvil bears the same inclusion as every blade in the province, a thumb's width from where a hilt would sit. Around it, cut into the walls, are eleven thousand tally marks. Fenn counts a hundred of them and stops. \"That's not blades,\" he says. \"That's smiths.\""
+      },
+      {
+        title: "The Smith's Price", missionName: "Recover Fenn",
+        intro: "Fenn goes back to Millbrook to break his own blade, which Oakhurst has warned him is precisely what the pattern wants a smith to try, and which he intends to do anyway.",
+        outro: "You find him at his own anvil with the blade whole and his hammer arm ruined — three failed strikes, each one turned aside by a weapon that saw it coming. He is grey with pain and entirely lucid. \"It knows my swing,\" he says. \"It should. I taught it. Take it somewhere it hasn't been taught.\""
+      },
+      {
+        title: "Cold Iron", missionName: "Carry It Up",
+        intro: "Oakhurst's reading is that the pattern can only be broken where it was first struck — but the first forge is only a copy. The original is higher, in the Shattered Peaks, in a cold that no forge fire has ever reached.",
+        outro: "The blade grows heavier with every hundred feet, and twice you find your own hand set against you, the hilt turning quietly toward your ribs. Near the summit it stops resisting altogether, which is worse. There is a forge cut into the mountain, and it has been waiting a long time for someone to bring it a good blade."
+      },
+      {
+        title: "Unremembered", missionName: "Break the Pattern",
+        intro: "The forge wants the blade returned to it, and the pattern completed, and the man in the illustration properly remembered at last. Oakhurst's counsel is short: the only way to break a memory is to put something else in its place.",
+        outro: "You forget him on purpose — strike the blade thinking of nothing at all, of the road, of a smith's ruined arm, of anything but the face in the book. The steel comes apart like wet clay. Across the province four hundred blades go dull at once, and every smith who made one sleeps properly for the first time in a year."
+      }
+    ]
+  },
+  {
+    id: "cartographers_error", name: "The Cartographer's Error",
+    epilogue: "The valley is off every map in the province and stays off. The survey office, however, has begun receiving corrections in a hand nobody recognises.",
+    chapters: [
+      {
+        title: "A Valley That Isn't", missionName: "Survey the Blank",
+        intro: "The provincial survey has a hole in it — nine square miles east of Millbrook that no chain-crew has measured in forty years, because every crew sent to measure it comes back having measured somewhere else. Surveyor Adaeze Marchetti would like a witness this time.",
+        outro: "You walk the boundary with her twice. Both times you end up a mile south of where you meant to be, both times without turning, and both times with a perfectly clear memory of walking straight. Marchetti checks her compass, her pacing, and her sanity, in that order. All three are working."
+      },
+      {
+        title: "The Crews That Came Back", missionName: "Interview the Chainmen",
+        intro: "Six crews have attempted the blank since the last full survey. All six returned. Marchetti has their field books and would like you present when she asks the surviving chainmen what they remember, because she suspects the answer will be nothing useful.",
+        outro: "Every field book records a full day's honest work in the wrong place, in a confident hand. Every chainman remembers a long, dull, uneventful survey. And every single one of them, when asked what lay to the east, gestures vaguely west and does not notice doing it."
+      },
+      {
+        title: "The Original Sheet", missionName: "The Survey Archive",
+        intro: "Marchetti takes you to the survey archive at the Warden's Ford, where the province's first master sheet has been kept flat and dark for two centuries. She wants to know whether the blank was always blank.",
+        outro: "It was not. The original sheet shows the valley surveyed, named, and settled — nine square miles, four hamlets, a road. Someone has since gone over it with a scraper, carefully, leaving the coastline intact. Marchetti holds it to the lamp. The scraped area is not empty. It has been redrawn underneath as flat, featureless ground."
+      },
+      {
+        title: "The Correction Office", missionName: "Raid the Chart House",
+        intro: "Somebody is still issuing corrections. A chart house above Cragside has been sending amended sheets to every parish for decades, unasked, and the parishes have been filing them without question because the corrections are always technically improvements.",
+        outro: "The chart house is staffed and busy and entirely legitimate on paper. In the back room you find the standing order: a two-hundred-year contract to keep nine square miles off every map printed in the province, signed by the provincial surveyor of the day, and countersigned by four hamlets that officially do not exist."
+      },
+      {
+        title: "The Fourth Hamlet", missionName: "The Marsh Approach",
+        intro: "Three of the four signatory hamlets are inside the blank. The fourth sits at the edge of the Sunken Marsh and appears on modern maps as a drainage feature. Marchetti proposes visiting a drainage feature.",
+        outro: "It is a village of forty people who have paid their taxes to nobody for two centuries and are quite content. They know exactly what the blank is. \"We asked to be left off,\" the eldest tells you. \"All four of us did. You'll want to ask why before you go poking at the other three.\""
+      },
+      {
+        title: "Why They Asked", missionName: "The Standing Order",
+        intro: "The eldest gives Marchetti the original petition, and Marchetti reads it twice before handing it over. Four hamlets, in agreement, formally requesting removal from the survey — not for privacy, not for taxes, but because of what being mapped had started to attract.",
+        outro: "\"A place that's on a map can be come to,\" Marchetti says slowly. \"Something was coming to them. Once a year, by the road, straight there — because there was a road, and it was drawn.\" The petition's final line asks the surveyor to unmake the road first. He did. The chart house has been maintaining the erasure ever since."
+      },
+      {
+        title: "The Ember Plate", missionName: "The Printing Stone",
+        intro: "The chart house's plates are cut from a stone quarried in the Emberfall Ruins, and the master plate — the one every provincial map is struck from — has never left the quarry chamber.",
+        outro: "The master plate is enormous, beautiful, and wrong in one place. The blank has been chiselled flat, and around the flattened patch the stone is scored with two centuries of small corrections, each one deepening the erasure. Recently, something has begun cutting from the other side. A road is coming back through, an inch a year."
+      },
+      {
+        title: "The Surveyor's Price", missionName: "Recover Marchetti",
+        intro: "Marchetti goes into the blank alone with a chain, a compass and a stubborn conviction that a place can be measured by someone determined enough not to be turned around.",
+        outro: "She comes out on the third day nine miles from where she went in, dehydrated, triumphant, and holding a field book with sixty pages of measurements in her own hand that she cannot remember taking. \"I mapped it,\" she says, before she passes out. \"Don't let me publish it. Whatever you do, don't let me publish it.\""
+      },
+      {
+        title: "The Road Redrawn", missionName: "Follow the New Cut",
+        intro: "The road is nearly through. Marchetti's stolen field book shows where it will surface, high in the Shattered Peaks, and the date it will finish — which is the day after tomorrow.",
+        outro: "You climb beside a road that is drawing itself: a clean-cut track appearing out of scree an inch at a time, running downhill toward four hamlets that spent two hundred years asking to be forgotten. At its head, a milestone stands already carved, listing the distance to a place that has not existed on paper since before your grandparents."
+      },
+      {
+        title: "Blank Again", missionName: "Unmake the Road",
+        intro: "Marchetti's field book is the only complete survey of the blank in existence, and the road is drawing itself from something very like it. She is awake enough now to tell you what she would do, and honest enough to admit she cannot bring herself to do it.",
+        outro: "You burn sixty pages of the best work she has ever done, and the road stops mid-cut. The milestone goes blank. Marchetti watches nine square miles of her life's ambition come apart in a fire and does not say a word until it is finished. Then: \"Right. Where's the next blank?\""
+      }
+    ]
+  },
+  {
+    id: "hollow_harvest", name: "The Hollow Harvest",
+    epilogue: "The fields are ordinary fields and the province will go hungry for a season, which everyone agrees is the better bargain. One granary was never opened.",
+    chapters: [
+      {
+        title: "A Very Good Year", missionName: "Walk the Millbrook Fields",
+        intro: "Millbrook's barley has come in at three times its usual yield on ground that has been tired for a decade. The village is celebrating. The tithe-assessor, a careful woman named Sabbath Locke, has asked for a second pair of eyes before she signs it off as a good year.",
+        outro: "The yield is real and the grain is excellent. It is also, Locke notes, heavier than barley has any right to be, and it does not rustle in the wind — it clicks. She fills a sack, weighs it, and weighs it again an hour later. It has gained two pounds sitting still in a barn."
+      },
+      {
+        title: "What Grows Between", missionName: "Turn the Fallow",
+        intro: "Locke wants the fallow strip turned over. Good ground does not come back on its own, and something has been putting into that soil what a decade of rest could not.",
+        outro: "Six inches down the fallow is threaded with fine pale root, running in every direction and belonging to no crop anyone planted. It is warm. Locke follows one strand for forty feet before it goes down out of reach, and marks its bearing: due east, toward the wood, and level as a mason's line."
+      },
+      {
+        title: "The Agronomist's Objection", missionName: "The Grange Records",
+        intro: "The provincial grange at the Warden's Ford keeps yield records back three hundred years, and a retired agronomist named Ferris Umbrey keeps opinions to match. He takes one look at Locke's grain and refuses to hold it.",
+        outro: "\"Every hundred and ten years,\" Umbrey says, laying out the ledgers. \"Same counties. Yields triple, then double again, then the parish stops filing returns entirely.\" Six cycles are recorded. Six times the returns stop. \"And then in the seventh year the yields come back to normal,\" he says, \"and there are rather fewer people to eat them.\""
+      },
+      {
+        title: "The Granary Round", missionName: "Raid the Tithe Barn",
+        intro: "The surplus is being collected. A tithe barn above Cragside has been taking in three counties' worth of grain and shipping none of it onward, and its wagons run at night, which Locke points out is a very odd hour to move barley.",
+        outro: "The barn is full to the roof and warm as a byre in there. Under the grain, the same pale root, thick as rope now, running down through the floor. And a manifest — not of grain out, but of grain in, by parish, with a column for expected return that is written in weights of something other than crop."
+      },
+      {
+        title: "The Marsh Root", missionName: "Follow It Down",
+        intro: "Every strand runs toward the Sunken Marsh. Umbrey has calculated the volume of root implied by the acreage involved and describes the figure as \"not a plant, in any sense I am prepared to defend.\"",
+        outro: "Beneath the marsh the root gathers into something the size of a village, slow and warm and unmistakably feeding. Locke finds the intake: a soft, wide mouth taking in marsh-water and silt and, among the silt, bone. Umbrey identifies three of them as human before Locke asks him, quite firmly, to stop."
+      },
+      {
+        title: "The Seventh Year", missionName: "Read the Cycle",
+        intro: "Umbrey has finished the arithmetic he has been avoiding. The cycle is not a blight and not a spirit. It is an arrangement — a very old one, renewed by whoever holds the parish when the good years begin, and paid for in the seventh.",
+        outro: "\"They knew,\" he says. \"Every time. Six parishes agreed to this, ate well for six years, and settled up in the seventh.\" He is furious in a way that has nowhere to go. \"Nobody was tricked, Warden. That's the part I can't get past. Somebody's grandfather signed for this and told nobody.\""
+      },
+      {
+        title: "The Ember Seed-Store", missionName: "The First Sowing",
+        intro: "The arrangement's original seed came out of a store beneath the Emberfall Ruins, and Umbrey wants to see how much of it is left, on the grounds that the answer determines whether this ends with the marsh or continues somewhere else.",
+        outro: "The seed-store is a vault of clay jars, and most of them are empty and long since accounted for. Twelve are full. Six are marked with the parishes now feeding the marsh. The remaining six bear names of places much larger — the Ford, Cragside, the Threshold Watch — and their seals have been recently, carefully, checked."
+      },
+      {
+        title: "The Assessor's Price", missionName: "Recover Locke",
+        intro: "Locke goes to burn the tithe barn herself, on the grounds that she signed the yield off as a good year and considers the correction to be her responsibility.",
+        outro: "The barn burns. You pull her out of it with root wrapped twice round her leg and her boot-knife blunted from cutting at it. She is calm in the way of someone who has decided something. \"It let go when the grain caught,\" she says. \"It doesn't want the barn. It wants the seventh year. Don't let it get there.\""
+      },
+      {
+        title: "Reaping Weather", missionName: "Climb to the Sowing Ground",
+        intro: "The seventh year begins at first frost, and the arrangement is renewed at a terraced field high in the Shattered Peaks that has been under cultivation since before the province was named. Umbrey has the words of the renewal. Someone will be up there to speak them.",
+        outro: "The terraces are green in the killing cold, tended and weeded and immaculate. Whoever keeps them has been at it a very long time and has left the last terrace bare, turned, and ready. A sack of Millbrook's own barley sits at the edge of it, waiting to be sown, with Locke's assessment mark still on the seal."
+      },
+      {
+        title: "Fallow", missionName: "Break the Arrangement",
+        intro: "The arrangement renews on a sowing, and a sowing requires seed that someone has vouched for. Umbrey's reading is blunt: nothing needs to be killed here. Something needs to be refused.",
+        outro: "You break the seal, scatter the barley down the mountainside where nothing will take, and leave the last terrace unsown. The root under the marsh loosens over a week and is simply gone by spring. The province eats badly for a year. Locke files the return herself and writes, in the remarks column, a poor harvest, honestly come by."
+      }
+    ]
+  },
+  {
+    id: "seven_silences", name: "Seven Names for Silence",
+    epilogue: "The province remembers its dead again, all of them, by name. Except one, and nobody can work out who is missing.",
+    chapters: [
+      {
+        title: "The Quiet House", missionName: "The Millbrook Vigil",
+        intro: "A family of five died in Millbrook this winter and no one has held a vigil, because no one can recall their names — not the neighbours, not the priest, not the man who dug the graves. A stonecutter called Wen Harrow has four blank markers and no idea what to carve.",
+        outro: "You go through the parish register together. The family's entries are there in full, in ink, perfectly legible: birth, marriage, death. You can read them aloud. Harrow can read them aloud. Neither of you can remember a single one of them thirty seconds later, and you both keep forgetting that you have already tried."
+      },
+      {
+        title: "What the Stone Keeps", missionName: "Walk the Burying Ground",
+        intro: "Harrow has been cutting markers in this province for twenty years and has begun to suspect this is not the first time. He wants the old ground walked, stone by stone, with someone who will write things down as they go.",
+        outro: "Eleven markers in the old ground are blank. Not weathered — cut smooth and never inscribed, and Harrow's own ledger shows he was paid for each of them. He does not remember the work. He recognises his own chisel-hand on the beading round the edges, which is somehow worse than not recognising it."
+      },
+      {
+        title: "The Litany", missionName: "The Ford Necrology",
+        intro: "The diocese at the Warden's Ford keeps a necrology — every death in the province, read aloud once a year so that nobody goes unremembered. Its keeper, a blind precentor named Aurel Sabine, has noticed the reading getting shorter.",
+        outro: "\"Forty-one names,\" Sabine says. \"Gone from the list since I took it up. I know because the reading used to take me a full night and now it does not.\" She cannot see the page, which is precisely why she is the only person who has noticed. \"Whatever's taking them can't touch what's held in a memory that isn't looking.\""
+      },
+      {
+        title: "The Erasing House", missionName: "Raid the Scriptorium",
+        intro: "Someone above Cragside has been offering a service: for a fee, a name struck from every record in the province. It is advertised discreetly as a mercy for the disgraced, and Sabine has traced eleven of her missing forty-one to its door.",
+        outro: "The scriptorium is orderly, well-lit, and busy. The work is real and the clients are real — grieving families, ruined merchants, one magistrate. And behind the desk, a standing order, unsigned and unpaid, requesting thirty further names that no client ever asked for. Sabine has you read the list aloud twice. Neither of you retains one."
+      },
+      {
+        title: "The Marsh Ledger", missionName: "The Unnamed Dead",
+        intro: "The scriptorium's struck names are not destroyed. They are sent somewhere, in sealed boxes, on a route that ends at the Sunken Marsh. Sabine intends to be there when a delivery arrives.",
+        outro: "The boxes go into the water and do not sink. Down among the reeds you find the receiving ground: rank upon rank of blank markers, each cut in the beading Harrow uses, each standing over someone. Sabine walks the rows by touch. \"They're all still here,\" she says. \"They're just not anybody any more.\""
+      },
+      {
+        title: "The Seventh Name", missionName: "Count the Silences",
+        intro: "Sabine has been keeping the necrology in her head since she noticed, and she has found the pattern. The names are not taken at random. They come in sevens, and each set of seven ends with a name that is not struck but replaced.",
+        outro: "\"Six erased, one substituted,\" she says. \"Six times over, that I can count.\" Somewhere in the province, six people are living under names that belonged to the erased — and none of them, she thinks, are aware of it. \"Somebody is being assembled out of dead people, Warden. Slowly. And politely.\""
+      },
+      {
+        title: "The Ember Register", missionName: "The First Necrology",
+        intro: "Sabine's litany descends from an older one kept beneath the Emberfall Ruins, cut into stone rather than written, on the theory that stone cannot be scraped without someone noticing.",
+        outro: "Someone noticed and did it anyway. The stone necrology runs for a hundred yards and the last forty feet have been chiselled blank. But the first line survives, and it is not a list of the dead at all — it is a single name repeated, and beneath it the instruction that as long as it is read aloud, the bearer cannot be finished."
+      },
+      {
+        title: "The Precentor's Price", missionName: "Recover Sabine",
+        intro: "Sabine goes to the scriptorium alone to read her necrology aloud in the middle of their working floor, which she describes as the only act of violence available to a blind woman of seventy.",
+        outro: "You find her hoarse, hurt, and still reading. She got through two hundred names before they stopped her. \"They can't write while I'm speaking,\" she says, delighted. \"Not one letter. Warden, take the list — I've forgotten my own mother twice tonight and I'd rather lose the list than lose her again. Read it at the top.\""
+      },
+      {
+        title: "The Reading", missionName: "Carry the List Up",
+        intro: "The seventh substitution completes at a stone in the Shattered Peaks where the first necrology was read. Sabine's list is the only complete record of the province's dead left anywhere, and it is now in your hands and nowhere else.",
+        outro: "The climb takes names off you as you go. You lose a village, then a face, then the reason you are carrying a bundle of paper. The list is still legible; you simply stop knowing why it matters. At the stone, something waits that is almost entirely a person, and it is six-sevenths finished, and it greets you by your name."
+      },
+      {
+        title: "Say Them All", missionName: "Read the Necrology",
+        intro: "It needs one more name to be complete, and it has been very careful to make sure that yours is the only one you can still remember. Sabine's instruction was simple and she gave it before she knew what it would cost you.",
+        outro: "You read the whole list aloud into the wind, every name but your own, and the thing at the stone comes apart as each one is claimed back by the person it belonged to. The province remembers its dead by morning. Sabine's reading takes a full night again, and she weeps through most of it, and finishes it anyway."
+      }
+    ]
+  },
+  {
+    id: "debt_of_wolves", name: "The Debt of Wolves",
+    epilogue: "The pact is settled and the wolves have gone back to being wolves. The old terms, though, ran both ways, and nobody has asked what the province now owes.",
+    chapters: [
+      {
+        title: "They Stopped Taking Sheep", missionName: "Walk the Flock Line",
+        intro: "Millbrook's wolves have not touched a sheep in two months. The shepherds ought to be pleased and are not, because the wolves have not gone anywhere — they sit at the treeline in daylight, in numbers, and watch the flocks without approaching. A shepherd named Corrie Vasch has stopped sleeping.",
+        outro: "You count nineteen of them at the treeline, sitting in a line as neat as a fence, none of them hunting. When you walk toward them they neither flee nor bristle. The nearest stands, waits for you to reach a particular stone, and then lies down again, as though a formality has been observed."
+      },
+      {
+        title: "The Marked Stone", missionName: "Read the Boundary",
+        intro: "That stone is a boundary marker, older than the village, and Vasch has walked past it every day of her life without reading it. She would like it read now, by somebody who is not from Millbrook and has no reason to be tactful.",
+        outro: "The stone is carved on the wood-facing side only, in a script that predates the parish. Vasch has been leaving a lamb out by it at midwinter since her mother did, and her mother since hers, and none of them ever knew why. The carvings, whatever else they say, are unmistakably a list of terms."
+      },
+      {
+        title: "The Old Terms", missionName: "The Ford Antiquary",
+        intro: "An antiquary at the Warden's Ford, Denholm Sark, reads the script and asks, before anything else, how long Millbrook has been leaving out the lamb. When Vasch says four generations he puts down his pen.",
+        outro: "\"Then you are ninety-six lambs in arrears,\" Sark says. \"The terms specify a lamb per household per year, not per village.\" He is not being funny. The stone records a pact — protection from the wood in exchange for a tithe — and it names the party of the second part in a way Sark declines to translate aloud."
+      },
+      {
+        title: "The Culling Camp", missionName: "Break the Hunt",
+        intro: "Word of the wolves has reached Cragside, and a chartered hunting company has arrived to solve the problem in the direct way. Sark is frantic. Vasch is grimly certain it will make things worse. Nobody in the company is interested in a boundary stone.",
+        outro: "You reach the camp after the first kill and before the second. The company is efficient and entirely unbothered. The wolves have not retaliated; they have simply moved their line ninety-six feet closer to the village overnight, which is a distance Sark works out on his fingers and then declines to explain."
+      },
+      {
+        title: "What the Marsh Pack Kept", missionName: "The Drowned Range",
+        intro: "The pact was not made with the wolves of Millbrook. Sark's reading points to an older range in the Sunken Marsh, where the party of the second part was said to den, and where the terms would have been sealed.",
+        outro: "The den is a hall, or was — stone benches under six feet of water, wolf-sized and human-shaped both, and between them a floor of small bones laid in careful rows. Vasch counts them because she cannot help herself. There are a great many more than ninety-six, and the newest of them are not lamb."
+      },
+      {
+        title: "The Party of the Second Part", missionName: "Translate the Second Name",
+        intro: "Sark finally translates the name he skipped. He does it in daylight, in a full room, with the door open, and he apologises to Vasch beforehand for what it is going to mean for her family.",
+        outro: "The pact was not made with wolves but with something that agreed to be a wolf for the duration — and the duration was specified in generations, not years. \"Four,\" Sark says. \"The term expires with the fourth generation of the signing household.\" Vasch is the fourth. \"They aren't hunting, Corrie. They're waiting for the settlement.\""
+      },
+      {
+        title: "The Ember Compact", missionName: "The Signing Chamber",
+        intro: "The original compact was struck in a chamber beneath the Emberfall Ruins, and Sark believes a copy of the terms in full — including whatever the province promised beyond lambs — is still there.",
+        outro: "The chamber holds the compact cut in full, and it is worse than a tithe. In exchange for protection, the signing households promised the wood a share of what they raised — and the carvings make plain that lambs were an accommodation, offered by the wood, out of what the carvings call patience. The patience has an end date, and it is marked."
+      },
+      {
+        title: "The Shepherd's Price", missionName: "Recover Vasch",
+        intro: "Vasch goes out to the treeline alone at dusk to settle her family's account personally, taking ninety-six lambs she does not have and a great deal of resolve she does.",
+        outro: "You find her inside the line, unhurt, surrounded and entirely calm, holding a conversation with something sitting where the largest wolf had been. It is being scrupulously polite. She is arguing terms. When you pull her out she is shaking and furious. \"They'll take the settlement in kind,\" she says. \"It has to be me or it has to be all of us.\""
+      },
+      {
+        title: "The Long Walk Up", missionName: "Climb to the Term's End",
+        intro: "The compact ends where it began, at a stone circle high in the Shattered Peaks, at the turn of the fourth generation — which is tonight. Sark has found one clause he thinks is worth something, and admits he is not certain he has read it correctly.",
+        outro: "The pack walks up with you. Not behind, not ahead — beside, at a distance, unhurried, nineteen of them all the way to the treeline and then more past it. None of them touch you. By the last ridge there are hundreds, and every one of them is walking on two legs and pretending, badly and politely, that they are not."
+      },
+      {
+        title: "Settlement", missionName: "Close the Compact",
+        intro: "The wood will take the settlement in kind or in person, and Vasch is the person specified. Sark's clause is a technicality about who may stand for a household — and technicalities, he points out, were their idea.",
+        outro: "You stand for the household, which the terms permit and nobody present expected, and settle ninety-six years of arrears in a single night's work that Sark refuses to describe in his written account. The pack goes back to being wolves before dawn. They take sheep again by the end of the week, and Vasch has never been so glad to lose a lamb."
+      }
+    ]
+  },
+  {
+    id: "lamplighters_round", name: "The Lamplighter's Round",
+    epilogue: "Every lamp on the road is lit and stays lit, and the dark between them is only dark. The round takes one hour longer than it used to, and nobody can say which stretch was added.",
+    chapters: [
+      {
+        title: "The Unlit Mile", missionName: "Walk the Evening Round",
+        intro: "The road lamps between Millbrook and the crossroads have been going out — not failing, going out, in order, one mile ahead of the lamplighter each evening. The lamplighter, a stooped man called Berrin Toll, has walked this round for thirty years and has begun walking it with a knife.",
+        outro: "You walk it with him. At the eleventh lamp the twelfth goes dark ahead of you, then the thirteenth, in sequence, at a walking pace. Toll relights them without comment and without hurrying. \"Don't run at it,\" he says. \"I ran at it in the spring. It let me catch up.\""
+      },
+      {
+        title: "What Walks Ahead", missionName: "Set the Watch",
+        intro: "Toll wants the round watched from both ends at once, which requires a second pair of hands and a willingness to stand alone in the dark for several hours. He is apologetic about the second part.",
+        outro: "From the far end you see it clearly: the lamps go out one at a time in front of Toll and relight one at a time behind him, and between the two there is a moving stretch of dark about a mile long that keeps perfect pace with an old man's stride. It has been escorting him. Possibly for years."
+      },
+      {
+        title: "The Lamp Rolls", missionName: "The Turnpike Office",
+        intro: "The turnpike office at the Warden's Ford has maintained the road lamps for two centuries and keeps a roll of every lamplighter it has ever employed. Its clerk, a precise young man named Ambrose Quill, is delighted to be asked and stops being delighted quickly.",
+        outro: "Every lamplighter on the roll walked the round for thirty years, give or take a season, and then stopped — resigned, retired, or simply not recorded further. There have been eleven. Toll is the twelfth, and he is in his thirtieth year. Quill checks the arithmetic three times and then asks, quietly, whether Toll knows."
+      },
+      {
+        title: "The Oil Contract", missionName: "Raid the Cragside Depot",
+        intro: "The lamp oil comes from a Cragside depot on a contract older than the turnpike, at a price the office has never questioned because it has never actually been charged anything.",
+        outro: "The depot is working, staffed, and shipping nightly. Nobody there is on any payroll Quill can find. The oil itself is unremarkable; the wicks are not. Each is cut to an exact length and stamped with a number, and the numbering runs sequentially, and the current batch is numbered in the eleven thousands."
+      },
+      {
+        title: "The Drowned Stretch", missionName: "The Marsh Lamps",
+        intro: "The road once ran further, through what is now the Sunken Marsh, and the old lamps are still out there on their posts. Quill wants to know whether that stretch is still on the round, officially speaking. It is.",
+        outro: "The marsh lamps are lit. All of them, under the water, burning steadily in a straight line into the dark, and somebody has been trimming the wicks. Toll wades out to the third one and comes back grey. \"That's my hand on the trim,\" he says. \"That's my cut. I've never been out here in my life.\""
+      },
+      {
+        title: "The Twelfth Lamplighter", missionName: "Read the Round",
+        intro: "Quill has worked out what the round is for, and he brings it to Toll rather than to you, because it is Toll's business first. Toll listens to all of it and then asks him to say it again for the Warden.",
+        outro: "The lamps are not lighting the road. They are marking a boundary — a line the dark agreed not to cross, renewed nightly by a man walking it with a taper. \"The escort isn't hunting you,\" Quill says. \"It's your relief. It walks the round with each lighter for thirty years, and then it walks it alone for a while.\""
+      },
+      {
+        title: "The Ember Wickworks", missionName: "The Numbered Cut",
+        intro: "The wicks are cut somewhere, and the numbering leads to a workshop beneath the Emberfall Ruins that has been in continuous operation for longer than the road has existed.",
+        outro: "The wickworks is running. Nobody is there. A blade rises and falls on its own schedule, and beside it a tally: eleven thousand four hundred and six wicks cut, and beneath that a second figure counting down. Quill works out the rate. At one wick a night, the second figure runs out in nine days."
+      },
+      {
+        title: "The Clerk's Price", missionName: "Recover Quill",
+        intro: "Quill goes out to walk the round himself, having reasoned that if the escort attaches to whoever carries the taper, a young man might buy an old one thirty more years.",
+        outro: "You find him four miles out, sitting in the dark, having put the taper down. \"It stopped when I stopped,\" he says. He is unhurt and badly shaken and entirely clear-headed. \"It's not owed a lighter, Warden. It's owed the walking. Somebody has to finish the round or the boundary doesn't close.\""
+      },
+      {
+        title: "The Long Round", missionName: "Walk to the Last Lamp",
+        intro: "The round does not end at the crossroads. It never did. The old rolls show it climbing into the Shattered Peaks, and the last lamp on the schedule has not been lit in two hundred years.",
+        outro: "You walk it with a taper and the dark walks beside you, patient and companionable and entirely uninterested in hurrying. Lamps you did not know existed stand ready on the ascent, wicks trimmed, waiting. Behind you the line of light gets longer. Ahead, one post stands unlit, and it is the last one, and it is enormous."
+      },
+      {
+        title: "Lit", missionName: "Light the Last Lamp",
+        intro: "The last lamp has been dark for two hundred years and the boundary has been a mile short ever since, which is precisely the length of the dark that has been escorting Toll. Nine days are up tonight.",
+        outro: "You light it. The dark stretch folds itself into the flame without any fuss at all, like something finally allowed to sit down. Toll finishes his thirtieth year and starts his thirty-first. Quill adds a mile to the official round and cannot, for the life of him, work out where on the road it goes."
+      }
+    ]
   }
 ];
 
-// Pick a random campaign arc id, optionally excluding one (used to avoid
-// repeating the arc a retiring hero just finished on rebirth). Falls back
-// to the full pool if the exclusion would otherwise leave nothing to pick.
-function pickCampaignArc(excludeId){
-  const pool = excludeId ? CAMPAIGN_ARCS.filter(a => a.id !== excludeId) : CAMPAIGN_ARCS.slice();
-  const chooseFrom = pool.length > 0 ? pool : CAMPAIGN_ARCS;
-  return chooseFrom[Math.floor(Math.random() * chooseFrom.length)].id;
+// Pick a random campaign arc id: no-repeat rotation across every arc the
+// account has ever completed (legacy.arcsCompleted), plus never the same
+// arc a retiring hero just finished back-to-back (excludeId). Once every
+// arc has been completed at least once, the full pool reopens.
+//
+// completedIds is optional and, when omitted, falls back to the global
+// `state`'s legacy. Both call sites (createNewHero, createDefaultState)
+// pass it explicitly instead of relying on that fallback: on the rebirth
+// path they run while `state` is being torn down/replaced (performRebirth
+// nulls it before showCreationScreen; createDefaultState runs before the
+// result is assigned back to `state`), so `state.legacy.arcsCompleted`
+// would read wrong/empty there. The reliable source on that path is the
+// `pendingRebirthLegacy` global (set by performRebirth, re-hydrated at
+// boot) — see its normalized `src.arcsCompleted` in createDefaultState.
+function pickCampaignArc(excludeId, completedIds){
+  const done = Array.isArray(completedIds) ? completedIds
+    : ((state && state.legacy && Array.isArray(state.legacy.arcsCompleted)) ? state.legacy.arcsCompleted : []);
+  let pool = CAMPAIGN_ARCS.filter(a => done.indexOf(a.id) === -1);
+  if (pool.length === 0) pool = CAMPAIGN_ARCS.slice();   // every story told — rotation reopens
+  const avoid = pool.filter(a => a.id !== excludeId);
+  if (avoid.length > 0) pool = avoid;                     // never repeat back-to-back
+  return pool[Math.floor(Math.random() * pool.length)].id;
 }
 
 // Resolve a hero's arc, falling back to "kaeloth" for a missing/unknown id
@@ -3237,7 +3812,17 @@ const ACHIEVEMENTS = [
   { id: "mythic_1", stat: "mythicsFound", threshold: 1, title: "the Hour-Lost",
     desc: "Return from the Forgotten Beyond bearing a Mythic weapon.", bonus: { key: "dropMult", value: 1.04 }, bonusText: "+4% item drop chance" },
   { id: "worldboss_1", stat: "worldBossesFelled", threshold: 1, title: "the Name-Taker",
-    desc: "Fell a World Boss.", bonus: { key: "injuryChanceMult", value: 0.97 }, bonusText: "-3% injury chance" }
+    desc: "Fell a World Boss.", bonus: { key: "injuryChanceMult", value: 0.97 }, bonusText: "-3% injury chance" },
+  // By far the strongest title in the game (every other bonus above is
+  // 2-4%) — deliberate, since it requires completing every campaign arc in
+  // the rotation at least once. threshold is CAMPAIGN_ARCS.length rather
+  // than a literal so the title auto-scales if arcs are ever added; this
+  // only evaluates correctly because CAMPAIGN_ARCS is defined earlier in
+  // this file than ACHIEVEMENTS. Still xpMult only — never powerMult/
+  // arenaEdgeMult, per the balance constraint noted above.
+  { id: "all_arcs", stat: "arcsCompleted", threshold: CAMPAIGN_ARCS.length, title: "the Realm's Memory",
+    desc: "Complete every campaign story in the realm.",
+    bonus: { key: "xpMult", value: 1.15 }, bonusText: "+15% XP from all sources" }
 ];
 
 const ARENA_MONSTERS = {
@@ -3553,7 +4138,11 @@ function createNewHero(name, raceId, classId){
     skills: [],          // learned skill ids, in learn order
     skillCooldowns: {},  // skillId -> readyAt epoch ms
     arenaRerolls: 0,      // Arena re-roll charges from second_wind; persist until consumed
-    campaignArc: pickCampaignArc(null)  // which CAMPAIGN_ARCS story this hero is living; flavor only
+    // which CAMPAIGN_ARCS story this hero is living; flavor only. completedIds
+    // is passed explicitly (not left to state's fallback) because on the
+    // rebirth path this runs while the global `state` is null/torn down —
+    // see pickCampaignArc and createDefaultState.
+    campaignArc: pickCampaignArc(null, normalizeLegacy(pendingRebirthLegacy).arcsCompleted)
   };
   // Starting kit — see createStartingItem/STARTING_ITEM_POWER. Built after
   // the hero object exists because the item names depend on hero.classId.
@@ -3578,13 +4167,13 @@ function createDefaultState(name, raceId, classId){
   if (inheritance > 0) hero.gold = inheritance;
   // Avoid repeating the arc the retiring hero just finished, if one is on
   // record (src.lastArcId, transient — see normalizeLegacy/performRebirth).
-  if (src.lastArcId) hero.campaignArc = pickCampaignArc(src.lastArcId);
+  if (src.lastArcId) hero.campaignArc = pickCampaignArc(src.lastArcId, src.arcsCompleted);
   // ⚠ Enumerated field-by-field, same trap as normalizeLegacy and
   // buildSavePayload: a legacy field missing here is silently dropped the
   // moment a new hero is created after a rebirth. worldBossFirsts,
   // bestiary, and stronghold are all account-wide and must survive that
   // transition.
-  const legacy = { rebirths: src.rebirths, boons: src.boons, legends: src.legends, totals: src.totals, achievements: src.achievements, worldBossFirsts: src.worldBossFirsts, bestiary: src.bestiary, stronghold: src.stronghold };
+  const legacy = { rebirths: src.rebirths, boons: src.boons, legends: src.legends, totals: src.totals, achievements: src.achievements, arcsCompleted: src.arcsCompleted, worldBossFirsts: src.worldBossFirsts, bestiary: src.bestiary, stronghold: src.stronghold };
   pendingRebirthLegacy = null;
 
   return {
@@ -3615,7 +4204,7 @@ function createEmptyLegacy(){
   // worldBossFirsts: { [bossId]: { heroName, at } } — who first felled each
   // World Boss, account-wide and never overwritten by a later kill of the
   // same boss. See applyTimedContentProgress.
-  return { rebirths: 0, boons: [], legends: [], totals: createEmptyStats(), achievements: [], worldBossFirsts: {}, bestiary: createEmptyBestiary(), stronghold: createEmptyStronghold() };
+  return { rebirths: 0, boons: [], legends: [], totals: createEmptyStats(), achievements: [], arcsCompleted: [], worldBossFirsts: {}, bestiary: createEmptyBestiary(), stronghold: createEmptyStronghold() };
 }
 
 // Coerce any stored/partial legacy blob into a well-formed one. Preserves
@@ -3642,6 +4231,19 @@ function normalizeLegacy(legacy){
       });
     }
     if (Array.isArray(legacy.achievements)) l.achievements = legacy.achievements.slice();
+    // Copied entry-by-entry with a shape guard (array of strings only), same
+    // precedent as achievements above — and additionally dropped if the id
+    // isn't a real CAMPAIGN_ARCS entry, so a hand-edited blob can't inflate
+    // the completed count (and, transitively, the "all_arcs" achievement).
+    if (Array.isArray(legacy.arcsCompleted)){
+      // Deduplicated as well as validated: "the Realm's Memory" gates purely
+      // on arcsCompleted.LENGTH, so a hand-edited save repeating one valid id
+      // could otherwise unlock the strongest bonus in the game. The normal
+      // game path already guards its push with indexOf, so this only ever
+      // affects tampered or corrupted blobs.
+      l.arcsCompleted = legacy.arcsCompleted.filter((id, i, arr) =>
+        typeof id === "string" && CAMPAIGN_ARCS.some(a => a.id === id) && arr.indexOf(id) === i);
+    }
     // Copied entry-by-entry with a shape guard, so a hand-edited or partial
     // blob can never put a malformed record into the Hall's roll.
     if (legacy.worldBossFirsts && typeof legacy.worldBossFirsts === "object"){
@@ -3883,6 +4485,13 @@ function getRenownBonusMult(hero, key){
 // needed (unlock checks, the Titles subtab's progress bars).
 function getAchievementProgress(stat){
   if (!state) return 0;
+  // arcsCompleted isn't a state.stats counter (it's an id list, not folded
+  // via totals like every other stat here) — special-cased ahead of the
+  // totals+current lookup below, which would otherwise silently read 0
+  // forever since state.stats.arcsCompleted never exists.
+  if (stat === "arcsCompleted"){
+    return (state.legacy && Array.isArray(state.legacy.arcsCompleted)) ? state.legacy.arcsCompleted.length : 0;
+  }
   const totals = (state.legacy && state.legacy.totals) ? state.legacy.totals : createEmptyStats();
   const current = (state.stats && typeof state.stats[stat] === "number") ? state.stats[stat] : 0;
   return (totals[stat] || 0) + current;
@@ -5175,6 +5784,20 @@ function applyTimedContentProgress(summary){
       if ((state.questProgress || 0) === ch.chapter - 1){
         state.questProgress = ch.chapter;
         if (state.stats) state.stats.questChaptersCompleted += 1;
+        // The full 10-chapter arc is told — record it account-wide, exactly
+        // once per arc id (idempotent: this path can re-run if the same
+        // hero somehow reaches chapter 10 again, e.g. a hand-edited save).
+        // See the legacy trap note above createEmptyLegacy — arcsCompleted
+        // must be enumerated everywhere legacy is, or this silently drops.
+        if (state.questProgress >= CAMPAIGN_SPINE.length){
+          if (!state.legacy || typeof state.legacy !== "object") state.legacy = createEmptyLegacy();
+          if (!Array.isArray(state.legacy.arcsCompleted)) state.legacy.arcsCompleted = [];
+          const arcId = hero.campaignArc;
+          if (arcId && state.legacy.arcsCompleted.indexOf(arcId) === -1){
+            state.legacy.arcsCompleted.push(arcId);
+            addLog("The tale of " + resolveCampaignArc(hero).name + " has been told in full. The realm will remember it.", "levelup");
+          }
+        }
       }
       recordBestiary("chapters", ch.id);
       outro = ch.outro;
@@ -5290,6 +5913,10 @@ function buildSavePayload(){
       legends: (state.legacy && Array.isArray(state.legacy.legends)) ? state.legacy.legends : [],
       totals: (state.legacy && state.legacy.totals) ? state.legacy.totals : createEmptyStats(),
       achievements: (state.legacy && Array.isArray(state.legacy.achievements)) ? state.legacy.achievements : [],
+      // Completed CAMPAIGN_ARCS ids — must be enumerated here explicitly
+      // like every other legacy field above, or it silently fails to
+      // persist (see the no-repeat rotation in pickCampaignArc).
+      arcsCompleted: (state.legacy && Array.isArray(state.legacy.arcsCompleted)) ? state.legacy.arcsCompleted : [],
       worldBossFirsts: (state.legacy && state.legacy.worldBossFirsts && typeof state.legacy.worldBossFirsts === "object") ? state.legacy.worldBossFirsts : {},
       // Account-wide Bestiary archive (see BESTIARY_CATEGORY_KEYS) — must be
       // enumerated here explicitly like every other legacy field above, or
@@ -8861,6 +9488,12 @@ function performRebirth(boonId){
     legends: prev.legends.concat([legend]),
     totals: foldedTotals,
     achievements: prev.achievements, // unlocked achievements are never lost
+    // Completed CAMPAIGN_ARCS ids are account-wide and outlive every hero on
+    // it — carried through untouched, exactly like achievements. This is
+    // also the value createDefaultState must read to seed the new hero's
+    // arc (state is torn down below, so state.legacy is not a safe source
+    // there — see pickCampaignArc's completedIds argument).
+    arcsCompleted: prev.arcsCompleted,
     // The roll of first-killers is account-wide and outlives every hero on
     // it — carried through untouched, exactly like achievements.
     worldBossFirsts: prev.worldBossFirsts,
