@@ -1245,6 +1245,7 @@
       <div class="codex-section"><b>Outgrowing an expedition.</b> Once your power overwhelms a dungeon, raid, or chapter, the extra strength stops buying better odds — the danger is already as good as beaten — and starts buying speed and safety instead. A venture you have thoroughly outgrown is marched through faster and is far less likely to leave a mark on you, up to three-quarters less likely. The duration shown on each card already accounts for it. But an old road pays an old road's toll: as a place stops being able to threaten you, its spoils dwindle toward what such a place was ever worth. This turns on the danger, not on the date — an expedition that still tests you yields its full measure however far your name has travelled since, while one you can walk through in your sleep gives up only what a sleepwalk deserves. Plunder worth having is found ahead of you, never behind. The same holds for ascending a cleared dungeon or raid: its Ascended tiers pay a much richer bonus, but if your power already dwarfs even the hardest of them, that bonus fades too — ascending content you have massively outgrown is never as rewarding as it looks.</div>
       <div class="codex-section"><b>The odds of a wound.</b> A dungeon, raid, or campaign chapter carries a 10% chance of injury on success, and a steep 60% chance on failure. The Arena is gentler at first but grows crueler with every win — its injury chance climbs 3% per fight survived, and never strikes during an early run's safe fights. All these odds bend to your hero's own fortune: gear, race, class, renown, and legacy boons can all shift the chance of harm, for better or worse.</div>
       <div class="codex-section"><b>Town.</b> The Shop restocks over time, the Blacksmith upgrades gear, the Cleric Temple grants blessings that mend injuries or shorten a vigil in exchange for tithe, the Tavern sells buffs, and the Enchanter binds properties into weapons and relics.</div>
+      <div class="codex-section"><b>Reforging.</b> Once an item reaches +5 at the Blacksmith, it may be reforged to raise its quality one tier — common through legendary. The price climbs steeply with the tier you're reaching for, and each item can only be reforged once in its life. Legendary is the ceiling: nothing forged in town can ever become Mythic, which the Forgotten Beyond alone can grant.</div>
       <div class="codex-section"><b>The Stronghold.</b> A holding in town, built up one of six buildings at a time — the Training Yard, Counting House, Infirmary, Forge Annex, Reliquary, and Runeworks — each ten levels deep, each with its own small permanent bonus to XP, gold, rest time, blacksmith prices, drop chance, or enchanter dust prices. Costs climb steeply with every level. Unlike everything else you own, the Stronghold is not reset by the Rite of Rebirth &mdash; gold poured into it here stays spent for good, across every life you live afterward.</div>
       <div class="codex-section"><b>The Daily Realm Decree.</b> Shown beneath the activity line at the top of the screen, a new Decree takes hold every day, the same one for every hero in every realm — it is not rolled for you, and it cannot be rerolled. Each Decree both gives and takes: read its effects before committing to a long venture, since what helps today may not tomorrow. It never touches Power, so it changes what a day is worth, never what a hero can survive.</div>
       <div class="codex-section"><b>Salvage &amp; the Enchanter.</b> Instead of selling gear to the Shop for coin, salvage it instead for dust — the Enchanter's own currency. The Enchanter works only on weapons and relics: Inscribe grants a bonus-less weapon its first property, Reroll gambles a fresh random property onto a weapon or relic that already has one (it can land on the very same property again — that's the wager), and Choose spends far more dust to set the exact property you want instead of leaving it to chance. A relic's property is always the stronger of the two; a weapon's is a lesser echo of it.</div>
@@ -2023,6 +2024,29 @@ const BLACKSMITH_BASE_COST = 10;
 const BLACKSMITH_COST_GROWTH = 3;
 const BLACKSMITH_TIER_COST_MULT = { common:1, uncommon:2, rare:4, epic:8, legendary:16, mythic:28 };
 const BLACKSMITH_UPGRADE_POWER_STEP = 0.1; // +10% of base power per upgrade level (nerfed from 0.2 in v5 — cap is now x1.5, not x2)
+
+// Reforge: one-time tier promotion for a fully-upgraded item. Priced off the
+// TARGET tier's BLACKSMITH_TIER_COST_MULT so it scales with the quality
+// achieved. Deliberately expensive — it lands at roughly 1.4x the cost of
+// simply buying a fresh item of that tier and taking it to +5, because what
+// you are paying for is keeping THIS item: its slot, its name, and any
+// Enchanter bonus already on it.
+const REFORGE_BASE_COST = 2500;
+
+function reforgeTargetTier(item){
+  const i = ITEM_TIERS.findIndex(t => t.id === item.tierId);
+  // Unknown tier, already legendary, or mythic -> no target. The legendary
+  // ceiling is deliberate: mythic is Forgotten Beyond-only (see ITEM_TIERS).
+  if (i < 0 || i >= ITEM_TIERS.length - 2) return null;
+  return ITEM_TIERS[i + 1];
+}
+
+function reforgeCost(item, hero){
+  const target = reforgeTargetTier(item);
+  if (!target) return null;
+  const tierMult = BLACKSMITH_TIER_COST_MULT[target.id] || 1;
+  return Math.round(REFORGE_BASE_COST * tierMult * getShopPriceMultiplier(hero) * getStrongholdBonusMult("forgeCostMult"));
+}
 
 // Cleric Temple
 const TEMPLE_TITHE_MULTIPLIER = 2;   // tithe = this x the gold the skipped rest would have earned
@@ -7125,6 +7149,21 @@ function renderBlacksmithPanel(){
     const atCap = (item.upgradeLevel || 0) >= BLACKSMITH_MAX_UPGRADE;
     const cost = atCap ? null : blacksmithUpgradeCost(item, state.hero);
     const afford = cost !== null && state.hero.gold >= cost;
+    let capHtml;
+    if (!atCap){
+      capHtml = null;
+    } else if (item.qualityUpgraded){
+      capHtml = "<span class=\"inv-meta\">Max upgrade &middot; reforged</span>";
+    } else {
+      const target = reforgeTargetTier(item);
+      if (!target){
+        capHtml = "<span class=\"inv-meta\">Max upgrade</span>";
+      } else {
+        const reCost = reforgeCost(item, state.hero);
+        const reAfford = state.hero.gold >= reCost;
+        capHtml = "<button class=\"btn small\" " + (reAfford ? "" : "disabled") + " data-reforge=\"" + item.id + "\">Reforge to " + target.name + " (" + fmtNumber(reCost) + "g)</button>";
+      }
+    }
     const row = document.createElement("div");
     row.className = "blacksmith-item";
     row.innerHTML =
@@ -7132,12 +7171,15 @@ function renderBlacksmithPanel(){
       "<span style=\"color:" + tier.color + "\">" + escapeHtml(item.name) + (item.upgradeLevel ? " +" + item.upgradeLevel : "") + "</span>" + tierBadge(item.tierId) + "</span>" +
       "<span class=\"inv-meta\">" + (equipped ? "Equipped · " : "") + "Pwr " + displayItemPower(item) + "</span></span>" +
       (atCap ?
-        "<span class=\"inv-meta\">Max upgrade</span>" :
+        capHtml :
         "<button class=\"btn small\" " + (afford ? "" : "disabled") + " data-upgrade=\"" + item.id + "\">Upgrade (" + fmtNumber(cost) + "g)</button>");
     list.appendChild(row);
   });
   list.querySelectorAll("[data-upgrade]").forEach(btn => {
     btn.addEventListener("click", () => upgradeItem(btn.dataset.upgrade));
+  });
+  list.querySelectorAll("[data-reforge]").forEach(btn => {
+    btn.addEventListener("click", () => reforgeItem(btn.dataset.reforge));
   });
 }
 
@@ -9733,6 +9775,32 @@ function upgradeItem(itemId){
   spendGold(state.hero, cost);
   item.upgradeLevel = (item.upgradeLevel || 0) + 1;
   addLog("Upgraded " + item.name + " to +" + item.upgradeLevel + ".", "system");
+  saveGame();
+  render();
+}
+
+// Reforge: raises a fully-upgraded (+5) item one quality tier, once per item
+// ever (see qualityUpgraded). Never touches upgradeLevel (the +5 was the
+// entry requirement, not something spent) or bonus (the Enchanter's alone —
+// see the Enchanter block above for the mirrored rule).
+function reforgeItem(itemId){
+  const item = findGearById(itemId);
+  if (!item) return;
+  if ((item.upgradeLevel || 0) < BLACKSMITH_MAX_UPGRADE) return;
+  if (item.qualityUpgraded) return;
+  const target = reforgeTargetTier(item);
+  if (!target) return;
+  const cost = reforgeCost(item, state.hero);
+  if (state.hero.gold < cost) return;
+  spendGold(state.hero, cost);
+  const midOf = t => (POWER_RANGES[t][0] + POWER_RANGES[t][1]) / 2;
+  const oldTierName = item.tierName;
+  item.power = Math.max(1, Math.round(item.power * midOf(target.id) / midOf(item.tierId)));
+  item.tierId = target.id;
+  item.tierName = target.name;
+  item.qualityUpgraded = true;
+  recordBestiary("tiers", item.tierId);
+  addLog("Reforged " + item.name + " from " + oldTierName + " to " + target.name + ".", "system");
   saveGame();
   render();
 }
