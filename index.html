@@ -1250,7 +1250,7 @@
       <div class="codex-section"><b>The Daily Realm Decree.</b> Shown beneath the activity line at the top of the screen, a new Decree takes hold every day, the same one for every hero in every realm — it is not rolled for you, and it cannot be rerolled. Each Decree both gives and takes: read its effects before committing to a long venture, since what helps today may not tomorrow. It never touches Power, so it changes what a day is worth, never what a hero can survive.</div>
       <div class="codex-section"><b>Salvage &amp; the Enchanter.</b> Instead of selling gear to the Shop for coin, salvage it instead for dust — the Enchanter's own currency. The Enchanter works only on weapons and relics: Inscribe grants a bonus-less weapon its first property, Reroll gambles a fresh random property onto a weapon or relic that already has one (it can land on the very same property again — that's the wager), and Choose spends far more dust to set the exact property you want instead of leaving it to chance. A relic's property is always the stronger of the two; a weapon's is a lesser echo of it.</div>
       <div class="codex-section"><b>Rebirth.</b> Complete the Campaign to unlock the Rite of Rebirth: your hero is enshrined in the Hall of Legends, and a new hero rises bearing a permanent boon of your choice and a small gold inheritance. Boons stack across every life.</div>
-      <div class="codex-section"><b>Achievements &amp; Titles.</b> Lifetime deeds — Arena wins, dungeons cleared, gold earned, and more — unlock permanent titles, each with its own small bonus. Every bonus you've unlocked stays active always; which title displays beside your name (Character &gt; Titles) is purely cosmetic. Unlike renown titles, which reset to nothing every rebirth, achievement progress is tracked account-wide and carries across every life you live. Living out every campaign story the rotation offers, across as many lives as it takes, earns its own title and by far the strongest bonus in the game.</div>
+      <div class="codex-section"><b>Achievements &amp; Titles.</b> Lifetime deeds — Arena wins, dungeons cleared, gold earned, and more — unlock permanent titles, each with its own small bonus. Every bonus you've unlocked stays active always; which title displays beside your name (Character &gt; Titles) is purely cosmetic. Unlike renown titles, which reset to nothing every rebirth, achievement progress is tracked account-wide and carries across every life you live. Living out every campaign story the rotation offers, across as many lives as it takes, earns its own title and by far the strongest bonus in the game. Choosing every one of the eighteen class evolutions across as many lives as it takes earns "the Many-Pathed," and felling every last name on the World Boss ladder earns "the Ladder's End."</div>
       <div class="codex-section"><b>The Bestiary.</b> Every zone, encounter, dungeon, raid, World Boss, Campaign chapter, and item tier you've ever seen is chronicled account-wide (Character &gt; Bestiary), each with the flavor text behind it — nothing here is ever forgotten to a rebirth. Reach 25%, 50%, 75%, and 100% overall completion for a small permanent bonus at each threshold. Anything you haven't yet encountered stays a nameless locked entry until you do — the Bestiary reveals nothing ahead of you, the World Boss ladder least of all.</div>
       <div class="codex-section"><b>Saving.</b> Your journey saves automatically to this browser; use the gear menu to export or import a backup, or to reset.</div>
       <div class="modal-actions"><button class="btn" id="codex-close-btn">Close</button></div>
@@ -3837,10 +3837,35 @@ const ACHIEVEMENTS = [
     desc: "Return from the Forgotten Beyond bearing a Mythic weapon.", bonus: { key: "dropMult", value: 1.04 }, bonusText: "+4% item drop chance" },
   { id: "worldboss_1", stat: "worldBossesFelled", threshold: 1, title: "the Name-Taker",
     desc: "Fell a World Boss.", bonus: { key: "injuryChanceMult", value: 0.97 }, bonusText: "-3% injury chance" },
-  // By far the strongest title in the game (every other bonus above is
-  // 2-4%) — deliberate, since it requires completing every campaign arc in
-  // the rotation at least once. threshold is CAMPAIGN_ARCS.length rather
-  // than a literal so the title auto-scales if arcs are ever added; this
+  // "evolutionsChosen" is a synthetic stat, same precedent as "arcsCompleted"
+  // — it's an account-wide id list (state.legacy.evolutionsChosen), not a
+  // folded state.stats counter, so getAchievementProgress special-cases it.
+  // threshold is Object.keys(EVOLUTIONS).length rather than a literal so the
+  // title auto-scales if evolutions are ever added; this only evaluates
+  // correctly because EVOLUTIONS is defined earlier in this file than
+  // ACHIEVEMENTS. tracker: "evolutions" drives the named chosen/unchosen
+  // list in renderTitlesPanel instead of the default numeric progress bar.
+  { id: "all_evolutions", stat: "evolutionsChosen", threshold: Object.keys(EVOLUTIONS).length,
+    title: "the Many-Pathed", tracker: "evolutions",
+    desc: "Choose every class evolution at least once.",
+    bonus: { key: "rewardMult", value: 1.12 },
+    bonusText: "+12% XP and gold from dungeons, raids, the Campaign, and the Arena" },
+  // "worldBossesUnique" is also synthetic: legacy.worldBossFirsts already
+  // records one entry per boss ever felled account-wide (first killer only,
+  // never overwritten — see applyTimedContentProgress), so "ladder cleared"
+  // is just that object's key count. Deliberately NOT stat: "worldBossesFelled"
+  // (that's a raw counter — 10 kills of rung 1 would wrongly unlock this) and
+  // deliberately no named tracker: the ladder's spoiler rule means later
+  // boss names must never leak into the UI, so this gets only the default
+  // numeric N/10 progress bar.
+  { id: "worldboss_all", stat: "worldBossesUnique", threshold: WORLD_BOSSES.length,
+    title: "the Ladder's End",
+    desc: "Fell every World Boss in the realm.",
+    bonus: { key: "injuryChanceMult", value: 0.80 }, bonusText: "-20% injury chance" },
+  // By far the strongest title in the game (every other bonus above tops
+  // out at 12%) — deliberate, since it requires completing every campaign
+  // arc in the rotation at least once. threshold is CAMPAIGN_ARCS.length
+  // rather than a literal so the title auto-scales if arcs are ever added; this
   // only evaluates correctly because CAMPAIGN_ARCS is defined earlier in
   // this file than ACHIEVEMENTS. Still xpMult only — never powerMult/
   // arenaEdgeMult, per the balance constraint noted above.
@@ -4197,7 +4222,7 @@ function createDefaultState(name, raceId, classId){
   // moment a new hero is created after a rebirth. worldBossFirsts,
   // bestiary, and stronghold are all account-wide and must survive that
   // transition.
-  const legacy = { rebirths: src.rebirths, boons: src.boons, legends: src.legends, totals: src.totals, achievements: src.achievements, arcsCompleted: src.arcsCompleted, worldBossFirsts: src.worldBossFirsts, bestiary: src.bestiary, stronghold: src.stronghold };
+  const legacy = { rebirths: src.rebirths, boons: src.boons, legends: src.legends, totals: src.totals, achievements: src.achievements, arcsCompleted: src.arcsCompleted, worldBossFirsts: src.worldBossFirsts, bestiary: src.bestiary, stronghold: src.stronghold, evolutionsChosen: src.evolutionsChosen };
   pendingRebirthLegacy = null;
 
   return {
@@ -4228,7 +4253,7 @@ function createEmptyLegacy(){
   // worldBossFirsts: { [bossId]: { heroName, at } } — who first felled each
   // World Boss, account-wide and never overwritten by a later kill of the
   // same boss. See applyTimedContentProgress.
-  return { rebirths: 0, boons: [], legends: [], totals: createEmptyStats(), achievements: [], arcsCompleted: [], worldBossFirsts: {}, bestiary: createEmptyBestiary(), stronghold: createEmptyStronghold() };
+  return { rebirths: 0, boons: [], legends: [], totals: createEmptyStats(), achievements: [], arcsCompleted: [], worldBossFirsts: {}, bestiary: createEmptyBestiary(), stronghold: createEmptyStronghold(), evolutionsChosen: [] };
 }
 
 // Coerce any stored/partial legacy blob into a well-formed one. Preserves
@@ -4267,6 +4292,15 @@ function normalizeLegacy(legacy){
       // affects tampered or corrupted blobs.
       l.arcsCompleted = legacy.arcsCompleted.filter((id, i, arr) =>
         typeof id === "string" && CAMPAIGN_ARCS.some(a => a.id === id) && arr.indexOf(id) === i);
+    }
+    // Same precedent as arcsCompleted immediately above: copied with a shape
+    // guard (array of strings only), deduplicated, and validated against
+    // EVOLUTIONS so a hand-edited blob can't inflate the chosen count (and,
+    // transitively, the "all_evolutions" achievement, which gates purely on
+    // evolutionsChosen.LENGTH).
+    if (Array.isArray(legacy.evolutionsChosen)){
+      l.evolutionsChosen = legacy.evolutionsChosen.filter((id, i, arr) =>
+        typeof id === "string" && Object.prototype.hasOwnProperty.call(EVOLUTIONS, id) && arr.indexOf(id) === i);
     }
     // Copied entry-by-entry with a shape guard, so a hand-edited or partial
     // blob can never put a malformed record into the Hall's roll.
@@ -4515,6 +4549,21 @@ function getAchievementProgress(stat){
   // forever since state.stats.arcsCompleted never exists.
   if (stat === "arcsCompleted"){
     return (state.legacy && Array.isArray(state.legacy.arcsCompleted)) ? state.legacy.arcsCompleted.length : 0;
+  }
+  // Same synthetic-stat precedent as arcsCompleted above: evolutionsChosen
+  // is an account-wide id list (state.legacy.evolutionsChosen), not a
+  // folded state.stats counter, so it's special-cased ahead of the
+  // totals+current lookup below, which would otherwise silently read 0
+  // forever since state.stats.evolutionsChosen never exists.
+  if (stat === "evolutionsChosen"){
+    return (state.legacy && Array.isArray(state.legacy.evolutionsChosen)) ? state.legacy.evolutionsChosen.length : 0;
+  }
+  // worldBossesUnique is likewise synthetic: legacy.worldBossFirsts already
+  // records one entry per boss ever felled account-wide (see
+  // applyTimedContentProgress) — "ladder cleared" is just that object's key
+  // count, deliberately distinct from the raw worldBossesFelled counter.
+  if (stat === "worldBossesUnique"){
+    return (state.legacy && state.legacy.worldBossFirsts && typeof state.legacy.worldBossFirsts === "object") ? Object.keys(state.legacy.worldBossFirsts).length : 0;
   }
   const totals = (state.legacy && state.legacy.totals) ? state.legacy.totals : createEmptyStats();
   const current = (state.stats && typeof state.stats[stat] === "number") ? state.stats[stat] : 0;
@@ -5941,6 +5990,11 @@ function buildSavePayload(){
       // like every other legacy field above, or it silently fails to
       // persist (see the no-repeat rotation in pickCampaignArc).
       arcsCompleted: (state.legacy && Array.isArray(state.legacy.arcsCompleted)) ? state.legacy.arcsCompleted : [],
+      // Evolution ids chosen at least once, account-wide — must be
+      // enumerated here explicitly like every other legacy field above, or
+      // it silently fails to persist (see the legacy trap note above
+      // createEmptyLegacy).
+      evolutionsChosen: (state.legacy && Array.isArray(state.legacy.evolutionsChosen)) ? state.legacy.evolutionsChosen : [],
       worldBossFirsts: (state.legacy && state.legacy.worldBossFirsts && typeof state.legacy.worldBossFirsts === "object") ? state.legacy.worldBossFirsts : {},
       // Account-wide Bestiary archive (see BESTIARY_CATEGORY_KEYS) — must be
       // enumerated here explicitly like every other legacy field above, or
@@ -7915,6 +7969,33 @@ function renderRenownPanel(){
 // just which are unlocked) so the locked bars keep moving as counters
 // climb, plus selectedTitle/renown so a selection, a fresh unlock, or a new
 // renown milestone all invalidate it.
+// Named chosen/unchosen list for the "all_evolutions" locked achievement
+// card, driven by tracker: "evolutions" on the ACHIEVEMENTS entry rather
+// than hardcoding that achievement's id here, so this stays data-driven.
+// EVOLUTIONS is keyed by id (not an array) — enumerate with Object.keys.
+// Reuses the existing .decree-effect/.decree-effect.good chip look (see the
+// Realm Decree banner) rather than inventing a new colour scheme, and pairs
+// the colour with a check/dash mark so chosen-vs-not still reads with
+// colour off.
+function evolutionTrackerHtml(){
+  const chosen = (state.legacy && Array.isArray(state.legacy.evolutionsChosen)) ? state.legacy.evolutionsChosen : [];
+  const ids = Object.keys(EVOLUTIONS);
+  const chip = id => {
+    const evo = EVOLUTIONS[id];
+    const got = chosen.indexOf(id) !== -1;
+    return "<span class=\"decree-effect" + (got ? " good" : "") + "\">" +
+      (got ? "✓ " : "– ") + escapeHtml(evo.name) + "</span>";
+  };
+  const tier2 = ids.filter(id => EVOLUTIONS[id].tier === 2).map(chip).join("");
+  const tier3 = ids.filter(id => EVOLUTIONS[id].tier === 3).map(chip).join("");
+  return "<div style=\"margin-top:0.6rem;\">" +
+    "<div style=\"font-size:0.72rem; color:var(--text-muted);\">Tier II evolutions</div>" +
+    "<div class=\"decree-effects\">" + tier2 + "</div>" +
+    "<div style=\"font-size:0.72rem; color:var(--text-muted); margin-top:0.35rem;\">Tier III evolutions</div>" +
+    "<div class=\"decree-effects\">" + tier3 + "</div>" +
+  "</div>";
+}
+
 function renderTitlesPanel(){
   const hero = state.hero;
   const progressSig = ACHIEVEMENTS.map(a => getAchievementProgress(a.stat)).join(",");
@@ -7954,6 +8035,7 @@ function renderTitlesPanel(){
         "<div class=\"bonus inert\">" + escapeHtml(a.bonusText) + "</div>" +
         "<div class=\"renown-progress-label\"><span>" + fmtNumber(progress) + " / " + fmtNumber(a.threshold) + "</span></div>" +
         "<div class=\"xp-bar-bg\" style=\"height:8px;\"><div class=\"xp-bar-fill\" style=\"width:" + pct.toFixed(1) + "%\"></div></div>" +
+        (a.tracker === "evolutions" ? evolutionTrackerHtml() : "") +
       "</div>";
     }).join("") + "</div>";
   }
@@ -9346,6 +9428,14 @@ function chooseEvolution(evoId){
   const evo = evolutionOptions(hero).find(e => e.id === evoId);
   if (!evo) return; // not currently a legal choice — gating is authoritative here
   hero.evolutions = (hero.evolutions || []).concat([evo.id]);
+  // Record this evolution account-wide, exactly once per id (idempotent,
+  // same indexOf guard as arcsCompleted above) — drives the "all_evolutions"
+  // achievement. See the legacy trap note above createEmptyLegacy:
+  // evolutionsChosen must be enumerated everywhere legacy is, or this
+  // silently drops.
+  if (!state.legacy || typeof state.legacy !== "object") state.legacy = createEmptyLegacy();
+  if (!Array.isArray(state.legacy.evolutionsChosen)) state.legacy.evolutionsChosen = [];
+  if (state.legacy.evolutionsChosen.indexOf(evo.id) === -1) state.legacy.evolutionsChosen.push(evo.id);
   addLog(hero.name + " evolves into a " + evo.name + "! New arms: " + evo.weapon +
     ". New skills: " + evo.skillNames.join(", ") + ".", "levelup");
   saveGame();
@@ -9536,6 +9626,9 @@ function performRebirth(boonId){
     // arc (state is torn down below, so state.legacy is not a safe source
     // there — see pickCampaignArc's completedIds argument).
     arcsCompleted: prev.arcsCompleted,
+    // Evolution ids chosen at least once are account-wide too — carried
+    // through untouched, exactly like arcsCompleted/achievements.
+    evolutionsChosen: prev.evolutionsChosen,
     // The roll of first-killers is account-wide and outlives every hero on
     // it — carried through untouched, exactly like achievements.
     worldBossFirsts: prev.worldBossFirsts,
