@@ -835,6 +835,7 @@
             <button class="subtab-btn" data-subtab="raids" data-icon="raids" data-icon-size="15">Raids</button>
             <button class="subtab-btn" data-subtab="quests" data-icon="campaign" data-icon-size="15">Campaign</button>
             <button class="subtab-btn" data-subtab="arena" data-icon="arena" data-icon-size="15">Arena</button>
+            <button class="subtab-btn" data-subtab="nemesis" data-icon="nemesis" data-icon-size="15">Nemesis</button>
             <button class="subtab-btn" data-subtab="worldboss" data-icon="worldboss" data-icon-size="15">World Bosses</button>
           </div>
           <div id="adv-training" class="adv-subpanel">
@@ -870,6 +871,11 @@
             <h3 data-icon="arena" data-icon-size="18">The Arena</h3>
             <p class="section-flair">The gate locks behind you; only victory or ruin opens it again.</p>
             <div id="arena-body"></div>
+          </div>
+          <div id="adv-nemesis" class="adv-subpanel hidden">
+            <h3 data-icon="nemesis" data-icon-size="18">Nemesis</h3>
+            <p class="section-flair">Some rivalries the realm keeps score of long after you've forgotten why they started.</p>
+            <div id="nemesis-body"></div>
           </div>
           <div id="adv-worldboss" class="adv-subpanel hidden">
             <h3 data-icon="worldboss" data-icon-size="18">World Bosses</h3>
@@ -1179,6 +1185,33 @@
   </div>
 
   <!-- ============================================================
+       NEMESIS RECKONING — SPARE OR FINISH MODAL
+       Forced choice, no cancel — same precedent as the rebirth boon modal
+       and the quest encounter modal above. Shown whenever
+       state.nemesis.pendingChoice is true (see maybeShowNemesisChoiceModal
+       in render()), including on a fresh load if the Reckoning was won
+       while offline — the choice persists across a save/reload exactly
+       like a queued quest encounter does.
+  ============================================================ -->
+  <div id="nemesis-choice-modal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3>The Reckoning is Won</h3>
+      <p id="nemesis-choice-flavor" style="text-align:center; color:var(--parchment-dim); margin-top:0;"></p>
+      <div class="modal-actions" style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; align-items:flex-start;">
+        <div style="display:flex; flex-direction:column; align-items:center; gap:0.3rem; max-width:250px;">
+          <button class="btn" id="nemesis-finish-btn">Finish it</button>
+          <div id="nemesis-finish-desc" style="font-size:0.75rem; color:var(--text-muted); text-align:center;"></div>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:0.3rem; max-width:250px;">
+          <button class="btn secondary" id="nemesis-spare-btn">Spare them</button>
+          <div id="nemesis-spare-desc" style="font-size:0.75rem; color:var(--text-muted); text-align:center;"></div>
+        </div>
+      </div>
+      <div class="modal-warning" style="text-align:center;">This is permanent. One nemesis, one ending, for the rest of this hero's life.</div>
+    </div>
+  </div>
+
+  <!-- ============================================================
        RESET CONFIRM MODAL
   ============================================================ -->
   <div id="reset-modal" class="modal-overlay hidden">
@@ -1241,6 +1274,7 @@
       <div class="codex-section"><b>The Forgotten Beyond.</b> A level-60 expedition past the seam in the world, where time does not keep step with the realm. Its length is not fixed and is not yours to choose: the span is rolled when you set out, anywhere from thirty minutes to six hours, and nothing shortens it &mdash; not haste, not a swiftness buff, not power far beyond what the place demands. XP, gold, and renown all scale with the span you drew, so a long crossing is a rich one. It yields no ordinary gear whatsoever. What it may yield is a <b>Mythic</b> weapon, a rarity above Legendary that exists nowhere else in the realm &mdash; not in any zone, dungeon, raid, chapter, or shop. The longer the rolled span, the better the odds, from 5% at the half-hour floor to a hard ceiling of 75% at six hours. An expedition that fails returns with nothing mythic, however long it was gone.</div>
       <div class="codex-section"><b>The Arena.</b> Fights resolve every 10 seconds against escalating monsters, and there is no retreat — you fight until a wound or a beating carries you out. Wins bank XP, gold, and renown, and the longer you last, the bigger the survival bonus on your spoils (up to +50%).</div>
       <div class="codex-section"><b>World Bosses.</b> A ladder of ten things the realm never managed to kill, opened only once your hero has seen the Campaign through to its last chapter. You climb it one rung at a time: only the next unbeaten name is ever shown to you, and the one after it stays nameless until the one before it falls. They yield <b>no gear and no gold whatsoever</b> &mdash; only XP and renown far beyond anything else in the realm. They are also brutally dangerous whether you win or lose: a 35% chance of injury on a kill, and 85% on a defeat. Do not expect to reach the top of the ladder. The point is how far you get, and the Hall remembers by name whoever first felled each one, across every life you live.</div>
+      <div class="codex-section"><b>Nemesis.</b> Every hero draws one personal rival at creation, met on the Adventure tab. It starts at the strength of a level-5 hero and grows 10% stronger every time you beat it — the longer a winning streak runs, the harder the next bout gets. A victory puts it on a 6-hour cooldown before it will face you again; a loss costs nothing but the attempt, and can be tried again at once. Rewards and the duel's length both scale with how far above or below your own strength it currently stands. The rivalry has an end: after 25 defeats it stops retreating and the next duel is the Reckoning, a final bout at far greater difficulty and reward that carries no cooldown of its own &mdash; only your own recovery decides when you try again. Win it and you're given a choice with no going back: finish the rivalry for a considerable one-off haul, or spare it for a permanent boost to every future dungeon, raid, Campaign, and Arena reward this hero ever earns. Either way, that hero's nemesis is settled for the rest of their life &mdash; one nemesis, one ending, per hero. A new life after rebirth draws a brand-new rival, starting the story over.</div>
       <div class="codex-section"><b>Injuries &amp; Rest.</b> Injuries lock you out of adventuring at 2; rest to heal — a Short Rest (4 hours) heals one injury, a Long Rest (6 hours) heals both.</div>
       <div class="codex-section"><b>Outgrowing an expedition.</b> Once your power overwhelms a dungeon, raid, or chapter, the extra strength stops buying better odds — the danger is already as good as beaten — and starts buying speed and safety instead. A venture you have thoroughly outgrown is marched through faster and is far less likely to leave a mark on you, up to three-quarters less likely. The duration shown on each card already accounts for it. But an old road pays an old road's toll: as a place stops being able to threaten you, its spoils dwindle toward what such a place was ever worth. This turns on the danger, not on the date — an expedition that still tests you yields its full measure however far your name has travelled since, while one you can walk through in your sleep gives up only what a sleepwalk deserves. Plunder worth having is found ahead of you, never behind. The same holds for ascending a cleared dungeon or raid: its Ascended tiers pay a much richer bonus, but if your power already dwarfs even the hardest of them, that bonus fades too — ascending content you have massively outgrown is never as rewarding as it looks.</div>
       <div class="codex-section"><b>The odds of a wound.</b> A dungeon, raid, or campaign chapter carries a 10% chance of injury on success, and a steep 60% chance on failure. The Arena is gentler at first but grows crueler with every win — its injury chance climbs 3% per fight survived, and never strikes during an early run's safe fights. All these odds bend to your hero's own fortune: gear, race, class, renown, and legacy boons can all shift the chance of harm, for better or worse.</div>
@@ -1331,7 +1365,7 @@
 
 const SAVE_KEY = "realmwalker_save";
 const SAVE_KEY_CORRUPT = "realmwalker_save_corrupt";
-const SAVE_VERSION = 16;
+const SAVE_VERSION = 17;
 
 // UI-only preferences (last tab/subtab viewed) — deliberately a separate
 // localStorage key from the game save so it never touches SAVE_VERSION
@@ -1350,7 +1384,7 @@ let uiPrefs = loadUiPrefs();
 
 // Which adventure subtab hosts each activity type, for the beacon dot and
 // the "one-tap continuity" auto-select when re-entering the Adventure tab.
-const ACTIVITY_SUBTAB_MAP = { training:"training", dungeon:"dungeons", raid:"raids", quest:"quests", arena:"arena", worldboss:"worldboss" };
+const ACTIVITY_SUBTAB_MAP = { training:"training", dungeon:"dungeons", raid:"raids", quest:"quests", arena:"arena", nemesis:"nemesis", worldboss:"worldboss" };
 
 /* ================================================================
    POWER MODEL  (v7 expected-gear re-anchor; supersedes the v5
@@ -3871,7 +3905,20 @@ const ACHIEVEMENTS = [
   // arenaEdgeMult, per the balance constraint noted above.
   { id: "all_arcs", stat: "arcsCompleted", threshold: CAMPAIGN_ARCS.length, title: "the Realm's Memory",
     desc: "Complete every campaign story in the realm.",
-    bonus: { key: "xpMult", value: 1.15 }, bonusText: "+15% XP from all sources" }
+    bonus: { key: "xpMult", value: 1.15 }, bonusText: "+15% XP from all sources" },
+  // nemesesSlain/nemesesSpared are ordinary state.stats counters (see
+  // createEmptyStats), each bumped exactly once per hero — a hero can only
+  // ever resolve their one nemesis through ONE door (see THE CHOICE in the
+  // NEMESIS header comment), so a single life can unlock at most one of
+  // this pair; collecting both titles takes two lives by construction.
+  // Neither bonus is powerMult/arenaEdgeMult, per the balance constraint
+  // noted above.
+  { id: "nemesis_slain", stat: "nemesesSlain", threshold: 1, title: "the Grudge-Ender",
+    desc: "End a nemesis for good.",
+    bonus: { key: "rewardMult", value: 1.08 }, bonusText: "+8% XP and gold from dungeons, raids, the Campaign, and the Arena" },
+  { id: "nemesis_spared", stat: "nemesesSpared", threshold: 1, title: "the Merciful",
+    desc: "Spare a nemesis and settle the grievance.",
+    bonus: { key: "injuryChanceMult", value: 0.90 }, bonusText: "-10% injury chance" }
 ];
 
 const ARENA_MONSTERS = {
@@ -3908,6 +3955,123 @@ const ASCEND_TIERS = [
 // it pays.
 const WORLDBOSS_INJURY_CHANCE_SUCCESS = 0.35;  // vs 0.10 for ordinary content
 const WORLDBOSS_INJURY_CHANCE_FAILURE = 0.85;  // vs 0.60
+
+/* ================================================================
+   NEMESIS — a personal, recurring rival
+   ----------------------------------------------------------------
+   One per hero, generated at creation (see createNemesis) and reset on
+   rebirth exactly like questProgress/worldBossProgress/ascendProgress —
+   a fresh hero draws a fresh rival, not the old one's unfinished business.
+
+   Difficulty is DERIVED from defeats and NEVER stored, so it cannot drift
+   or be left inconsistent by a hand-edited save:
+     nemesisDifficulty() = round(BASE * GROWTH ^ defeats)
+   102 is expectedPower(level 5) under this game's anchoring model — as
+   hard as a level-5 hero. Every VICTORY puts the nemesis on a 6-hour
+   cooldown, after which it returns 10% stronger. A LOSS costs nothing but
+   the attempt: no cooldown, no growth — only victories escalate it.
+
+   challenge = clamp(MIN, MAX, nemesisDifficulty() / power) measures how
+   far above (>1) or below (<1) the hero the nemesis currently sits, and
+   drives everything reward-shaped: duel length, xp, gold, and drop count
+   all scale with it (see getNemesisDef).
+
+   ⚠ FREEZE TRAP: unlike every other timed-content def, a nemesis def is
+   derived from LIVE hero state (power, best zone) rather than fixed data.
+   If it were recomputed at resolution instead of frozen at fight-start, a
+   hero who leveled up or re-geared mid-duel would resolve on different
+   terms than the ones they accepted when they clicked Fight. startTimedContent
+   freezes difficulty/durationMin/xp/gold/dropRolls onto state.activity the
+   moment the fight begins; getNemesisDef reads them back from there for the
+   rest of the fight instead of recomputing them. Success chance, injury
+   safety, and drop tier are deliberately NOT on that frozen list — those
+   already float on live hero power for every other content type in the
+   game (see the SURPLUS POWER block), and nemesis is no exception.
+
+   THE RECKONING: once defeats reaches NEMESIS_RECKONING_DEFEATS the rivalry
+   stops escalating and stops retreating — nemesisIsReckoning() goes true,
+   getNemesisDef() spikes difficulty by NEMESIS_RECKONING_SPIKE for that one
+   final duel, and timedContentBlockReason lets it be fought with no
+   cooldown. A loss there is free and immediately retryable, exactly like
+   any other nemesis loss — the Reckoning is a wall you may retry, never a
+   soft-lock. A WIN does not resolve anything by itself: it sets
+   state.nemesis.pendingChoice (persisted, so it survives a reload/offline
+   return — see maybeShowNemesisChoiceModal) and freezes that duel's own
+   xp/gold/drop-tier onto state.nemesis.pendingHaul for the choice to spend
+   later. The duel's own xp/gold/drops are paid immediately on the win,
+   exactly like every other nemesis victory, through the ordinary reward
+   pipeline earlier in applyTimedContentProgress — nothing special happens
+   to that grant. The live/offline result popup for THIS win is suppressed
+   (summary.contentResolved is nulled) so the choice modal is the one place
+   that reports it, instead of reporting the same win twice.
+
+   THE CHOICE: resolveNemesisFinish ("slain") pays an ADDITIONAL one-off
+   haul — 3x pendingHaul's xp/gold plus 3 extra drop rolls at its frozen
+   drop tier — and ends the rivalry for good. resolveNemesisSpare
+   ("spared") pays no extra haul but sets hero.nemesisSpared, worth a
+   permanent +10% rewardMult for the rest of this hero's life (see
+   getRewardMultiplier — deliberately NOT a buff, since pruneExpiredBuffs
+   would eventually strip one). Either way state.nemesis.resolved is set
+   and timedContentBlockReason refuses the fight forever after — one
+   nemesis per hero, for life. A rebirth still draws a brand-new one
+   (createNemesis via createDefaultState), same as today.
+================================================================ */
+const NEMESIS_BASE_DIFFICULTY = 102;      // expectedPower(level 5) — see the POWER MODEL block
+const NEMESIS_GROWTH = 1.10;              // +10% per defeat
+const NEMESIS_COOLDOWN_MS = 6 * 60 * 60 * 1000;
+const NEMESIS_BASE_MIN = 20;              // duel length at an even (challenge 1.0) fight
+const NEMESIS_CHALLENGE_MIN = 0.25;
+const NEMESIS_CHALLENGE_MAX = 3.0;
+const NEMESIS_REWARD_EXPONENT = 1.5;
+const NEMESIS_XP_ZONE_HOURS = 1.0;
+const NEMESIS_GOLD_ZONE_HOURS = 1.0;
+const NEMESIS_RECKONING_DEFEATS = 25;     // it stops retreating here — see THE RECKONING above
+const NEMESIS_RECKONING_SPIKE = 1.5;      // final-duel difficulty multiplier
+const NEMESIS_FINISH_HAUL_MULT = 3;       // Door A ("Finish it"): one-off haul = 3x the duel's xp/gold
+const NEMESIS_FINISH_EXTRA_DROPS = 3;     // ...plus this many extra drop rolls
+const NEMESIS_SPARE_REWARD_MULT = 1.10;   // Door B ("Spare them"): permanent rewardMult for this hero's life
+
+// ---- Nemesis flavor pools ----
+// A nemesis is an ANTIHERO, not a monster: someone with a name, a grievance,
+// and a reason to keep coming back. Backstories are templates rather than
+// fragment-assembly so the prose reads as authored. {N} is replaced with the
+// nemesis's full name at generation time; {F} with the given name alone.
+const NEMESIS_GIVEN = [
+  "Ansel", "Bryn", "Cassivar", "Dellorne", "Eskild", "Fennimore", "Gethin",
+  "Halloran", "Ivor", "Jessamy", "Kestrel", "Lisbeth", "Maerwen", "Nikolai",
+  "Ottoline", "Perrin", "Quillon", "Rasmus", "Sabine", "Thibault",
+  "Ulrica", "Verity", "Wendell", "Yarrow", "Zennor"
+];
+
+const NEMESIS_EPITHET = [
+  "the Unforgiven", "the Second Blade", "who Kept the Receipt", "the Patient",
+  "the Wolf's Widow", "who Counts in Threes", "the Undismissed", "the Long Memory",
+  "who Came Back Anyway", "the Quiet Complaint", "the Last Apprentice",
+  "who Buried the Wrong Man", "the Unpaid", "the Better Student",
+  "who Reads the Ledgers", "the Held Grudge", "the Understudy",
+  "who Was There First", "the Refused", "the Twice-Told",
+  "who Walks the Same Road", "the Uninvited", "the Other Hand", "the Honest Thief"
+];
+
+// {N} = full name ("Bryn, the Patient"). Keep each to one or two sentences.
+const NEMESIS_BACKSTORY = [
+  "{N} was turned away from the Wardenry the same season you were taken in, and has never once accepted that the difference was merit.",
+  "{N} held the same contract you did, at half the price, and finished it first. Nobody wrote it down. {F} has been correcting the record ever since.",
+  "{N} lost a sibling to a job you walked away from, and has never been able to decide whether that makes you a coward or a survivor. Either way, it makes you findable.",
+  "{N} was the better student for eleven years, right up until the day it stopped mattering, and has been trying to schedule a re-examination ever since.",
+  "{N} sold you a map that was accurate, and has spent every year since insisting on being paid for it. The sum is no longer the point.",
+  "{N} watched you leave a village standing that should have burned, and has been settling the difference personally, one road at a time.",
+  "{N} carries a list of everyone who was in the room that night. It is not a long list. Yours is not the first name on it, but it is the one that keeps getting crossed out and rewritten.",
+  "{N} buried someone under your name, on your word, and later found out otherwise. {F} would like the grave back, or an explanation, and is no longer particular about which.",
+  "{N} has never claimed to be in the right — only to be owed, which {F} finds is a far harder thing for anyone to argue with.",
+  "{N} took the blame for something you did, served the sentence for it honestly, and came out the other side with a great deal of time to think about the arrangement.",
+  "{N} was hired to kill you once and could not manage it. The contract lapsed years ago. {F} has continued out of what can only be described as professional embarrassment.",
+  "{N} keeps a ledger of every favour the realm has failed to return, and has decided, on no particular evidence, that you are the one collecting on its behalf.",
+  "{N} says the two of you agreed to something at a crossroads a long time ago. You do not remember the crossroads. {F} remembers all of it, in order.",
+  "{N} is not certain any more which of you started it, and has stopped regarding that as a question worth resolving before the next attempt.",
+  "{N} wanted the road you took, the name you took, and the life that came with them, and has been walking a parallel one just close enough to keep score.",
+  "{N} was there when the seal held and you were not, and has never forgiven the realm for remembering it the other way round."
+];
 
 // The Forgotten Beyond (any def with mythicSource) — every number below is
 // per ROLLED HOUR of the span the expedition drew at start, derived at
@@ -4242,6 +4406,10 @@ function createDefaultState(name, raceId, classId){
     // progression exactly like questProgress/worldBossProgress — resets on
     // rebirth (a fresh hero here always gets a fresh {}), NOT a legacy field.
     ascendProgress: {},
+    // Per-hero personal rival — generated fresh here exactly like
+    // questProgress/worldBossProgress/ascendProgress above, so a rebirth
+    // gets a brand-new nemesis rather than inheriting the old one's tally.
+    nemesis: createNemesis(),
     stats: createEmptyStats(),
     legacy: legacy,   // { rebirths, boons:[boonId], legends:[legendRecord] } — Rebirth (prestige)
     lastTick: Date.now()
@@ -4373,7 +4541,8 @@ function createEmptyStats(){
     dungeonsCompleted: 0, dungeonsFailed: 0,
     raidsCompleted: 0, raidsFailed: 0,
     questChaptersCompleted: 0, restsCompleted: 0,
-    mythicsFound: 0, worldBossesFelled: 0
+    mythicsFound: 0, worldBossesFelled: 0,
+    nemesesSlain: 0, nemesesSpared: 0
   };
 }
 
@@ -4887,15 +5056,21 @@ function getTimerMultiplier(hero){
 
 // Multiplies xp/gold payouts from dungeons, raids, quests, and the Arena
 // (applied on top of the regular xp/gold multipliers). Previously
-// buff + evolution only, with no permanent source; achievements are the
-// first (see arena_1000/dungeon_200/raid_5, the only entries that key off
-// rewardMult) — verified nothing downstream assumed this was evolution-only.
+// buff + evolution only, with no permanent source; achievements were the
+// first (see arena_1000/dungeon_200/raid_5, nemesis_slain, the entries that
+// key off rewardMult) — verified nothing downstream assumed this was
+// evolution-only. hero.nemesisSpared is the second permanent source: set
+// once by resolveNemesisSpare (Door B of the Reckoning's choice) and
+// deliberately stored directly on the hero, NOT as a buff — pruneExpiredBuffs
+// would eventually strip a buff, and this must last the rest of this hero's
+// life. See THE CHOICE in the NEMESIS header comment.
 function getRewardMultiplier(hero){
   let mult = 1;
   mult *= getBuffMultiplier(hero, "rewardMult");
   mult *= getEvolutionPerkMult(hero, "rewardMult"); // Raider 1.25, Assassin 1.15, Warlord 1.10
   mult *= getAchievementBonusMult("rewardMult");
   mult *= getDecreeMult("rewardMult");
+  if (hero.nemesisSpared) mult *= NEMESIS_SPARE_REWARD_MULT;
   return mult;
 }
 
@@ -5527,7 +5702,7 @@ function applyProgress(elapsedMs, opts){
     applyTrainingProgressWithCap(elapsedMs, maxDrops, summary);
   } else if (activity.type === "rest"){
     applyRestProgress(summary);
-  } else if (activity.type === "dungeon" || activity.type === "raid" || activity.type === "quest" || activity.type === "worldboss"){
+  } else if (activity.type === "dungeon" || activity.type === "raid" || activity.type === "quest" || activity.type === "worldboss" || activity.type === "nemesis"){
     applyTimedContentProgress(summary);
   } else if (activity.type === "arena"){
     // Fights resolve automatically as elapsed time crosses each
@@ -5633,6 +5808,101 @@ function ascendDef(def, ascendTier){
   return out;
 }
 
+/* ---- Nemesis: identity + derived def ---- */
+
+// A fresh nemesis: one random given name x one random epithet (600 possible
+// identities) and one random backstory template, with {N}/{F} substituted
+// for the full display name / given name alone. Called at hero creation
+// (createDefaultState) and by migrateV16toV17 for an existing hero that has
+// none — nowhere else, since a nemesis's IDENTITY is fixed for the hero's
+// whole life; only its defeats/readyAt change afterward.
+function createNemesis(){
+  const given = NEMESIS_GIVEN[Math.floor(Math.random() * NEMESIS_GIVEN.length)];
+  const epithet = NEMESIS_EPITHET[Math.floor(Math.random() * NEMESIS_EPITHET.length)];
+  const template = NEMESIS_BACKSTORY[Math.floor(Math.random() * NEMESIS_BACKSTORY.length)];
+  const full = given + ", " + epithet;
+  const backstory = template.split("{N}").join(full).split("{F}").join(given);
+  return { given: given, epithet: epithet, backstory: backstory, defeats: 0, readyAt: 0 };
+}
+
+function nemesisDisplayName(nem){
+  return nem.given + ", " + nem.epithet;
+}
+
+// Difficulty is derived from defeats alone and NEVER stored — see the
+// NEMESIS header comment. `defeats` defaults to the current nemesis's own
+// count so every call site but a migration/test one can omit it.
+function nemesisDifficulty(defeats){
+  const d = (typeof defeats === "number") ? defeats : ((state.nemesis && state.nemesis.defeats) || 0);
+  return Math.round(NEMESIS_BASE_DIFFICULTY * Math.pow(NEMESIS_GROWTH, d));
+}
+
+// >1 means the nemesis currently outmatches the hero; <1 means the hero
+// outmatches the nemesis. Clamped so an undergeared hero is never handed a
+// hopeless fight, and an overwhelming one can never trivialize it to nothing.
+function nemesisChallenge(hero, difficulty){
+  const diff = (typeof difficulty === "number") ? difficulty : nemesisDifficulty();
+  const power = Math.max(1, computePower(hero));
+  return Math.min(NEMESIS_CHALLENGE_MAX, Math.max(NEMESIS_CHALLENGE_MIN, diff / power));
+}
+
+// True once this hero's nemesis has stopped retreating for good — see THE
+// RECKONING in the NEMESIS header comment. False again the instant it's
+// resolved (either door), since a resolved nemesis is never fought again
+// regardless of its frozen defeats count.
+function nemesisIsReckoning(){
+  return !!(state.nemesis && !state.nemesis.resolved && (state.nemesis.defeats || 0) >= NEMESIS_RECKONING_DEFEATS);
+}
+
+// Normalized nemesis def — same shape getTimedContentDef returns for every
+// other type (id/name/difficulty/durationMin/xp/gold/dropRolls), so it slots
+// into the existing applyTimedContentProgress/timedContentDurationMs/
+// contentDropTier pipeline unchanged. Deliberately carries no levelReq: a
+// nemesis isn't anchored to a zone, so contentZoneTier's `|| 1` fallback is
+// exactly right for it — full hero-tier loot on a fair fight, sliding toward
+// tier 1 as the hero outgrows it, precisely like every other content type.
+//
+// Two branches:
+//  - RESOLVING (state.activity.type === "nemesis" already, mid-duel or at
+//    the instant it ends): returns the values FROZEN at fight-start (see
+//    startTimedContent) instead of recomputing them against whatever the
+//    hero's power/zone happen to be right now — see the FREEZE TRAP note.
+//  - QUOTING (any other time — the panel showing terms before a fight, or
+//    startTimedContent about to freeze a fresh one): computes live from the
+//    hero's current power and best zone.
+function getNemesisDef(){
+  if (!state.nemesis) return null;
+  const hero = state.hero;
+  const act = state.activity;
+  if (act && act.type === "nemesis" && typeof act.difficulty === "number"){
+    return {
+      id: "nemesis", name: nemesisDisplayName(state.nemesis),
+      difficulty: act.difficulty, durationMin: act.durationMin,
+      xp: act.xp, gold: act.gold, renown: 0, dropRolls: act.dropRolls,
+      // defeats hasn't moved since this duel started (only its own
+      // resolution can change it), so nemesisIsReckoning() still correctly
+      // describes the fight that's in progress right now.
+      reckoning: nemesisIsReckoning()
+    };
+  }
+  // The Reckoning spikes difficulty for this one final duel — same
+  // challenge/duration/reward formula as any other nemesis fight, just
+  // computed against the spiked number. See THE RECKONING above.
+  const reckoning = nemesisIsReckoning();
+  const difficulty = reckoning ? Math.round(nemesisDifficulty() * NEMESIS_RECKONING_SPIKE) : nemesisDifficulty();
+  const challenge = nemesisChallenge(hero, difficulty);
+  const zone = bestUnlockedZone(hero);
+  const durationMin = Math.max(5, Math.round(NEMESIS_BASE_MIN * challenge));
+  const xp = Math.round(zone.xpPerHour * NEMESIS_XP_ZONE_HOURS * Math.pow(challenge, NEMESIS_REWARD_EXPONENT));
+  const gold = Math.round(zone.goldPerHour * NEMESIS_GOLD_ZONE_HOURS * Math.pow(challenge, NEMESIS_REWARD_EXPONENT));
+  const dropRolls = 1 + Math.floor(challenge);
+  return {
+    id: "nemesis", name: nemesisDisplayName(state.nemesis),
+    difficulty: difficulty, durationMin: durationMin, xp: xp, gold: gold, renown: 0, dropRolls: dropRolls,
+    challenge: challenge, reckoning: reckoning
+  };
+}
+
 // Normalized definition for a piece of timed content. Quest chapters
 // keep their mission stats nested, so this flattens them into the same
 // shape dungeons and raids already have.
@@ -5652,6 +5922,7 @@ function getTimedContentDef(type, contentId, ascendTier){
   // completion and the previous rung, not on level. Returned as-authored so
   // nothing downstream can read a reward off it that doesn't exist.
   else if (type === "worldboss") def = WORLD_BOSSES.find(b => b.id === contentId) || null;
+  else if (type === "nemesis") def = getNemesisDef();
   else if (type === "quest"){
     const ch = campaignChapters().find(q => q.id === contentId);
     if (ch){
@@ -5674,12 +5945,13 @@ function contentTypeLabel(type){
   if (type === "dungeon") return "Dungeon";
   if (type === "raid") return "Raid";
   if (type === "worldboss") return "World Boss";
+  if (type === "nemesis") return "Nemesis";
   return "Campaign";
 }
 
 function isBusyWithContent(){
   const t = state.activity.type;
-  return t === "dungeon" || t === "raid" || t === "quest" || t === "arena" || t === "worldboss";
+  return t === "dungeon" || t === "raid" || t === "quest" || t === "arena" || t === "worldboss" || t === "nemesis";
 }
 
 // Like rest, timed content doesn't scale with elapsedMs — it resolves
@@ -5849,6 +6121,47 @@ function applyTimedContentProgress(summary){
     }
   }
 
+  // Nemesis: victory escalates it (defeats++ and a 6h cooldown, both read
+  // by nemesisDifficulty/timedContentBlockReason from here on); a loss
+  // costs nothing but the attempt — no cooldown, no growth, immediately
+  // retryable. Injury already ran through the standard success/failure
+  // branches above using the ordinary CONTENT_INJURY_CHANCE_SUCCESS/
+  // _FAILURE rates — a duel is dangerous, but not specially so.
+  //
+  // Once defeats reaches NEMESIS_RECKONING_DEFEATS this stops escalating
+  // (nemesisIsReckoning() reads defeats itself, so simply not incrementing
+  // past 25 IS the growth freeze — no separate flag needed) and a WIN opens
+  // the spare-or-finish choice instead of the usual struck-down log line.
+  // See THE RECKONING / THE CHOICE in the NEMESIS header comment.
+  let nemesisReckoningWin = false;
+  if (type === "nemesis" && state.nemesis){
+    if (success){
+      if (nemesisIsReckoning()){
+        nemesisReckoningWin = true;
+        state.nemesis.pendingChoice = true;
+        // Freeze THIS duel's own xp/gold/drop-tier for the choice to spend
+        // later — same freeze-at-the-moment precedent as the duel's own def
+        // (see the FREEZE TRAP note). xpGain/goldGain are already the exact
+        // amounts just granted above via grantXp/awardGold.
+        state.nemesis.pendingHaul = {
+          xp: Math.round(xpGain), gold: Math.round(goldGain),
+          dropTier: contentDropTier(hero, def)
+        };
+        addLog(hero.name + " has beaten " + nemesisDisplayName(state.nemesis) + " in the Reckoning. " +
+          "The fight is won — but the rivalry isn't over until " + hero.name + " decides how.", "levelup");
+      } else {
+        state.nemesis.defeats = (state.nemesis.defeats || 0) + 1;
+        state.nemesis.readyAt = Date.now() + NEMESIS_COOLDOWN_MS;
+        addLog(hero.name + " has struck down " + nemesisDisplayName(state.nemesis) + " — the " +
+          ordinal(state.nemesis.defeats) + " time this rivalry has ended in your favor. " +
+          state.nemesis.given + " will be back in six hours, stronger for it.", "levelup");
+      }
+    } else {
+      addLog(nemesisDisplayName(state.nemesis) + " gets the better of this bout. No harm done to the score — " +
+        hero.name + " can go again at once.", "system");
+    }
+  }
+
   let outro = null;
   if (type === "quest"){
     const ch = campaignChapters().find(q => q.id === def.id);
@@ -5882,7 +6195,12 @@ function applyTimedContentProgress(summary){
 
   if (injured) addInjury(hero, def.name);
 
-  summary.contentResolved = {
+  // A Reckoning win is reported by the nemesis choice modal instead (see
+  // maybeShowNemesisChoiceModal) — its xp/gold/drops were already granted
+  // above like any other nemesis win, so leaving this set here would report
+  // the exact same win a second time through the ordinary result popup /
+  // welcome-back note.
+  summary.contentResolved = nemesisReckoningWin ? null : {
     type: type, name: def.name, success: success,
     xp: xpGain, gold: goldGain, renown: renownGain,
     items: items, injured: injured, outro: outro,
@@ -5973,6 +6291,10 @@ function buildSavePayload(){
     // enumerated like every other per-hero field here, or it silently drops
     // on the next save.
     ascendProgress: (state.ascendProgress && typeof state.ascendProgress === "object") ? state.ascendProgress : {},
+    // Per-hero personal rival — must be enumerated here explicitly like
+    // every other per-hero field above, or it silently drops on the very
+    // next save (see the legacy trap note above createEmptyLegacy).
+    nemesis: (state.nemesis && typeof state.nemesis === "object") ? state.nemesis : createNemesis(),
     stats: state.stats || createEmptyStats(),
     // Rebirth (prestige) + achievements. Only these canonical fields persist
     // on a normal save — the transient pendingInheritance lives solely on a
@@ -6091,6 +6413,7 @@ function migrateSave(data){
   if (d.version === 13) d = migrateV13toV14(d);
   if (d.version === 14) d = migrateV14toV15(d);
   if (d.version === 15) d = migrateV15toV16(d);
+  if (d.version === 16) d = migrateV16toV17(d);
   return d;
 }
 
@@ -6402,6 +6725,19 @@ function migrateV15toV16(data){
   return data;
 }
 
+// v17 adds the Nemesis — one new per-hero field:
+//   • data.nemesis — { given, epithet, backstory, defeats, readyAt }, reset
+//     on rebirth exactly like questProgress/worldBossProgress/ascendProgress.
+//     An existing hero predates the feature and has never had one, so this
+//     generates a brand-new rival for them exactly as createDefaultState
+//     does for a freshly rolled hero — there is no demonstrated identity to
+//     backfill here, unlike the Bestiary's backfills in migrateV14toV15.
+function migrateV16toV17(data){
+  if (!data.nemesis || typeof data.nemesis !== "object") data.nemesis = createNemesis();
+  data.version = 17;
+  return data;
+}
+
 function migrateItemToGear(item, hero){
   if (item.slot) return item; // already gear-shaped, leave as-is
   const slot = SLOTS[Math.floor(Math.random() * SLOTS.length)];
@@ -6530,7 +6866,7 @@ function applyOfflineProgress(){
   const rawBoundaries = (state.hero.buffs || []).map(b => b.expiresAt)
     .concat(localDayBoundariesBetween(start, now));
   const a = state.activity;
-  if ((a.type === "rest" || a.type === "dungeon" || a.type === "raid" || a.type === "quest" || a.type === "worldboss") && a.endsAt){
+  if ((a.type === "rest" || a.type === "dungeon" || a.type === "raid" || a.type === "quest" || a.type === "worldboss" || a.type === "nemesis") && a.endsAt){
     rawBoundaries.push(a.endsAt);
   } else if (a.type === "training"){
     rawBoundaries.push(a.startedAt + TRAINING_CAP_MS);
@@ -6626,6 +6962,7 @@ const ICON_ART = {
   // its neighbours; the sockets are circles rather than dashes so they stay
   // legible at the 15px subtab size.
   worldboss: '<path d="M4.4 16.6 C2.9 11.4 3.3 7.4 5.1 4.6 C6.7 7.9 7.9 10.1 9.4 11.7 L12 4.2 L14.6 11.7 C16.1 10.1 17.3 7.9 18.9 4.6 C20.7 7.4 21.1 11.4 19.6 16.6 Z"/><path d="M4.2 16.9 H19.8 V20.1 H4.2 Z"/><circle cx="12" cy="18.5" r="1.05" fill="none" stroke-width="1.3"/>',
+  nemesis: '<path d="M5 19.5 L16.5 5.5"/><path d="M19 19.5 L7.5 5.5"/><path d="M3.6 17.6 L6.8 20.4"/><path d="M20.4 17.6 L17.2 20.4"/>',
   // --- Gear slots (registry only; gear-panel agent consumes these) ---
   weapon: '<path d="M12 2.5 L13.4 5 V13 H10.6 V5 Z"/><path d="M8 14 H16"/><path d="M12 14 V19.4"/><circle cx="12" cy="20.7" r="1.3"/>',
   helm: '<path d="M4.5 16 a7.5 7.5 0 0 1 15 0"/><path d="M4.5 16 h15"/><path d="M12 8.5 V19.5"/>',
@@ -7011,14 +7348,14 @@ function renderHeroPanel(){
     const remaining = Math.max(0, act.endsAt - Date.now());
     activityEl.textContent = (act.restKind === "short" ? "Resting (short)" : "Resting (long)");
     trackerEl.innerHTML = "<span class=\"activity-name\">Resting</span> — " + humanizeDuration(remaining) + " remaining";
-  } else if (act.type === "dungeon" || act.type === "raid" || act.type === "quest" || act.type === "worldboss"){
+  } else if (act.type === "dungeon" || act.type === "raid" || act.type === "quest" || act.type === "worldboss" || act.type === "nemesis"){
     const def = getTimedContentDef(act.type, act.contentId, act.ascendTier);
     const label = contentTypeLabel(act.type);
     const remaining = Math.max(0, act.endsAt - Date.now());
     const ascendSuffix = (def && def.ascendName) ? " [" + def.ascendName + "]" : "";
     activityEl.textContent = label + ": " + (def ? def.name : "Unknown") + ascendSuffix + " — " + fmtCountdown(remaining) + " left";
     const verb = act.type === "dungeon" ? "Delving" : act.type === "raid" ? "Raiding" :
-      act.type === "worldboss" ? "Hunting" : "On campaign:";
+      act.type === "worldboss" ? "Hunting" : act.type === "nemesis" ? "Dueling" : "On campaign:";
     trackerEl.innerHTML = verb + " <span class=\"activity-name\">" + escapeHtml(def ? def.name : "Unknown") + escapeHtml(ascendSuffix) + "</span> — " + humanizeDuration(remaining) + " remaining";
   } else if (act.type === "arena"){
     activityEl.textContent = "In the Arena — fight " + act.fightNumber;
@@ -7925,6 +8262,205 @@ function renderArena(){
     "</div>";
 }
 
+/* ---- the Nemesis ---- */
+
+function renderNemesis(){
+  const hero = state.hero;
+  if (!state.nemesis) return; // should never happen post-migration, but never let a render crash the loop
+  const power = computePower(hero);
+  const act = state.activity;
+  const active = act.type === "nemesis";
+  const fightRemaining = active ? Math.max(0, act.endsAt - Date.now()) : 0;
+  // No cooldown at all once the Reckoning is reached (see THE RECKONING) —
+  // readyAt can still hold a stale future timestamp from the escalating win
+  // that pushed defeats to NEMESIS_RECKONING_DEFEATS, so this must ignore it
+  // rather than just reading it, or the panel would show a bogus countdown
+  // for a fight timedContentBlockReason already allows right now.
+  const cooldownRemaining = (active || nemesisIsReckoning()) ? 0 : Math.max(0, (state.nemesis.readyAt || 0) - Date.now());
+  const sig = state.nemesis.defeats + "|" + power + "|" + act.type + "|" +
+    Math.floor(fightRemaining / 1000) + "|" + Math.floor(cooldownRemaining / 1000) + "|" +
+    (hero.injuries >= MAX_INJURIES) + "|" + getTimerMultiplier(hero) + "|" +
+    (state.nemesis.resolved || "") + "|" + !!state.nemesis.pendingChoice;
+  if (contentRenderSigs["nemesis-body"] === sig) return;
+  contentRenderSigs["nemesis-body"] = sig;
+
+  const body = document.getElementById("nemesis-body");
+  const name = nemesisDisplayName(state.nemesis);
+
+  // Resolved (either door): the fight is over for this hero's whole life —
+  // a short memorial line instead of the usual fight card. See THE CHOICE
+  // in the NEMESIS header comment.
+  if (state.nemesis.resolved){
+    const memorial = state.nemesis.resolved === "slain"
+      ? name + " is gone for good. This rivalry ended in " + hero.name + "'s favor, once and for all."
+      : name + " was spared. Whatever stood between them is settled — " + hero.name + " carries that mercy for the rest of this life.";
+    body.innerHTML =
+      "<div class=\"zone-card\">" +
+        "<div class=\"zone-info\">" +
+          "<div class=\"zone-name-row\"><h4 class=\"content-title\">" + escapeHtml(name) + "</h4>" +
+            "<span class=\"tier-badge\">" + (state.nemesis.resolved === "slain" ? "Finished" : "Spared") + "</span></div>" +
+          "<div class=\"content-flavor\">" + escapeHtml(memorial) + "</div>" +
+        "</div>" +
+      "</div>";
+    return;
+  }
+
+  // Reuses getTimedContentDef's "nemesis" branch (getNemesisDef) — the
+  // FROZEN terms while active, a fresh live quote otherwise. Same function
+  // startTimedContent and applyTimedContentProgress read, so this panel can
+  // never show numbers that disagree with what the fight actually resolves on.
+  const def = getTimedContentDef("nemesis", "nemesis");
+  const ratio = power / def.difficulty;
+  const band = contentBandInfo(ratio);
+  const chancePct = Math.round(successChance(ratio) * 100);
+  const dur = active ? Math.max(0, act.endsAt - act.startedAt) : timedContentDurationMs(hero, def);
+  const reason = timedContentBlockReason("nemesis", def);
+  const onCooldown = cooldownRemaining > 0;
+  const defeats = state.nemesis.defeats || 0;
+  // The Reckoning label replaces "Defeated N times" once it's reached — the
+  // count is frozen at NEMESIS_RECKONING_DEFEATS from here on anyway.
+  const reckoning = def.reckoning;
+
+  body.innerHTML =
+    "<div class=\"zone-card" + (active ? " active" : "") + "\">" +
+      "<div class=\"zone-info\">" +
+        "<div class=\"zone-name-row\"><h4 class=\"content-title\">" + escapeHtml(name) + "</h4>" +
+          "<span class=\"tier-badge\">" + (reckoning ? "The Reckoning" : escapeHtml(humanizeDuration(dur))) + "</span></div>" +
+        "<div class=\"content-flavor\">" + escapeHtml(state.nemesis.backstory) + "</div>" +
+        "<div class=\"zone-req\">" + (reckoning ?
+          "This is the final duel — it no longer retreats" :
+          "Defeated " + defeats + " time" + (defeats === 1 ? "" : "s")) +
+          " — difficulty <b>" + fmtNumber(def.difficulty) + "</b> vs your power <b>" + fmtNumber(power) + "</b></div>" +
+        "<div class=\"zone-stats\">" +
+          "<span><b>" + fmtNumber(def.xp) + "</b> xp</span>" +
+          "<span style=\"color:var(--gold-bright)\"><b>" + fmtNumber(def.gold) + "</b> gold</span>" +
+          "<span>" + def.dropRolls + " drop roll" + (def.dropRolls === 1 ? "" : "s") + "</span>" +
+          "<span class=\"content-band\" style=\"color:" + band.color + "\">" + band.label + " (" + chancePct + "%)</span>" +
+        "</div>" +
+      "</div>" +
+      "<div class=\"zone-action\">" +
+        (active ? "<span class=\"content-countdown\">" + fmtCountdown(fightRemaining) + "</span>" :
+          onCooldown ? "<span class=\"content-countdown\">" + fmtCountdown(cooldownRemaining) + "</span>" :
+          reason ? "<span style=\"color:var(--text-muted); font-size:0.78rem;\" title=\"" + escapeHtml(reason) + "\">" + escapeHtml(reason) + "</span>" :
+          "<button class=\"btn small\" id=\"nemesis-fight-btn\">Fight</button>") +
+      "</div>" +
+    "</div>";
+
+  const fightBtn = document.getElementById("nemesis-fight-btn");
+  if (fightBtn) fightBtn.addEventListener("click", () => startTimedContent("nemesis", "nemesis"));
+}
+
+/* ---- Nemesis Reckoning: the spare-or-finish choice ----
+   Forced two-door modal, same precedent as the quest encounter modal —
+   see the NEMESIS-CHOICE-MODAL markup and THE CHOICE in the NEMESIS header
+   comment. Presents state.nemesis.pendingChoice; resolving either door
+   clears it and sets state.nemesis.resolved for good. */
+
+// Called from render() every tick — cheap (a few property reads) and
+// idempotent (skips once the modal is already open), so it's the single
+// place that reopens the choice on a live win, on a reload with the choice
+// still pending, and after an offline win resolved while the tab was
+// closed. Mirrors showWelcomeBackModal's "report on return" role for this
+// one event.
+function maybeShowNemesisChoiceModal(){
+  if (!state || !state.nemesis || !state.nemesis.pendingChoice) return;
+  const modal = document.getElementById("nemesis-choice-modal");
+  if (modal && modal.classList.contains("hidden")) openNemesisChoiceModal();
+}
+
+function openNemesisChoiceModal(){
+  const nem = state.nemesis;
+  if (!nem || !nem.pendingChoice) return;
+  const hero = state.hero;
+  const name = nemesisDisplayName(nem);
+  const haul = nem.pendingHaul || { xp: 0, gold: 0, dropTier: 1 };
+  const finishXp = haul.xp * NEMESIS_FINISH_HAUL_MULT;
+  const finishGold = haul.gold * NEMESIS_FINISH_HAUL_MULT;
+
+  document.getElementById("nemesis-choice-flavor").textContent =
+    hero.name + " stands over " + name + ", beaten at last. The blade is only half the decision — " +
+    "what happens next is the rest of it.";
+  document.getElementById("nemesis-finish-desc").textContent =
+    "End it, permanently. One last, considerable haul: +" + fmtNumber(finishXp) + " xp, +" +
+    fmtNumber(finishGold) + " gold, and " + NEMESIS_FINISH_EXTRA_DROPS + " extra drop rolls. Nothing further from this rivalry, ever again.";
+  document.getElementById("nemesis-spare-desc").textContent =
+    "Let them walk. No extra haul today — but the grievance is settled, and " + hero.name +
+    " carries a permanent +" + Math.round((NEMESIS_SPARE_REWARD_MULT - 1) * 100) +
+    "% XP and gold from dungeons, raids, the Campaign, and the Arena for the rest of this life.";
+
+  document.getElementById("nemesis-choice-modal").classList.remove("hidden");
+}
+
+// Door A: end the rivalry. Pays the additional one-off haul frozen onto
+// pendingHaul at the moment the Reckoning was won (NEMESIS_FINISH_HAUL_MULT
+// x its xp/gold, plus NEMESIS_FINISH_EXTRA_DROPS drop rolls at its frozen
+// drop tier) — ON TOP OF the duel's own xp/gold/drops, which were already
+// granted when the duel itself resolved (see applyTimedContentProgress).
+function resolveNemesisFinish(){
+  const nem = state.nemesis;
+  if (!nem || !nem.pendingChoice) return;
+  const hero = state.hero;
+  const haul = nem.pendingHaul || { xp: 0, gold: 0, dropTier: 1 };
+  const name = nemesisDisplayName(nem);
+
+  grantXp(hero, haul.xp * NEMESIS_FINISH_HAUL_MULT);
+  awardGold(hero, haul.gold * NEMESIS_FINISH_HAUL_MULT);
+  const items = [];
+  for (let i = 0; i < NEMESIS_FINISH_EXTRA_DROPS; i++){
+    const tier = rollItemTier(haul.dropTier);
+    const item = rollGearItem(tier, haul.dropTier, hero);
+    state.inventory.push(item);
+    items.push(item);
+    recordBestiary("tiers", item.tierId);
+    addLog("Recovered " + itemDisplayName(item) + " from the Reckoning.", "drop");
+  }
+  if (state.stats) state.stats.itemsFound += items.length;
+
+  if (!state.stats) state.stats = createEmptyStats();
+  state.stats.nemesesSlain = (state.stats.nemesesSlain || 0) + 1;
+  nem.resolved = "slain";
+  nem.pendingChoice = false;
+  delete nem.pendingHaul;
+
+  addLog(hero.name + " finishes it. " + name + "'s rivalry ends here, for good — a last haul of +" +
+    fmtNumber(haul.xp * NEMESIS_FINISH_HAUL_MULT) + " xp, +" + fmtNumber(haul.gold * NEMESIS_FINISH_HAUL_MULT) +
+    " gold, and " + items.length + " item" + (items.length === 1 ? "" : "s") + ".", "levelup");
+
+  document.getElementById("nemesis-choice-modal").classList.add("hidden");
+  saveGame();
+  render();
+}
+
+// Door B: spare the rivalry. No extra haul, but hero.nemesisSpared is a
+// permanent flag (NOT a buff — see getRewardMultiplier) worth +10%
+// rewardMult for the rest of this hero's life.
+function resolveNemesisSpare(){
+  const nem = state.nemesis;
+  if (!nem || !nem.pendingChoice) return;
+  const hero = state.hero;
+  const name = nemesisDisplayName(nem);
+
+  hero.nemesisSpared = true;
+  if (!state.stats) state.stats = createEmptyStats();
+  state.stats.nemesesSpared = (state.stats.nemesesSpared || 0) + 1;
+  nem.resolved = "spared";
+  nem.pendingChoice = false;
+  delete nem.pendingHaul;
+
+  addLog(hero.name + " lowers the blade. " + name + " lives, and whatever stood between them is settled — " +
+    hero.name + " will carry that mercy for the rest of this life (+" +
+    Math.round((NEMESIS_SPARE_REWARD_MULT - 1) * 100) + "% XP and gold from dungeons, raids, the Campaign, and the Arena).", "levelup");
+
+  document.getElementById("nemesis-choice-modal").classList.add("hidden");
+  saveGame();
+  render();
+}
+
+function wireNemesisChoiceModal(){
+  document.getElementById("nemesis-finish-btn").addEventListener("click", resolveNemesisFinish);
+  document.getElementById("nemesis-spare-btn").addEventListener("click", resolveNemesisSpare);
+}
+
 function renderRenownPanel(){
   const hero = state.hero;
   // Includes selectedTitle (not just renown) since this panel's header line
@@ -8270,7 +8806,9 @@ function renderStatsPanel(){
     ["Campaign chapters completed", fmtNumber(s.questChaptersCompleted)],
     ["Rests completed", fmtNumber(s.restsCompleted)],
     ["Mythic weapons found", fmtNumber(s.mythicsFound || 0)],
-    ["World Bosses felled", fmtNumber(s.worldBossesFelled || 0)]
+    ["World Bosses felled", fmtNumber(s.worldBossesFelled || 0)],
+    ["Nemeses finished", fmtNumber(s.nemesesSlain || 0)],
+    ["Nemeses spared", fmtNumber(s.nemesesSpared || 0)]
   ];
   document.getElementById("stats-body").innerHTML =
     rows.map(r => "<div class=\"k\">" + r[0] + "</div><div class=\"v\">" + r[1] + "</div>").join("");
@@ -8935,7 +9473,7 @@ function wireCodexModal(){
   });
 }
 
-const ADV_SUBTABS = ["training", "dungeons", "raids", "quests", "arena", "worldboss"];
+const ADV_SUBTABS = ["training", "dungeons", "raids", "quests", "arena", "nemesis", "worldboss"];
 
 // Shared by manual subtab clicks, the "one-tap continuity" auto-select on
 // Adventure tab entry, and boot-time restore — keeps all three in sync
@@ -9084,6 +9622,8 @@ function render(){
   renderQuests();
   renderWorldBosses();
   renderArena();
+  renderNemesis();
+  maybeShowNemesisChoiceModal();
   renderRenownPanel();
   renderTitlesPanel();
   renderSkillsPanel();
@@ -9184,6 +9724,21 @@ function timedContentBlockReason(type, def, ascendTier){
     const idx = WORLD_BOSSES.findIndex(b => b.id === def.id);
     if (idx !== (state.worldBossProgress || 0)) return "Not the next name on the list";
   }
+  if (type === "nemesis"){
+    if (!state.nemesis) return "No nemesis to fight";
+    // A resolved nemesis (either door) is off the table forever — one
+    // nemesis per hero, for life. See THE CHOICE in the NEMESIS header.
+    if (state.nemesis.resolved){
+      return state.nemesis.resolved === "slain" ? "This rivalry is finished" : "This rivalry was settled";
+    }
+    // The Reckoning was won but not yet resolved — the choice must be made
+    // before any further duel (there is nothing left to fight anyway; see
+    // maybeShowNemesisChoiceModal for how the modal returns on its own).
+    if (state.nemesis.pendingChoice) return "A choice awaits you first";
+    // No cooldown at all once the Reckoning is reached — it stops
+    // retreating. Before that, the usual 6h cooldown applies.
+    if (!nemesisIsReckoning() && (state.nemesis.readyAt || 0) > Date.now()) return "Recovering from your last duel";
+  }
   return null;
 }
 
@@ -9217,9 +9772,23 @@ function startTimedContent(type, contentId, ascendTier){
   // rollTimedContentDurationMs for why shortening it would be a penalty.
   const dur = rollTimedContentDurationMs(state.hero, def);
   state.activity = { type: type, contentId: contentId, startedAt: now, endsAt: now + dur, ascendTier: appliedTier };
+  // Freeze the Nemesis's quoted terms onto the activity itself — see the
+  // FREEZE TRAP note on the NEMESIS constants block. getNemesisDef reads
+  // these back for the rest of the fight instead of recomputing them
+  // against whatever the hero's power/zone happen to be by the time it
+  // resolves (see getNemesisDef / applyTimedContentProgress).
+  if (type === "nemesis"){
+    state.activity.difficulty = def.difficulty;
+    state.activity.durationMin = def.durationMin;
+    state.activity.xp = def.xp;
+    state.activity.gold = def.gold;
+    state.activity.dropRolls = def.dropRolls;
+  }
 
   if (type === "worldboss"){
     addLog("Set out to hunt " + def.name + " (" + humanizeDuration(dur) + ").", "zone");
+  } else if (type === "nemesis"){
+    addLog(state.hero.name + " goes looking for " + def.name + " (" + humanizeDuration(dur) + ").", "zone");
   } else {
     const typeLabel = type === "dungeon" ? "the dungeon" : type === "raid" ? "the raid" : "the campaign";
     addLog("Set out for " + typeLabel + " \"" + def.name + "\"" + (def.ascendName ? " (" + def.ascendName + ")" : "") +
@@ -10406,6 +10975,7 @@ function wireGameScreen(){
   wireEvolutionModal();
   wireSkillModal();
   wireEncounterModal();
+  wireNemesisChoiceModal();
   wireRebirthModals();
   wireContentResultModal();
   wireChapterStoryModal();
@@ -10662,6 +11232,7 @@ function boot(){
     questProgress: (typeof data.questProgress === "number") ? data.questProgress : 0,
     worldBossProgress: (typeof data.worldBossProgress === "number") ? data.worldBossProgress : 0,
     ascendProgress: (data.ascendProgress && typeof data.ascendProgress === "object") ? data.ascendProgress : {},
+    nemesis: (data.nemesis && typeof data.nemesis === "object") ? data.nemesis : createNemesis(),
     stats: data.stats || createEmptyStats(),
     legacy: normalizeLegacy(data.legacy),
     lastTick: data.lastTick || Date.now()
