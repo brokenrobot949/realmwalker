@@ -2733,7 +2733,21 @@ const QUEST_ENCOUNTERS = [
   { id: "threshold_breathes_back", kind: "dilemma", zoneId: "threshold_watch", title: "Something Breathes Back",
     prose: "For one held second the Threshold's breathing stops, and something on the other side of the seam breathes in instead — a long, patient pull, aimed, unmistakably, at you standing this close to the crack. The other sentries have already backed off three paces. They're waiting to see if you will.",
     safeLabel: "Fall back with the sentries", riskLabel: "Hold your ground",
-    riskFlavor: "Whatever's pulling air through that seam hasn't gotten a taste yet. Holding still isn't the same as being safe." }
+    riskFlavor: "Whatever's pulling air through that seam hasn't gotten a taste yet. Holding still isn't the same as being safe." },
+
+  // The Gilded Ossuary was added to ZONES after this table was written and
+  // went a long while with no scoped entries of its own, drawing only the 12
+  // generics. These three restore the per-zone trio and hold the deliberate
+  // 13/13/13 lore/boon/dilemma split that keeps ~2/3 of encounters harmless.
+  { id: "ossuary_they_put_them_back", kind: "lore", zoneId: "gilded_ossuary", title: "They Put Them Back",
+    prose: "The hand you stripped on Tuesday is wearing its rings again. Not similar rings — the same three, one of them still carrying the notch your knife left working it over the knuckle. Nothing in the chamber has been disturbed, the silt is undisturbed, and the water has not moved. The crews down here have a rule about it: take what you like, but never take the same thing twice, because the second time is the time something notices it is being asked for." },
+  { id: "ossuary_kings_own_hand", kind: "boon", zoneId: "gilded_ossuary", title: "The King's Own Hand",
+    prose: "A sarcophagus lid has slipped a finger's width off true, and in the gap a hand rests palm-up, holding something out. Not clutching it — offering it, arranged that way by somebody, a very long time ago, for somebody. You are the somebody who turned up. The fingers close, unhurried and without malice, about a second after you lift it clear.",
+    reward: { type: "item" } },
+  { id: "ossuary_sealed_from_inside", kind: "dilemma", zoneId: "gilded_ossuary", title: "Sealed From The Inside",
+    prose: "This one was closed properly — pinned at all four corners, the way the wealthy ones are. The difference is that the fittings are on the wrong face of the lid, countersunk and turned down from within, by someone lying where you are about to look. Whatever is in there did not want company, and went to the trouble of saying so in ironwork.",
+    safeLabel: "Leave a share and move on", riskLabel: "Work the pins out",
+    riskFlavor: "Four pins, turned from the inside. Whoever set them had hands, and time, and a reason." }
 ];
 
 // Reward for the risky door — flat "half an hour of this zone's output",
@@ -9079,6 +9093,21 @@ function bestiaryEntryDisplay(category, def, i){
   return { name: def.name, flavor: def.flavor || null };
 }
 
+// Where an un-chronicled ENCOUNTER can be found, for its locked card.
+// QUEST_ENCOUNTERS entries are either zone-scoped (an optional zoneId, 3 per
+// zone) or generic (no zoneId — fireQuestEncounter draws those in every
+// zone), so a generic one needs saying rather than leaving blank.
+//
+// Encounters ONLY. Every other category's locked card stays a bare "???" on
+// purpose: the World Boss ladder in particular has a hard spoiler rule that
+// unfelled names must never render anywhere. This leaks nothing — it names
+// the zone the player would go questing in, never the encounter itself.
+function bestiaryEncounterHint(def){
+  if (!def || !def.zoneId) return "Can turn up while questing in any zone.";
+  const zone = ZONES.find(z => z.id === def.zoneId);
+  return zone ? "Found while questing in " + zone.name + "." : "Found while questing.";
+}
+
 const BESTIARY_CATEGORY_LABELS = {
   zones: "Zones", encounters: "Encounters", dungeons: "Dungeons", raids: "Raids",
   bosses: "World Bosses", chapters: "Campaign Chapters", tiers: "Item Tiers"
@@ -9123,9 +9152,13 @@ function renderBestiaryPanel(){
     html += "<h4 style=\"margin-top:1.1rem; color:var(--steel);\">" + escapeHtml(BESTIARY_CATEGORY_LABELS[cat]) + " — " + seenCount + " / " + roster.length + "</h4>";
     html += "<div class=\"card-grid\">" + roster.map((def, i) => {
       if (!seen[def.id]){
+        // Encounters get a where-to-look hint (see bestiaryEncounterHint);
+        // every other category stays a bare "???" so nothing leaks ahead.
+        const hint = (cat === "encounters") ? bestiaryEncounterHint(def) : null;
         return "<div class=\"pick-card locked\">" +
           "<h4 style=\"color:var(--text-muted)\">???</h4>" +
           "<div class=\"flavor\">Not yet chronicled.</div>" +
+          (hint ? "<div class=\"zone-req\">" + escapeHtml(hint) + "</div>" : "") +
         "</div>";
       }
       const display = bestiaryEntryDisplay(cat, def, i);
