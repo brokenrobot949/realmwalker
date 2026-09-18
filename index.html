@@ -1323,7 +1323,7 @@
       <div class="codex-section"><b>The Forgotten Beyond.</b> A level-60 expedition past the seam in the world, where time does not keep step with the realm. Its length is not fixed and is not yours to choose: the span is rolled when you set out, anywhere from thirty minutes to six hours, and nothing shortens it &mdash; not haste, not a swiftness buff, not power far beyond what the place demands. XP, gold, and renown all scale with the span you drew, so a long crossing is a rich one. It yields no ordinary gear whatsoever. What it may yield is a <b>Mythic</b> weapon, a rarity above Legendary that exists nowhere else in the realm &mdash; not in any zone, dungeon, raid, chapter, or shop. The longer the rolled span, the better the odds, from 5% at the half-hour floor to a hard ceiling of 75% at six hours. An expedition that fails returns with nothing mythic, however long it was gone.</div>
       <div class="codex-section"><b>The Arena.</b> Fights resolve every 10 seconds against escalating monsters, and there is no retreat — you fight until a wound or a beating carries you out. Wins bank XP, gold, and renown, and the longer you last, the bigger the survival bonus on your spoils (up to +50%).</div>
       <div class="codex-section"><b>World Bosses.</b> A ladder of ten things the realm never managed to kill, opened only once your hero has seen the Campaign through to its last chapter. You climb it one rung at a time: only the next unbeaten name is ever shown to you, and the one after it stays nameless until the one before it falls. They yield <b>no gear and no gold whatsoever</b> &mdash; only XP and renown far beyond anything else in the realm. They are also brutally dangerous whether you win or lose: a 35% chance of injury on a kill, and 85% on a defeat. Do not expect to reach the top of the ladder. The point is how far you get, and the Hall remembers by name whoever first felled each one, across every life you live. Fell all ten and an eleventh name reveals itself &mdash; one that does not stay felled. It comes back from every kill stronger and richer than before, without end, for as many times as you're willing to face it again.</div>
-      <div class="codex-section"><b>Nemesis.</b> Every hero draws one personal rival at creation, met on the Adventure tab. It starts at the strength of a level-5 hero and grows 10% stronger every time you beat it — the longer a winning streak runs, the harder the next bout gets. A victory puts it on a 4-hour cooldown before it will face you again; a loss costs nothing but the attempt, and can be tried again at once. Rewards and the duel's length both scale with how far above or below your own strength it currently stands. The rivalry has an end: after 25 defeats it stops retreating and the next duel is the Reckoning, a final bout at far greater difficulty and reward that carries no cooldown of its own &mdash; only your own recovery decides when you try again. Win it and you're given a choice with no going back: finish the rivalry for a considerable one-off haul, or spare it for a permanent boost to every future dungeon, raid, Campaign, and Arena reward this hero ever earns. Either way, that hero's nemesis is settled for the rest of their life &mdash; one nemesis, one ending, per hero. A new life after rebirth draws a brand-new rival, starting the story over.</div>
+      <div class="codex-section"><b>Nemesis.</b> Every hero draws one personal rival at creation, met on the Adventure tab. It starts at the strength of a level-5 hero and grows roughly 17% stronger every time you beat it — the longer a winning streak runs, the harder the next bout gets. A victory puts it on a 4-hour cooldown before it will face you again; a loss costs nothing but the attempt, and can be tried again at once. Rewards and the duel's length both scale with how far above or below your own strength it currently stands. The rivalry has an end: after 15 defeats it stops retreating and the next duel is the Reckoning, a final bout at far greater difficulty and reward that carries no cooldown of its own &mdash; only your own recovery decides when you try again. Win it and you're given a choice with no going back: finish the rivalry for a considerable one-off haul, or spare it for a permanent boost to every future dungeon, raid, Campaign, and Arena reward this hero ever earns. Either way, that hero's nemesis is settled for the rest of their life &mdash; one nemesis, one ending, per hero. A new life after rebirth draws a brand-new rival, starting the story over.</div>
       <div class="codex-section"><b>Injuries &amp; Rest.</b> Injuries lock you out of adventuring at 2; rest to heal — a Short Rest (4 hours) heals one injury, a Long Rest (6 hours) heals both.</div>
       <div class="codex-section"><b>Outgrowing an expedition.</b> Once your power overwhelms a dungeon, raid, or chapter, the extra strength stops buying better odds — the danger is already as good as beaten — and starts buying speed and safety instead. A venture you have thoroughly outgrown is marched through faster and is far less likely to leave a mark on you, up to three-quarters less likely. The duration shown on each card already accounts for it. But an old road pays an old road's toll: as a place stops being able to threaten you, its spoils dwindle toward what such a place was ever worth. This turns on the danger, not on the date — an expedition that still tests you yields its full measure however far your name has travelled since, while one you can walk through in your sleep gives up only what a sleepwalk deserves. Plunder worth having is found ahead of you, never behind. The same holds for ascending a cleared dungeon or raid: its Ascended tiers pay a much richer bonus, but if your power already dwarfs even the hardest of them, that bonus fades too — ascending content you have massively outgrown is never as rewarding as it looks.</div>
       <div class="codex-section"><b>The odds of a wound.</b> A dungeon, raid, or campaign chapter carries a 10% chance of injury on success, and a steep 60% chance on failure. The Arena is gentler at first but grows crueler with every win — its injury chance climbs 3% per fight survived, and never strikes during an early run's safe fights. All these odds bend to your hero's own fortune: gear, race, class, renown, and legacy boons can all shift the chance of harm, for better or worse.</div>
@@ -4071,10 +4071,20 @@ const WORLDBOSS_INJURY_CHANCE_FAILURE = 0.85;  // vs 0.60
      nemesisDifficulty() = round(BASE * GROWTH ^ defeats)
    102 is expectedPower(level 5) under this game's anchoring model — as
    hard as a level-5 hero. Every VICTORY puts the nemesis on a 4-hour
-   cooldown (cut from 6h), after which it returns 10% stronger. A LOSS
+   cooldown (cut from 6h), after which it returns 17.2% stronger. A LOSS
    costs nothing but the attempt: no cooldown, no growth — only victories
-   escalate it. Reaching THE RECKONING at 25 defeats now costs ~100h of
-   cooldowns rather than ~150h.
+   escalate it.
+
+   GROWTH and RECKONING_DEFEATS are a MATCHED PAIR — changing one without
+   the other moves where the rivalry ends. They were re-tuned together from
+   1.10/25 to 1.172/15 to reach the SAME final power in fewer bouts:
+     102 * 1.10 ^25 = 1105  ->  Reckoning 1658   (old)
+     102 * 1.172^15 = 1103  ->  Reckoning 1655   (now)
+   i.e. 1.172 = (1105/102)^(1/15). The endpoint is preserved to within 0.2%
+   (a maxed hero still faces the Reckoning at ~41%), while the run costs
+   15 cooldowns (~60h) instead of 25 (~100h). The ramp is correspondingly
+   steeper: the old curve left the nemesis a 90%+ pushover from about the
+   third bout onward, where this one keeps it a real fight throughout.
 
    challenge = clamp(MIN, MAX, nemesisDifficulty() / power) measures how
    far above (>1) or below (<1) the hero the nemesis currently sits, and
@@ -4122,15 +4132,15 @@ const WORLDBOSS_INJURY_CHANCE_FAILURE = 0.85;  // vs 0.60
    (createNemesis via createDefaultState), same as today.
 ================================================================ */
 const NEMESIS_BASE_DIFFICULTY = 102;      // expectedPower(level 5) — see the POWER MODEL block
-const NEMESIS_GROWTH = 1.10;              // +10% per defeat
-const NEMESIS_COOLDOWN_MS = 4 * 60 * 60 * 1000; // cut from 6h; Reckoning at 25 defeats now ~100h of cooldowns, not ~150h
+const NEMESIS_GROWTH = 1.172;             // +17.2% per defeat — MATCHED to RECKONING_DEFEATS below, see POWER MODEL
+const NEMESIS_COOLDOWN_MS = 4 * 60 * 60 * 1000; // cut from 6h; Reckoning at 15 defeats costs ~60h of cooldowns
 const NEMESIS_BASE_MIN = 20;              // duel length at an even (challenge 1.0) fight
 const NEMESIS_CHALLENGE_MIN = 0.25;
 const NEMESIS_CHALLENGE_MAX = 3.0;
 const NEMESIS_REWARD_EXPONENT = 1.5;
 const NEMESIS_XP_ZONE_HOURS = 1.0;
 const NEMESIS_GOLD_ZONE_HOURS = 1.0;
-const NEMESIS_RECKONING_DEFEATS = 25;     // it stops retreating here — see THE RECKONING above
+const NEMESIS_RECKONING_DEFEATS = 15;     // it stops retreating here — MATCHED to NEMESIS_GROWTH, see THE RECKONING above
 const NEMESIS_RECKONING_SPIKE = 1.5;      // final-duel difficulty multiplier
 const NEMESIS_FINISH_HAUL_MULT = 3;       // Door A ("Finish it"): one-off haul = 3x the duel's xp/gold
 const NEMESIS_FINISH_EXTRA_DROPS = 3;     // ...plus this many extra drop rolls
@@ -5938,7 +5948,18 @@ function nemesisDisplayName(nem){
 // NEMESIS header comment. `defeats` defaults to the current nemesis's own
 // count so every call site but a migration/test one can omit it.
 function nemesisDifficulty(defeats){
-  const d = (typeof defeats === "number") ? defeats : ((state.nemesis && state.nemesis.defeats) || 0);
+  const raw = (typeof defeats === "number") ? defeats : ((state.nemesis && state.nemesis.defeats) || 0);
+  // CLAMPED at the Reckoning threshold so the endpoint is STRUCTURAL rather
+  // than merely incidental. A Reckoning win doesn't increment defeats, so in
+  // ordinary play the count never exceeds the threshold anyway — but it can
+  // arrive there two other ways, and both used to produce a wildly
+  // over-scaled final duel:
+  //   • a save made before GROWTH/RECKONING_DEFEATS were re-tuned 1.10/25 ->
+  //     1.172/15, stranded mid-run at (say) 24 defeats: without this clamp
+  //     that hero's Reckoning came out at d6902 instead of d1655 — a 5%
+  //     fight, soft-locking the ending they were one bout away from
+  //   • a hand-edited or corrupted save
+  const d = Math.max(0, Math.min(NEMESIS_RECKONING_DEFEATS, raw));
   return Math.round(NEMESIS_BASE_DIFFICULTY * Math.pow(NEMESIS_GROWTH, d));
 }
 
