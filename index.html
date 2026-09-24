@@ -267,6 +267,15 @@
     transition:width 0.4s ease;
     box-shadow:0 0 8px rgba(212,175,55,0.4);
   }
+  /* Slim variant for the mobile collapsed-hero-panel summary line. */
+  .xp-bar-bg.thin{ height:4px; border-radius:6px; }
+
+  /* Collapsible hero panel (mobile only — see @media max-width:640px
+     below for the rules that actually show/hide anything). Hidden here
+     by default so desktop always renders the full panel regardless of
+     the stored uiPrefs.heroCollapsed preference, per spec. */
+  .hero-collapse-toggle{ display:none; }
+  .hero-collapse-xp{ display:none; }
 
   .settings-corner{ position:relative; display:flex; gap:0.5rem; }
   .gear-btn{
@@ -491,6 +500,18 @@
 
   /* ================= ADVENTURE SUB-TABS ================= */
   .adv-subtab-row{ display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.9rem; border-bottom:1px solid var(--panel-border); padding-bottom:0.6rem; }
+  /* Mobile groups .adv-subtab-row's buttons into two labelled tile grids
+     (Progression / Challenges — see @media max-width:640px below). On
+     desktop these wrappers must be invisible to layout: display:contents
+     flattens .subtab-group/.subtab-group-tiles so their button children
+     become direct flex items of .adv-subtab-row, reproducing today's
+     single wrapping row of pills exactly. The group label only exists
+     for the mobile grid and stays out of the desktop flow entirely. */
+  .subtab-group, .subtab-group-tiles{ display:contents; }
+  .subtab-group-label{ display:none; }
+  /* World Bosses swaps to the shorter "Bosses" label only inside the
+     mobile tile (see Change 1's trap note) — full text is the desktop default. */
+  .subtab-label-short{ display:none; }
   .subtab-btn{
     position:relative;
     background:var(--bg-1); border:1px solid var(--panel-border); color:var(--parchment-dim);
@@ -721,17 +742,68 @@
     }
     .tab-btn .icon{ margin-right:0; }
 
-    /* -- adventure/character subtabs: horizontal scroll instead of wrap -- */
-    .adv-subtab-row, .char-subtab-row{
-      flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;
-      scrollbar-width:none; -ms-overflow-style:none;
-      padding-bottom:0.6rem;
+    /* -- adventure/character subtabs: icon-over-label tile grids instead of
+       a hidden-scrollbar strip (the old overflow-x:auto + scrollbar:none
+       combo left 5 of 7 Adventure subtabs permanently off-screen with no
+       visual cue they existed). Mirrors .tab-btn's mobile idiom above:
+       column layout, icon above a small uppercase label, >=44px tap target. */
+    .adv-subtab-row{ display:flex; flex-direction:column; gap:0.7rem; }
+    .subtab-group{ display:block; }
+    .subtab-group-label{
+      display:block; font-family:Georgia,'Times New Roman',serif; font-size:0.72rem;
+      letter-spacing:0.08em; text-transform:uppercase; color:var(--parchment-dim);
+      margin-bottom:0.35rem;
     }
-    .adv-subtab-row::-webkit-scrollbar, .char-subtab-row::-webkit-scrollbar{ display:none; }
+    .subtab-group-tiles, .char-subtab-row{
+      display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:0.4rem;
+    }
+    .subtab-label-full{ display:none; }
+    .subtab-label-short{ display:inline; }
     .subtab-btn{
-      flex:0 0 auto; white-space:nowrap;
-      min-height:40px; padding:0.5rem 1.1rem; font-size:0.85rem;
+      flex:none; width:100%; box-sizing:border-box;
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.25rem;
+      min-height:48px; padding:0.35rem 0.2rem;
+      font-size:0.68rem; text-transform:uppercase; letter-spacing:0.02em;
+      white-space:normal; text-align:center; border-radius:8px;
     }
+    .subtab-btn .icon{ margin-right:0; }
+    /* The has-activity/has-pending dot is position:absolute against
+       .subtab-btn (position:relative, unchanged), so it still lands at
+       the tile's top-right corner regardless of the icon-over-label
+       column layout — this is one of the main wins here, since a dot on
+       an off-screen scrolled-away button used to be invisible. */
+
+    /* -- collapsible hero panel: default collapsed, tap to expand -- */
+    .hero-collapse-toggle{
+      display:flex; align-items:center; justify-content:space-between; gap:0.6rem; width:100%;
+      background:none; border:0; padding:0; margin:0 0 0.5rem; font:inherit; color:inherit;
+      text-align:left; cursor:pointer;
+    }
+    .hero-collapse-toggle:focus-visible{ outline:1px solid var(--gold-bright); outline-offset:3px; border-radius:4px; }
+    .hero-collapse-left{ display:flex; align-items:baseline; gap:0.55rem; flex-wrap:wrap; min-width:0; }
+    .hero-collapse-caret{
+      display:inline-block; margin-right:0.3rem; color:var(--parchment-dim);
+      font-size:0.65rem; flex:0 0 auto; transform:rotate(90deg);
+    }
+    .hero-panel.collapsed .hero-collapse-caret{ transform:rotate(0deg); }
+    .hero-collapse-name{
+      font-family:Georgia,'Times New Roman',serif; color:var(--gold-bright); font-size:0.95rem;
+      overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:8.5rem;
+    }
+    .hero-collapse-stat{ font-size:0.8rem; color:var(--parchment-dim); white-space:nowrap; }
+    .hero-collapse-stat b{ color:var(--gold); }
+    .hero-collapse-injury{
+      font-size:0.8rem; font-weight:bold; display:inline-flex; align-items:center;
+      gap:0.2rem; white-space:nowrap;
+    }
+    .hero-collapse-injury.injury-ok{ color:var(--green); }
+    .hero-collapse-injury.injury-warn{ color:var(--gold); }
+    .hero-collapse-injury.injury-bad{ color:var(--red); }
+    .hero-collapse-xp{ display:block; margin:-0.15rem 0 0.6rem; }
+    /* Expanded state shows the full xp-bar-wrap inside .hero-full-body
+       instead — no need for both at once. */
+    .hero-panel:not(.collapsed) .hero-collapse-xp{ display:none; }
+    .hero-panel.collapsed .hero-full-body{ display:none; }
 
     /* -- hero stat row: wrap with tighter row-gap -- */
     .stat-row{ gap:0.4rem 1.2rem; }
@@ -814,33 +886,53 @@
 
     <div class="top-bar">
       <div class="hero-panel panel">
-        <div class="hero-title-row">
-          <span class="hero-crest-holder" id="hero-crest-holder"></span>
-          <h2 id="hero-name-display"></h2>
-          <span class="hero-sub" id="hero-sub-display"></span>
+        <!-- Mobile-only collapse toggle: hidden outright on desktop (see
+             .hero-collapse-toggle{display:none} base rule), so it never
+             touches desktop layout or behavior. Default collapsed state
+             and the aria-expanded value are both set by JS from the
+             persisted uiPrefs.heroCollapsed on boot — see the wiring
+             block near the decree-banner toggle. -->
+        <button type="button" class="hero-collapse-toggle" id="hero-collapse-toggle" aria-expanded="false" aria-controls="hero-full-body">
+          <span class="hero-collapse-left">
+            <span class="hero-collapse-caret" aria-hidden="true">&#9656;</span>
+            <span class="hero-collapse-name" id="hero-collapse-name"></span>
+            <span class="hero-collapse-stat" id="hero-collapse-level"></span>
+            <span class="hero-collapse-stat" id="hero-collapse-power"></span>
+            <span class="hero-collapse-injury" id="hero-collapse-injury"></span>
+          </span>
+        </button>
+        <div class="hero-collapse-xp" id="hero-collapse-xp">
+          <div class="xp-bar-bg thin"><div class="xp-bar-fill" id="hero-collapse-xp-fill" style="width:0%"></div></div>
         </div>
-        <div class="stat-row">
-          <span class="stat">Level <b id="hero-level"></b></span>
-          <span class="stat" data-icon="gold" data-icon-size="14">Gold <b id="hero-gold"></b></span>
-          <span class="stat" data-icon="dust" data-icon-size="14">Dust <b id="hero-dust"></b></span>
-          <span class="stat" data-icon="power" data-icon-size="14">Power <b id="hero-power"></b></span>
-        </div>
-        <div class="xp-bar-wrap">
-          <div class="xp-bar-label">
-            <span>Experience</span>
-            <span id="xp-label"></span>
+        <div class="hero-full-body" id="hero-full-body">
+          <div class="hero-title-row">
+            <span class="hero-crest-holder" id="hero-crest-holder"></span>
+            <h2 id="hero-name-display"></h2>
+            <span class="hero-sub" id="hero-sub-display"></span>
           </div>
-          <div class="xp-bar-bg"><div class="xp-bar-fill" id="xp-bar-fill" style="width:0%"></div></div>
-        </div>
-        <div class="injury-row">
-          <span class="injury-status" id="injury-status"></span>
-          <div class="rest-actions" id="rest-actions">
-            <button class="btn small secondary" id="rest-short-btn" data-icon="rest" data-icon-size="15">Short Rest (4h)</button>
-            <button class="btn small secondary" id="rest-long-btn" data-icon="rest" data-icon-size="15">Long Rest (6h)</button>
+          <div class="stat-row">
+            <span class="stat">Level <b id="hero-level"></b></span>
+            <span class="stat" data-icon="gold" data-icon-size="14">Gold <b id="hero-gold"></b></span>
+            <span class="stat" data-icon="dust" data-icon-size="14">Dust <b id="hero-dust"></b></span>
+            <span class="stat" data-icon="power" data-icon-size="14">Power <b id="hero-power"></b></span>
           </div>
-          <div class="rest-countdown hidden" id="rest-countdown"></div>
+          <div class="xp-bar-wrap">
+            <div class="xp-bar-label">
+              <span>Experience</span>
+              <span id="xp-label"></span>
+            </div>
+            <div class="xp-bar-bg"><div class="xp-bar-fill" id="xp-bar-fill" style="width:0%"></div></div>
+          </div>
+          <div class="injury-row">
+            <span class="injury-status" id="injury-status"></span>
+            <div class="rest-actions" id="rest-actions">
+              <button class="btn small secondary" id="rest-short-btn" data-icon="rest" data-icon-size="15">Short Rest (4h)</button>
+              <button class="btn small secondary" id="rest-long-btn" data-icon="rest" data-icon-size="15">Long Rest (6h)</button>
+            </div>
+            <div class="rest-countdown hidden" id="rest-countdown"></div>
+          </div>
+          <div class="buff-row" id="buff-row"></div>
         </div>
-        <div class="buff-row" id="buff-row"></div>
       </div>
 
       <div class="settings-corner">
@@ -879,13 +971,28 @@
             <button class="btn secondary small" id="stop-training-btn">Stop questing</button>
           </div>
           <div class="adv-subtab-row">
-            <button class="subtab-btn active" data-subtab="training" data-icon="quests" data-icon-size="15">Quests</button>
-            <button class="subtab-btn" data-subtab="dungeons" data-icon="dungeons" data-icon-size="15">Dungeons</button>
-            <button class="subtab-btn" data-subtab="raids" data-icon="raids" data-icon-size="15">Raids</button>
-            <button class="subtab-btn" data-subtab="quests" data-icon="campaign" data-icon-size="15">Campaign</button>
-            <button class="subtab-btn" data-subtab="arena" data-icon="arena" data-icon-size="15">Arena</button>
-            <button class="subtab-btn" data-subtab="nemesis" data-icon="nemesis" data-icon-size="15">Nemesis</button>
-            <button class="subtab-btn" data-subtab="worldboss" data-icon="worldboss" data-icon-size="15">World Bosses</button>
+            <!-- Grouped into Progression/Challenges for the mobile tile grid only —
+                 .subtab-group/.subtab-group-tiles are display:contents on desktop,
+                 so this nesting is invisible there (still a flat flex row of pills)
+                 and every existing .adv-subtab-row .subtab-btn query below still
+                 matches these buttons regardless of nesting depth. -->
+            <div class="subtab-group" data-subtab-group="progression">
+              <div class="subtab-group-label">Progression</div>
+              <div class="subtab-group-tiles">
+                <button class="subtab-btn active" data-subtab="training" data-icon="quests" data-icon-size="15">Quests</button>
+                <button class="subtab-btn" data-subtab="dungeons" data-icon="dungeons" data-icon-size="15">Dungeons</button>
+                <button class="subtab-btn" data-subtab="raids" data-icon="raids" data-icon-size="15">Raids</button>
+                <button class="subtab-btn" data-subtab="quests" data-icon="campaign" data-icon-size="15">Campaign</button>
+              </div>
+            </div>
+            <div class="subtab-group" data-subtab-group="challenges">
+              <div class="subtab-group-label">Challenges</div>
+              <div class="subtab-group-tiles">
+                <button class="subtab-btn" data-subtab="arena" data-icon="arena" data-icon-size="15">Arena</button>
+                <button class="subtab-btn" data-subtab="nemesis" data-icon="nemesis" data-icon-size="15">Nemesis</button>
+                <button class="subtab-btn" data-subtab="worldboss" data-icon="worldboss" data-icon-size="15"><span class="subtab-label-full">World Bosses</span><span class="subtab-label-short">Bosses</span></button>
+              </div>
+            </div>
           </div>
           <div id="adv-training" class="adv-subpanel">
             <h3 data-icon="quests" data-icon-size="18">Questing Zones</h3>
@@ -1314,7 +1421,7 @@
   <div id="codex-modal" class="modal-overlay hidden">
     <div class="modal-box">
       <h3>Realm Codex</h3>
-      <div class="codex-section"><b>The basics.</b> You guide a single hero through an idle realm — progress continues while the game is closed.</div>
+      <div class="codex-section"><b>The basics.</b> You guide a single hero through an idle realm — progress continues while the game is closed. On a phone, tap the hero panel at the top to collapse it to a single summary line, freeing up room to see more of the Adventure list at a glance.</div>
       <div class="codex-section"><b>Your class.</b> At creation you choose one of three: the Squire (martial, sword &amp; shield), the Scout (martial, bow &amp; daggers), or the Apprentice (magical, staff &amp; wand). Each grants a small permanent bonus, and decides which evolutions open to you later.</div>
       <div class="codex-section"><b>Class evolutions.</b> At level 20 your class evolves into one of two paths, and at level 40 it evolves again into one of two further paths — eighteen evolved classes in all, six at the second tier and twelve at the third. Each evolution grants a stronger permanent bonus that replaces your previous class bonus rather than stacking, plus a new weapon and a new repertoire of skills. The choice is permanent for that hero.</div>
       <div class="codex-section"><b>Skills.</b> At levels 10, 25, 30, 45, 50, and 55 you choose a new skill from your current class's repertoire — six in all. Each is triggered from the Skills tab for a temporary effect, or an instant one like mending an injury, then goes on cooldown; the stronger the skill, the longer the wait before it's ready again.</div>
@@ -7468,13 +7575,25 @@ function renderHeroPanel(){
   document.getElementById("hero-level").textContent = hero.level;
   document.getElementById("hero-gold").textContent = fmtNumber(hero.gold);
   document.getElementById("hero-dust").textContent = fmtNumber(hero.dust || 0);
-  document.getElementById("hero-power").textContent = computePower(hero);
+  const power = computePower(hero);
+  document.getElementById("hero-power").textContent = power;
 
   const needed = xpNeeded(hero.level);
   const pct = Math.max(0, Math.min(100, (hero.xp / needed) * 100));
   document.getElementById("xp-bar-fill").style.width = pct.toFixed(1) + "%";
   document.getElementById("xp-label").textContent =
     fmtNumber(hero.xp) + " / " + fmtNumber(needed) + " (" + pct.toFixed(1) + "%)";
+
+  // Mobile collapsed-panel summary mirror — plain unconditional writes,
+  // not gated by contentRenderSigs, so this always reflects the same
+  // live level/power/xp as the full panel above on every render() pass
+  // (elements are display:none outside @media max-width:640px, but kept
+  // in sync regardless so there's nothing to catch up on when the
+  // viewport crosses the breakpoint or the panel gets expanded).
+  document.getElementById("hero-collapse-name").textContent = heroDisplayName(hero);
+  document.getElementById("hero-collapse-level").innerHTML = "Lv <b>" + hero.level + "</b>";
+  document.getElementById("hero-collapse-power").innerHTML = icon("power", 12) + "<b>" + power + "</b>";
+  document.getElementById("hero-collapse-xp-fill").style.width = pct.toFixed(1) + "%";
 
   const activityEl = document.getElementById("activity-value");
   const trackerEl = document.getElementById("activity-tracker");
@@ -7520,6 +7639,14 @@ function renderInjuryStatus(){
   // Wounded states lead with the bandaged-heart glyph; Unhurt stays text-only.
   statusEl.innerHTML = (hero.injuries > 0 ? icon("injury", 15) : "") + escapeHtml(label);
   statusEl.className = "injury-status " + cls;
+
+  // Collapsed-panel mirror — injuries lock the hero out of activities, so
+  // they must stay clearly visible (icon + the same color the full panel
+  // uses, not color alone) even when the panel is collapsed down to one line.
+  const collapseInjuryEl = document.getElementById("hero-collapse-injury");
+  const collapseLabel = hero.injuries > 0 ? (hero.injuries + " injur" + (hero.injuries === 1 ? "y" : "ies")) : "Unhurt";
+  collapseInjuryEl.innerHTML = (hero.injuries > 0 ? icon("injury", 12) : "") + escapeHtml(collapseLabel);
+  collapseInjuryEl.className = "hero-collapse-injury " + cls;
 
   const resting = state.activity.type === "rest";
   const busy = isBusyWithContent();
@@ -11189,6 +11316,29 @@ function wireGameScreen(){
       const collapsed = !decreeBanner.classList.contains("collapsed");
       applyDecreeCollapsed(collapsed);
       saveDecreeCollapsed(collapsed);
+    });
+  }
+
+  // Hero panel collapse — same toggle idiom as the decree banner above,
+  // but this preference lives in uiPrefs (realmwalker_ui), not its own
+  // key, per spec. The .collapsed class and CSS it drives only do
+  // anything inside @media max-width:640px, so applying it here is safe
+  // on desktop: desktop always renders the full panel regardless of the
+  // stored value. Default is collapsed (uiPrefs.heroCollapsed unset ->
+  // treated as true) so the Adventure picker lands on a phone's first screen.
+  const heroPanelEl = document.querySelector(".hero-panel");
+  const heroCollapseToggle = document.getElementById("hero-collapse-toggle");
+  if (heroPanelEl && heroCollapseToggle){
+    const applyHeroCollapsed = (collapsed) => {
+      heroPanelEl.classList.toggle("collapsed", collapsed);
+      heroCollapseToggle.setAttribute("aria-expanded", collapsed ? "false" : "true");
+    };
+    applyHeroCollapsed(uiPrefs.heroCollapsed !== false);
+    heroCollapseToggle.addEventListener("click", () => {
+      const collapsed = !heroPanelEl.classList.contains("collapsed");
+      applyHeroCollapsed(collapsed);
+      uiPrefs.heroCollapsed = collapsed;
+      saveUiPrefs();
     });
   }
 
